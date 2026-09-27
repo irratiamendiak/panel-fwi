@@ -347,7 +347,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     </div>
   </section>
 
-  <section id="meteoSec" data-lang="auto" aria-label="Eguraldi-iragarpena / Previsión meteorológica">
+  <section id="meteoSec" data-lang="auto" aria-label="Eguraldi-iragarpena / Previsión meteorológica" hidden>
     <h2 id="mtTit">Eguraldi-iragarpena</h2>
     <div class="card mt">
       <div class="mt-top">
@@ -1559,17 +1559,18 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     return METEO.cargando;
   }
   function meteoElegir(nombre, desplazar){
-    if (!nombre || /gipuzkoa/i.test(nombre)) return;
-    METEO.nombre = nombre;
+    // GIPUZKOA (edo estaziorik ez): atala ezkutatu egiten da; eguraldi-iragarpena estazio edo eremu bakoitzeko da
+    METEO.nombre = (!nombre || /gipuzkoa/i.test(nombre)) ? null : nombre;
     meteoRender();
-    if (desplazar) $('#meteoSec').scrollIntoView({behavior: 'smooth', block: 'start'});
+    if (desplazar && METEO.nombre) $('#meteoSec').scrollIntoView({behavior: 'smooth', block: 'start'});
   }
   function meteoRender(){
+    $('#meteoSec').hidden = !METEO.nombre;
+    if (!METEO.nombre) return;
     $('#mtTit').textContent = Tm('Eguraldi-iragarpena', 'Previsión meteorológica');
     $('#mtSelLbl').textContent = Tm('Estazioa / eremua:', 'Estación / zona:');
     if (!METEO.datos){ $('#mtDias').innerHTML = `<p class="nota">${Tm('Iragarpena kargatzen…','Cargando la previsión…')}</p>`; return; }
     const pts = METEO.puntos;
-    if (!METEO.nombre){ const e = DATA && DATA.estaciones[sel]; METEO.nombre = e && !e.resumen ? e.nombre : pts[0].estacion; }
     let k = pts.findIndex(p => p.estacion === METEO.nombre); if (k < 0) k = 0;
     const p = pts[k], d = METEO.datos[k];
     const sl = $('#mtSel');
@@ -1630,6 +1631,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   }
   function meteoIniciar(){
     $('#mtSel').addEventListener('change', e => meteoElegir(e.target.value));
+    const e0 = DATA && DATA.estaciones[sel]; METEO.nombre = e0 && !e0.resumen ? e0.nombre : null;
     meteoRender();
     meteoCargar().then(meteoRender).catch(() => { $('#mtDias').innerHTML = `<p class="nota">${Tm('Ezin izan da eguraldi-iragarpena kargatu (Open-Meteo). Saiatu berriro geroago.','No se ha podido cargar la previsión meteorológica (Open-Meteo). Inténtalo más tarde.')}</p>`; });
     setInterval(() => meteoCargar().then(meteoRender).catch(() => {}), 3600e3);
@@ -1799,7 +1801,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     if (!b || !DATA) return;
     sel = +b.dataset.st; todo = false;
     render();
-    if (!DATA.estaciones[sel].resumen) meteoElegir(DATA.estaciones[sel].nombre);
+    meteoElegir(DATA.estaciones[sel].resumen ? null : DATA.estaciones[sel].nombre);
   });
   $('#todo').addEventListener('click', () => { todo = !todo; detalle(); });
 })();
