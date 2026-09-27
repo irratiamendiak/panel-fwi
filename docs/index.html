@@ -128,6 +128,14 @@ a.ir-met{color:var(--accent);font-weight:600;white-space:nowrap}
 .mt-dia .sur{margin-top:6px;font-size:12px;background:#f7dfa8;border-radius:999px;padding:2px 6px;font-weight:700;color:#7a4a00}
 .mt-leg{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin:2px 0}
 .mt-leg i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px}
+.mt-tres{overflow-x:auto;margin:0 0 14px}
+.mt-tres table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+.mt-tres caption{text-align:left;font-weight:700;padding:0 0 6px}
+.mt-tres th,.mt-tres td{padding:5px 6px;text-align:center;border-bottom:1px solid var(--line)}
+.mt-tres th{background:var(--field);font-weight:600}
+.mt-tres td:first-child,.mt-tres th:first-child{text-align:left;color:var(--muted);white-space:nowrap}
+.mt-tres .pasado{opacity:.4}.mt-tres .ic{font-size:22px}.mt-tres .seco{color:#b5480f;font-weight:700}
+.mt-tres .t{color:#c0392b;font-weight:700}.mt-tres .fl{display:inline-block;font-weight:700}.mt-tres .fl.sur{color:#d9382b}
 .mt-graf{overflow-x:auto}.mt-graf svg{display:block;min-width:720px}
 @media (max-width:760px){.mt-dias{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .verif h3{margin:0 0 4px;font-size:17px}
@@ -356,6 +364,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         <label><span id="mtSelLbl">Estazioa / eremua:</span> <select id="mtSel"></select></label>
       </div>
       <div class="mt-dias" id="mtDias"><p class="nota">…</p></div>
+      <div class="mt-tres" id="mtTres"></div>
       <div class="mt-leg" id="mtLeg"></div>
       <div class="mt-graf" id="mtGraf"></div>
       <p class="nota" id="mtNota"></p>
@@ -1587,17 +1596,43 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     $('#mtDias').innerHTML = dl.time.map((f, i) => {
       const [ic, txt] = WMO(dl.weather_code[i]), dir = dl.wind_direction_10m_dominant[i], hr = dl.relative_humidity_2m_min ? dl.relative_humidity_2m_min[i] : null;
       const sur = esSurDir(dir) && dl.wind_speed_10m_max[i] >= 3;
-      return `<div class="mt-dia${i === METEO.dia ? ' hoy' : ''}" data-dia="${i}" role="button" tabindex="0" aria-pressed="${i === METEO.dia}" title="${txt} · ${Tm('sakatu orduz orduko iragarpena ikusteko','pulsa para ver la previsión hora a hora')}"><div class="dn">${nomDia(f, i)}</div><div class="ic">${ic}</div>
+      return `<div class="mt-dia${i === METEO.dia ? ' hoy' : ''}" data-dia="${i}" role="button" tabindex="0" aria-pressed="${i === METEO.dia}" title="${txt} · ${Tm('sakatu egun horren xehetasuna ikusteko','pulsa para ver el detalle de ese día')}"><div class="dn">${nomDia(f, i)}</div><div class="ic">${ic}</div>
         <div><span class="tx">${fmt(dl.temperature_2m_max[i],0)}°</span> <span class="tn">${fmt(dl.temperature_2m_min[i],0)}°</span></div>
         <div class="ln">💧 ${fmt(dl.precipitation_sum[i])} mm${dl.precipitation_probability_max[i] != null ? ' <small>(% '+dl.precipitation_probability_max[i]+')</small>' : ''}</div>
         ${hr != null ? `<div class="ln">${Tm('HR min.','HR mín.')} <b class="${hr < 45 ? 'seco' : ''}">% ${fmt(hr,0)}</b></div>` : ''}
         <div class="ln"><span class="fl" style="transform:rotate(${(dir||0)+180}deg)">↑</span> ${fmt(dl.wind_speed_10m_max[i],0)} km/h <small>${sector8(dir)} · ${Tm('boladak','rachas')} ${fmt(dl.wind_gusts_10m_max[i],0)}</small></div>
         ${sur ? `<div class="sur">💨 ${Tm('Hego haizea','Viento sur')}</div>` : ''}</div>`;
     }).join('');
+    // --- aukeratutako egunaren xehetasuna, 3 orduro
+    {
+      const h3 = d.hourly, fd = dl.time[Math.min(METEO.dia, dl.time.length - 1)];
+      const ahoraIso = hoyISO() + 'T' + String(Math.floor(minutosEuskadi() / 60)).padStart(2,'0') + ':00';   // Euskadiko ordua
+      const tramos = [0,3,6,9,12,15,18,21].map(hh => {
+        const t0 = fd + 'T' + String(hh).padStart(2,'0') + ':00', k = h3.time.indexOf(t0);
+        if (k < 0) return null;
+        const ks = [k, k+1, k+2].filter(n => n < h3.time.length);
+        return {hh, k, pasado: fd === hoy && h3.time[Math.min(k+2, h3.time.length-1)] < ahoraIso,
+                lluvia: ks.reduce((a, n) => a + (h3.precipitation[n] || 0), 0),
+                racha: Math.max(...ks.map(n => h3.wind_gusts_10m[n] || 0))};
+      }).filter(Boolean);
+      const cls = tr => tr.pasado ? ' class="pasado"' : '';
+      const fila = (tit, fn) => `<tr><td>${tit}</td>${tramos.map(tr => `<td${cls(tr)}>${fn(tr)}</td>`).join('')}</tr>`;
+      const nomSel = nomDia(fd, Math.round((fecha(fd) - fecha(hoy)) / 864e5));
+      $('#mtTres').innerHTML = !tramos.length ? '' : `<table><caption>${nomSel}: ${Tm('3 orduro','cada 3 horas')}</caption>
+        <thead><tr><th></th>${tramos.map(tr => `<th${cls(tr)}>${String(tr.hh).padStart(2,'0')}:00</th>`).join('')}</tr></thead><tbody>`+
+        fila(Tm('Eguraldia','Tiempo'), tr => { const [ic, tx] = WMO(h3.weather_code[tr.k]); return `<span class="ic" title="${tx}">${ic}</span>`; })+
+        fila(Tm('Tenperatura','Temperatura'), tr => `<span class="t">${fmt(h3.temperature_2m[tr.k])} °C</span>`)+
+        fila(Tm('Hezetasuna','Humedad'), tr => { const v = h3.relative_humidity_2m[tr.k]; return `<span class="${v < 45 ? 'seco' : ''}">% ${fmt(v,0)}</span>`; })+
+        fila(Tm('Euria (3 h)','Lluvia (3 h)'), tr => `${fmt(tr.lluvia)} mm`)+
+        fila(Tm('Haizea','Viento'), tr => { const dir = h3.wind_direction_10m[tr.k], v = h3.wind_speed_10m[tr.k], sur = esSurDir(dir) && v >= 3;
+          return `<span class="fl${sur ? ' sur' : ''}" style="transform:rotate(${Math.round((dir||0)+180)}deg)">↑</span> ${fmt(v,0)} km/h <small>${sector8(dir)}</small>`; })+
+        fila(Tm('Boladak','Rachas'), tr => `${fmt(tr.racha,0)} km/h`)+
+        '</tbody></table>';
+    }
     $('#mtLeg').innerHTML = `<span><i style="background:#c0392b"></i>${Tm('Tenperatura','Temperatura')}</span><span><i style="height:0;border-top:2px dashed #2c6fb3"></i>${Tm('Hezetasuna','Humedad')}</span>`+
       `<span><i style="background:#5aa0e6;height:10px;width:10px"></i>${Tm('Euria (mm/h)','Lluvia (mm/h)')}</span><span>➤ ${Tm('Haizearen norabidea eta abiadura, km/h (gorriz: hegoaldekoa)','Dirección y velocidad del viento, km/h (en rojo: del sur)')}</span>`;
     // --- 72 ordu
-    const h = d.hourly, ahora = new Date(), iso0 = isoDe(ahora) + 'T' + String(ahora.getHours()).padStart(2,'0') + ':00';
+    const h = d.hourly, iso0 = hoyISO() + 'T' + String(Math.floor(minutosEuskadi() / 60)).padStart(2,'0') + ':00';   // Euskadiko ordua
     const diaSel = dl.time[Math.min(METEO.dia, dl.time.length - 1)];
     const desde = diaSel === hoy ? iso0 : diaSel + 'T00:00';        // gaur: orain arte; beste egun bat: 00:00etatik
     let i0 = h.time.findIndex(t => t >= desde); if (i0 < 0) i0 = 0;
@@ -1629,8 +1664,8 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     g += `<text x="${ml-14}" y="${base+22}" text-anchor="end" fill="#555">${Tm('haizea','viento')}</text><text x="${ml-14}" y="${base+38}" text-anchor="end" fill="#555">km/h</text></svg>`;
     $('#mtGraf').innerHTML = g;
     const act = new Date(METEO.cuando);
-    $('#mtNota').innerHTML = Tm(`Aukeratutako egunetik aurrerako 72 orduak, orduz ordu (itzalean, gaueko orduak). Sakatu egun bat bere orduak ikusteko; mapan eremu bat sakatuz gero, haren iragarpena ikusten da. Iragarpena: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), eskatua ${fmtOrdua(act)}etan.`,
-      `72 horas a partir del día elegido, hora a hora (sombreadas, las horas nocturnas). Pulsa un día para ver sus horas; pulsando una zona en el mapa se ve su previsión. Previsión: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), consultada a las ${fmtOrdua(act)}.`);
+    $('#mtNota').innerHTML = Tm(`Aukeratutako egunetik aurrerako 72 orduak, orduz ordu (itzalean, gaueko orduak). Sakatu egun bat bere xehetasuna (3 orduro) eta orduak ikusteko; mapan eremu bat sakatuz gero, haren iragarpena ikusten da. Iragarpena: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), eskatua ${fmtOrdua(act)}etan.`,
+      `72 horas a partir del día elegido, hora a hora (sombreadas, las horas nocturnas). Pulsa un día para ver su detalle (cada 3 horas) y sus horas; pulsando una zona en el mapa se ve su previsión. Previsión: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), consultada a las ${fmtOrdua(act)}.`);
   }
   function meteoIniciar(){
     $('#mtSel').addEventListener('change', e => { seleccionarEstacion(e.target.value); meteoElegir(e.target.value); });
