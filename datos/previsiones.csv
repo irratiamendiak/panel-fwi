@@ -227,3 +227,51 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg
 2026-09-28,Zizurkil,2026-09-29,1,15.4,8.5,23.3,Moderado,0,3.13,Alto
 2026-09-28,Zizurkil,2026-09-30,2,31.0,21.6,44.5,Alto,0,6.6,Muy alto
 2026-09-28,Zizurkil,2026-10-01,3,0.0,0.0,3.9,Muy bajo,0,0.08,Muy bajo
+2026-09-29,Altzola,2026-09-29,0,10.6,7.0,15.6,Bajo,1,2.11,Alto
+2026-09-29,Altzola,2026-09-30,1,20.5,13.6,28.3,Moderado,0,4.23,Muy alto
+2026-09-29,Altzola,2026-10-01,2,0.2,0.0,3.8,Muy bajo,0,0.1,Muy bajo
+2026-09-29,Altzola,2026-10-02,3,1.6,0.3,5.5,Muy bajo,0,0.25,Muy bajo
+2026-09-29,Arrasate,2026-09-29,0,38.5,35.2,43.8,Muy alto,1,8.36,Extremo
+2026-09-29,Arrasate,2026-09-30,1,31.9,22.2,44.3,Alto,0,6.83,Muy alto
+2026-09-29,Arrasate,2026-10-01,2,0.8,0.0,4.4,Muy bajo,0,0.16,Muy bajo
+2026-09-29,Arrasate,2026-10-02,3,7.2,0.8,13.0,Bajo,0,1.44,Moderado
+2026-09-29,Berastegi,2026-09-29,0,25.7,17.5,40.6,Alto,1,5.4,Muy alto
+2026-09-29,Berastegi,2026-09-30,1,22.3,12.6,34.7,Alto,0,4.64,Muy alto
+2026-09-29,Berastegi,2026-10-01,2,0.4,0.0,4.0,Muy bajo,0,0.12,Muy bajo
+2026-09-29,Berastegi,2026-10-02,3,5.3,0.0,11.1,Bajo,0,1.07,Moderado
+2026-09-29,Bidania,2026-09-29,0,13.2,8.5,19.8,Moderado,1,2.66,Alto
+2026-09-29,Bidania,2026-09-30,1,20.6,13.8,28.5,Moderado,0,4.26,Muy alto
+2026-09-29,Bidania,2026-10-01,2,0.5,0.0,4.1,Muy bajo,0,0.13,Muy bajo
+2026-09-29,Bidania,2026-10-02,3,3.8,2.5,7.7,Muy bajo,0,0.79,Bajo
+2026-09-29,Gipuzkoa,2026-09-29,0,23.7,17.7,33.9,Alto,1,5.0,Muy alto
+2026-09-29,Gipuzkoa,2026-09-30,1,25.1,16.5,35.8,Alto,0,5.2,Muy alto
+2026-09-29,Gipuzkoa,2026-10-01,2,0.4,0.0,4.0,Muy bajo,0,0.1,Muy bajo
+2026-09-29,Gipuzkoa,2026-10-02,3,4.3,0.8,9.1,Muy bajo,0,0.9,Bajo
+2026-09-29,Miramon,2026-09-29,0,32.0,23.8,46.8,Alto,1,6.84,Muy alto
+2026-09-29,Miramon,2026-09-30,1,28.8,19.1,41.1,Alto,0,6.1,Muy alto
+2026-09-29,Miramon,2026-10-01,2,0.2,0.0,3.8,Muy bajo,0,0.1,Muy bajo
+2026-09-29,Miramon,2026-10-02,3,1.2,0.0,5.1,Muy bajo,0,0.21,Muy bajo
+2026-09-29,Mutriku,2026-09-29,0,14.3,9.6,20.9,Moderado,1,2.89,Alto
+2026-09-29,Mutriku,2026-09-30,1,8.2,3.4,13.7,Bajo,0,1.01,Moderado
+2026-09-29,Mutriku,2026-10-01,2,0.1,0.0,3.7,Muy bajo,0,0.09,Muy bajo
+2026-09-29,Mutriku,2026-10-02,3,1.0,0.0,4.8,Muy bajo,0,0.18,Muy bajo
+2026-09-29,Ordizia,2026-09-29,0,24.4,16.2,39.2,Alto,1,5.1,Muy alto
+2026-09-29,Ordizia,2026-09-30,1,31.0,21.3,43.3,Alto,0,6.61,Muy alto
+2026-09-29,Ordizia,2026-10-01,2,0.3,0.0,3.9,Muy bajo,0,0.11,Muy bajo
+2026-09-29,Ordizia,2026-10-02,3,7.5,1.1,13.3,Bajo,0,1.49,Moderado
+2026-09-29,Pasaia,2026-09-29,0,28.4,20.1,43.2,Alto,1,6.0,Muy alto
+2026-09-29,Pasaia,2026-09-30,1,30.5,20.8,42.8,Alto,0,6.49,Muy alto
+2026-09-29,Pasaia,2026-10-01,2,0.2,0.0,3.8,Muy bajo,0,0.1,Muy bajo
+2026-09-29,Pasaia,2026-10-02,3,2.6,1.2,6.5,Muy bajo,0,0.56,Bajo
+2026-09-29,Zarautz,2026-09-29,0,15.9,11.2,22.5,Moderado,1,3.24,Alto
+2026-09-29,Zarautz,2026-09-30,1,9.1,4.3,14.7,Bajo,0,1.13,Moderado
+2026-09-29,Zarautz,2026-10-01,2,0.2,0.0,3.8,Muy bajo,0,0.1,Muy bajo
+2026-09-29,Zarautz,2026-10-02,3,0.7,0.0,4.6,Muy bajo,0,0.16,Muy bajo
+2026-09-29,Zegama,2026-09-29,0,26.8,18.6,41.7,Alto,1,5.65,Muy alto
+2026-09-29,Zegama,2026-09-30,1,25.6,15.9,37.9,Alto,0,5.37,Muy alto
+2026-09-29,Zegama,2026-10-01,2,0.3,0.0,3.9,Muy bajo,0,0.12,Muy bajo
+2026-09-29,Zegama,2026-10-02,3,6.4,0.0,12.2,Bajo,0,1.28,Moderado
+2026-09-29,Zizurkil,2026-09-29,0,16.9,12.2,23.5,Moderado,1,3.45,Alto
+2026-09-29,Zizurkil,2026-09-30,1,25.9,16.1,38.2,Alto,0,5.43,Muy alto
+2026-09-29,Zizurkil,2026-10-01,2,0.2,0.0,3.8,Muy bajo,0,0.1,Muy bajo
+2026-09-29,Zizurkil,2026-10-02,3,2.8,1.5,6.7,Muy bajo,0,0.61,Bajo
