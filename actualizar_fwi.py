@@ -512,13 +512,19 @@ def descargar(cli, sensores, datos, dia_fin, primera, hora, max_dias, alm=None, 
 
 # ---------------------------------------------------------------- salida
 def lluvia_con_observada(alm, cod, sens, horas):
-    """Lluvia de las 24 h previas a las 12:00 de hoy mezclando lo ya medido con la previsión.
+    """Lluvia de la ventana de 24 h de una estimación, mezclando lo ya medido con la previsión.
 
     Cada hora completa (6 lecturas de 10 minutos) usa lo medido por la estación; las horas aún sin
-    medir usan la previsión. Devuelve (mm, horas_medidas)."""
+    medir usan la previsión. Las horas que todavía no han terminado (con 10 min de margen para que
+    Euskalmet publique) no se piden a la API. Devuelve (mm, horas_medidas)."""
     total, medidas = 0.0, 0
+    limite = datetime.now(ZONA).replace(tzinfo=None) - timedelta(minutes=10)
     for ts, prev_mm in horas:
-        b = datetime.strptime(ts, "%Y-%m-%dT%H:%M") - timedelta(hours=1)   # hora oficial (Open-Meteo)
+        fin = datetime.strptime(ts, "%Y-%m-%dT%H:%M")                     # fin de la hora (hora oficial)
+        if fin > limite:                                                   # aún no ha terminado: previsión
+            total += prev_mm
+            continue
+        b = fin - timedelta(hours=1)
         du, hu, _ = ew.a_utc(b.date(), b.hour)                              # Euskalmet va en UTC
         d = alm.hora(cod, "lluvia", sens, du, hu)
         trozos = [d.get((hu, m)) for m in range(0, 60, 10)]
@@ -672,7 +678,9 @@ def crear_previsor(alm, sensores, hora):
                     cod_lluvia, sens_lluvia = CODIGO_HIBRIDO[nombre], sensores.get(nombre)
                 else:                                  # Mutriku u otro punto sin estación real: no hay nada que mezclar
                     cod_lluvia, sens_lluvia = None, None
-                if j == 0 and cod_lluvia and sens_lluvia and alm.cli.errores_conexion == 0 and alm.cli.limite_agotado < 2:   # hoy, antes de las 12:00: la lluvia ya caída se toma de la estación
+                # Estimación del día en curso: la lluvia ya caída desde la hora del dato de ayer se toma de la
+                # estación (horas completas) y el resto, de la previsión. Los días siguientes, solo previsión.
+                if j == 0 and cod_lluvia and sens_lluvia and alm.cli.errores_conexion == 0 and alm.cli.limite_agotado < 2:
                     try:
                         P, medidas = lluvia_con_observada(alm, cod_lluvia, sens_lluvia, horas)
                     except (RuntimeError, KeyError):
