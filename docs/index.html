@@ -136,6 +136,14 @@ a.ir-met{color:var(--accent);font-weight:600;white-space:nowrap}
 .mt-tres td:first-child,.mt-tres th:first-child{text-align:left;color:var(--muted);white-space:nowrap}
 .mt-tres .pasado{opacity:.4}.mt-tres .ic{font-size:22px}.mt-tres .seco{color:#b5480f;font-weight:700}
 .mt-tres .t{color:#c0392b;font-weight:700}.mt-tres .fl{display:inline-block;font-weight:700}.mt-tres .fl.sur{color:#d9382b}
+.mt-gip .mt-ctl{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 8px}
+.mt-gip .grp{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.mt-gip button{font:inherit;font-size:13px;padding:4px 9px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.mt-gip button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.mt-gip button.pasado{opacity:.45}
+.mt-gip .mapa-gip{max-width:760px;margin:0 auto}.mt-gip .mapa-gip svg{width:100%;height:auto;display:block}
+.mt-gip .esc{display:flex;align-items:center;gap:6px;justify-content:center;font-size:12px;margin:4px 0}
+.mt-gip .esc .bar{width:220px;height:10px;border-radius:5px}
 .mt-graf{overflow-x:auto}.mt-graf svg{display:block;min-width:720px}
 @media (max-width:760px){.mt-dias{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .verif h3{margin:0 0 4px;font-size:17px}
@@ -356,7 +364,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     </div>
   </section>
 
-  <section id="meteoSec" data-lang="auto" aria-label="Eguraldi-iragarpena / Previsión meteorológica" hidden>
+  <section id="meteoSec" data-lang="auto" aria-label="Eguraldi-iragarpena / Previsión meteorológica">
     <h2 id="mtTit">Eguraldi-iragarpena</h2>
     <div class="card mt">
       <div class="mt-top">
@@ -364,6 +372,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         <label><span id="mtSelLbl">Estazioa / eremua:</span> <select id="mtSel"></select></label>
       </div>
       <div class="mt-dias" id="mtDias"><p class="nota">…</p></div>
+      <div class="mt-gip" id="mtGip" hidden></div>
       <div class="mt-tres" id="mtTres"></div>
       <div class="mt-leg" id="mtLeg"></div>
       <div class="mt-graf" id="mtGraf"></div>
@@ -522,7 +531,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     <details class="met">
       <summary>Hiru eguneko iragarpena</summary>
       <p>Benetako FWIaren modu berean kalkulatzen da, baina <b>Open-Meteoren</b> eguzki-eguerdiko iragarpen meteorologikoarekin, estazio bakoitzaren joera historikoarekin zuzendua, eta neurtutako azken eguneko kodeetatik abiatuta. Balioaren azpiko tarteak adierazten du 2025 eta 2026ko kasuen % 80 inguruan non erori zen benetako balioa. Probetan, akatsa egun batera FWIren 3 puntu ingurukoa izan zen, eta hiru egunera 4 ingurukoa; egun muturrekoenetan gutxietsi ohi du. Egun bakoitzeko iragarpena gordetzen da, gero neurtutakoarekin alderatu eta fidagarritasuna egiaztatzeko.</p>
-      <p><b>Eguraldi-iragarpena.</b> Indizeen iragarpenaren azpian, estazio edo eragin-eremu bakoitzeko 7 eguneko eguraldi-iragarpena dago (tenperatura, euria, hezetasun minimoa eta haizea, hego haizea nabarmenduta) eta hurrengo 72 orduetako grafikoa. Open-Meteo-ri zuzenean eskatzen zaio, estazioaren puntuan eta altueran, eta orduro eguneratzen da. Mapan eremu bat sakatuz gero, haren iragarpena irekitzen da.</p>
+      <p><b>Eguraldi-iragarpena.</b> Indizeen iragarpenaren azpian, estazio edo eragin-eremu bakoitzeko 7 eguneko eguraldi-iragarpena dago (tenperatura, euria, hezetasun minimoa eta haizea, hego haizea nabarmenduta) eta hurrengo 72 orduetako grafikoa. Open-Meteo-ri zuzenean eskatzen zaio, estazioaren puntuan eta altueran, eta orduro eguneratzen da. Mapan eremu bat sakatuz gero, haren iragarpena irekitzen da. GIPUZKOA hautatuta, lurralde osoko laburpena eta mapa bat ageri dira: eremu bakoitza aukeratutako aldagaiaren kolorez (tenperatura, hezetasuna, euria edo haizea), egun bakoitzeko 3 orduro, 7 egunera arte.</p>
     </details>
 
     <details class="met">
@@ -664,7 +673,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     <details class="met">
       <summary>Previsión a tres días</summary>
       <p>Se calcula igual que el FWI real, pero con la previsión meteorológica de <b>Open-Meteo</b> para el mediodía solar, corregida con el comportamiento histórico de cada estación y partiendo de los códigos del último día medido. El rango bajo cada valor indica dónde cayó el valor real en alrededor del 80 % de los casos de 2025 y 2026. En las pruebas, el error fue de unos 3 puntos de FWI a un día y de unos 4 a tres días; en los días más extremos suele quedarse corta. La previsión de cada día se guarda, para compararla después con lo medido y comprobar su fiabilidad.</p>
-      <p><b>Previsión meteorológica.</b> Bajo la previsión de los índices hay una previsión meteorológica a 7 días para cada estación o zona de influencia (temperatura, lluvia, humedad mínima y viento, destacando el viento sur) y un gráfico de las próximas 72 horas. Se pide directamente a Open-Meteo, en el punto y la altitud de la estación, y se actualiza cada hora. Pulsando una zona en el mapa se abre su previsión.</p>
+      <p><b>Previsión meteorológica.</b> Bajo la previsión de los índices hay una previsión meteorológica a 7 días para cada estación o zona de influencia (temperatura, lluvia, humedad mínima y viento, destacando el viento sur) y un gráfico de las próximas 72 horas. Se pide directamente a Open-Meteo, en el punto y la altitud de la estación, y se actualiza cada hora. Pulsando una zona en el mapa se abre su previsión. Con GIPUZKOA seleccionada aparecen un resumen de todo el territorio y un mapa con cada zona coloreada según la variable elegida (temperatura, humedad, lluvia o viento), cada 3 horas y hasta 7 días.</p>
     </details>
 
     <details class="met">
@@ -1545,7 +1554,8 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   }
 
   // ---- Eguraldi-iragarpena (Open-Meteo), estazio edo eragin-eremu bakoitzeko. Zuzenean webgunetik eskatzen da.
-  const METEO = {datos: null, puntos: null, cuando: 0, nombre: null, cargando: null, dia: 0};   // dia: aukeratutako eguna (0 = gaur)
+  const METEO = {datos: null, puntos: null, cuando: 0, nombre: null, cargando: null, dia: 0,   // dia: aukeratutako eguna (0 = gaur)
+                 geo: null, slot: null, vari: 'T', anim: null};                                  // Gipuzkoako mapa: 3 orduko tartea eta aldagaia
   const Tm = (eu, es) => window.LANG === 'es' ? es : eu;
   const WMO = c => c === 0 ? ['☀️', Tm('Oskarbi','Despejado')] : c <= 2 ? ['🌤️', Tm('Hodei gutxi','Poco nuboso')] : c === 3 ? ['☁️', Tm('Estalita','Cubierto')]
     : c <= 48 ? ['🌫️', Tm('Lainoa','Niebla')] : c <= 57 ? ['🌦️', Tm('Zirimiria','Llovizna')] : c <= 67 ? ['🌧️', Tm('Euria','Lluvia')]
@@ -1555,6 +1565,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     if (METEO.cargando) return METEO.cargando;
     if (!forzar && METEO.datos && Date.now() - METEO.cuando < 3600e3) return Promise.resolve();
     METEO.cargando = cargarGeo().then(geo => {
+      METEO.geo = geo;
       const pts = geo.zonas.features.map(f => f.properties).filter(p => p.lat != null)
         .sort((a, b) => a.estacion.localeCompare(b.estacion));
       const q = new URLSearchParams({
@@ -1570,21 +1581,25 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   }
   function meteoElegir(nombre, desplazar){
     // GIPUZKOA (edo estaziorik ez): atala ezkutatu egiten da; eguraldi-iragarpena estazio edo eremu bakoitzeko da
-    METEO.nombre = (!nombre || /gipuzkoa/i.test(nombre)) ? null : nombre;
+    METEO.nombre = (!nombre || /gipuzkoa/i.test(nombre)) ? 'GIPUZKOA' : nombre;
     meteoRender();
     if (desplazar && METEO.nombre) $('#meteoSec').scrollIntoView({behavior: 'smooth', block: 'start'});
   }
   function meteoRender(){
-    $('#meteoSec').hidden = !METEO.nombre;
-    if (!METEO.nombre) return;
+    $('#meteoSec').hidden = false;
+    if (!METEO.nombre) METEO.nombre = 'GIPUZKOA';
     $('#mtTit').textContent = Tm('Eguraldi-iragarpena', 'Previsión meteorológica');
     $('#mtSelLbl').textContent = Tm('Estazioa / eremua:', 'Estación / zona:');
     if (!METEO.datos){ $('#mtDias').innerHTML = `<p class="nota">${Tm('Iragarpena kargatzen…','Cargando la previsión…')}</p>`; return; }
     const pts = METEO.puntos;
+    const sl = $('#mtSel');
+    if (sl.options.length !== pts.length + 1) sl.innerHTML = '<option value="GIPUZKOA">GIPUZKOA</option>' + pts.map(x => `<option value="${x.estacion}">${x.estacion}</option>`).join('');
+    const gip = METEO.nombre === 'GIPUZKOA';
+    ['mtTres','mtLeg','mtGraf'].forEach(id => $('#'+id).hidden = gip); $('#mtGip').hidden = !gip;
+    if (gip){ sl.value = 'GIPUZKOA'; meteoRenderGip(); return; }
+    if (METEO.anim){ clearInterval(METEO.anim); METEO.anim = null; }
     let k = pts.findIndex(p => p.estacion === METEO.nombre); if (k < 0) k = 0;
     const p = pts[k], d = METEO.datos[k];
-    const sl = $('#mtSel');
-    if (sl.options.length !== pts.length) sl.innerHTML = pts.map(x => `<option value="${x.estacion}">${x.estacion}</option>`).join('');
     sl.value = p.estacion;
     $('#mtCab').innerHTML = `<b>${p.estacion}</b> <span class="nota">· ${p.alt != null ? p.alt + ' m · ' : ''}${
       p.modelo ? Tm('ereduaren puntua (🖥️), eragin-eremu osorako','punto del modelo (🖥️), para toda su zona')
@@ -1667,19 +1682,128 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     $('#mtNota').innerHTML = Tm(`Aukeratutako egunetik aurrerako 72 orduak, orduz ordu (itzalean, gaueko orduak). Sakatu egun bat bere xehetasuna (3 orduro) eta orduak ikusteko; mapan eremu bat sakatuz gero, haren iragarpena ikusten da. Iragarpena: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), eskatua ${fmtOrdua(act)}etan.`,
       `72 horas a partir del día elegido, hora a hora (sombreadas, las horas nocturnas). Pulsa un día para ver su detalle (cada 3 horas) y sus horas; pulsando una zona en el mapa se ve su previsión. Previsión: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), consultada a las ${fmtOrdua(act)}.`);
   }
+  // ---- GIPUZKOA: egun bakoitzeko laburpena eta lurraldeko mapa, 3 orduro
+  const RAMPAS = {
+    T: [[0,[59,111,182]],[10,[127,183,217]],[17,[242,230,160]],[24,[240,160,75]],[32,[217,56,43]]],
+    H: [[20,[217,96,43]],[45,[242,196,107]],[70,[207,227,239]],[100,[59,120,182]]],
+    R: [[0,[244,246,248]],[0.5,[207,227,245]],[2,[134,184,232]],[5,[63,134,214]],[12,[31,79,158]]],
+    W: [[0,[244,246,248]],[10,[215,234,223]],[20,[159,208,176]],[35,[240,192,64]],[55,[217,56,43]]]
+  };
+  function colorRampa(r, v){
+    if (v == null || isNaN(v)) return '#c9d0cc';
+    if (v <= r[0][0]) return `rgb(${r[0][1]})`;
+    for (let i = 1; i < r.length; i++) if (v <= r[i][0]){
+      const [a, ca] = r[i-1], [b, cb] = r[i], t = (v - a) / (b - a);
+      return `rgb(${ca.map((c, k) => Math.round(c + t * (cb[k] - c))).join(',')})`;
+    }
+    return `rgb(${r[r.length-1][1]})`;
+  }
+  const VARS = () => ({T: [Tm('Tenperatura','Temperatura'), '°C'], H: [Tm('Hezetasuna','Humedad'), '%'], R: [Tm('Euria (3 h)','Lluvia (3 h)'), 'mm'], W: [Tm('Haizea','Viento'), 'km/h']});
+  function meteoRenderGip(){
+    const pts = METEO.puntos, D = METEO.datos, hoy = hoyISO();
+    const dias = D[0].daily.time;
+    $('#mtCab').innerHTML = `<b>GIPUZKOA</b> <span class="nota">· ${Tm('lurralde osoa: estazio eta eragin-eremu guztien iragarpena','todo el territorio: previsión de todas las estaciones y zonas de influencia')}</span>`;
+    // --- egunak: lurraldeko laburpena
+    const nomD = (f, i) => i === 0 && f === hoy ? Tm('Gaur','Hoy') : (i === 1 ? Tm('Bihar','Mañana')
+      : (() => { const x = fecha(f); return (window.LANG === 'es' ? DIA_ES[x.getDay()].replace('.', '') : EGUN_LAB[x.getDay()]).replace(/^./, c => c.toUpperCase()) + ' ' + x.getDate(); })());
+    $('#mtDias').innerHTML = dias.map((f, i) => {
+      const col = key => D.map(d => d.daily[key] ? d.daily[key][i] : null).filter(v => v != null);
+      const code = Math.max(...col('weather_code')), [ic, txt] = WMO(code);
+      const tmax = Math.max(...col('temperature_2m_max')), tmin = Math.min(...col('temperature_2m_min'));
+      const ll = Math.max(...col('precipitation_sum')), pr = Math.max(...col('precipitation_probability_max'));
+      const hrs = col('relative_humidity_2m_min'), hr = hrs.length ? Math.min(...hrs) : null;
+      const w = Math.max(...col('wind_speed_10m_max')), g = Math.max(...col('wind_gusts_10m_max'));
+      const nSur = D.filter(d => esSurDir(d.daily.wind_direction_10m_dominant[i]) && d.daily.wind_speed_10m_max[i] >= 3).length;
+      return `<div class="mt-dia${i === METEO.dia ? ' hoy' : ''}" data-dia="${i}" role="button" tabindex="0" aria-pressed="${i === METEO.dia}" title="${txt} · ${Tm('sakatu egun horren mapa ikusteko','pulsa para ver el mapa de ese día')}">
+        <div class="dn">${nomD(f, i)}</div><div class="ic">${ic}</div>
+        <div><span class="tx">${fmt(tmax,0)}°</span> <span class="tn">${fmt(tmin,0)}°</span></div>
+        <div class="ln">💧 ${Tm('gehienez','hasta')} ${fmt(ll)} mm${pr > -1 ? ' <small>(% '+pr+')</small>' : ''}</div>
+        ${hr != null ? `<div class="ln">${Tm('HR min.','HR mín.')} <b class="${hr < 45 ? 'seco' : ''}">% ${fmt(hr,0)}</b></div>` : ''}
+        <div class="ln">${Tm('Haizea','Viento')} ${fmt(w,0)} km/h <small>${Tm('boladak','rachas')} ${fmt(g,0)}</small></div>
+        ${nSur ? `<div class="sur">💨 ${Tm('Hego haizea','Viento sur')}: ${nSur} ${Tm('eremu','zonas')}</div>` : ''}</div>`;
+    }).join('');
+    // --- 3 orduko tartea
+    const fd = dias[Math.min(METEO.dia, dias.length - 1)];
+    const horaE = Math.floor(minutosEuskadi() / 60);
+    if (METEO.slot == null) METEO.slot = fd === hoy ? Math.min(7, Math.floor(horaE / 3)) : 4;
+    const hh = METEO.slot * 3, t0 = fd + 'T' + String(hh).padStart(2,'0') + ':00';
+    const V = VARS();
+    const val = (d, k) => {
+      const h = d.hourly, ks = [k, k+1, k+2].filter(n => n < h.time.length);
+      return {T: h.temperature_2m[k], H: h.relative_humidity_2m[k], R: ks.reduce((a, n) => a + (h.precipitation[n] || 0), 0),
+              W: h.wind_speed_10m[k], dir: h.wind_direction_10m[k], g: Math.max(...ks.map(n => h.wind_gusts_10m[n] || 0)), code: h.weather_code[k]};
+    };
+    const valores = {};
+    pts.forEach((p, i) => { const k = D[i].hourly.time.indexOf(t0); if (k >= 0) valores[p.estacion] = val(D[i], k); });
+    // --- mapa (zonak aukeratutako aldagaiaren kolorez, eta estazio bakoitzean ikonoa, balioa eta haizea)
+    const geo = METEO.geo, anill = g => !g ? [] : (g.type === 'Polygon' ? g.coordinates : g.coordinates.flat());
+    const todos = geo.contorno.features.flatMap(f => anill(f.geometry)).flat();
+    let x0 = 99, x1 = -99, y0 = 99, y1 = -99;
+    todos.forEach(([x, y]) => { x0 = Math.min(x0,x); x1 = Math.max(x1,x); y0 = Math.min(y0,y); y1 = Math.max(y1,y); });
+    const kx = Math.cos((y0+y1)/2*Math.PI/180), W = 760, esc = W/((x1-x0)*kx), H = Math.round((y1-y0)*esc);
+    const P = ([x, y]) => [(x-x0)*kx*esc, (y1-y)*esc];
+    const cam = g => anill(g).map(a => 'M' + a.map(q => P(q).map(v => v.toFixed(1)).join(',')).join('L') + 'Z').join('');
+    let m = `<svg viewBox="-8 -8 ${W+16} ${H+16}" role="img" aria-label="${Tm('Gipuzkoako eguraldi-mapa','Mapa del tiempo de Gipuzkoa')}">`;
+    geo.zonas.features.forEach(f => {
+      const v = valores[f.properties.estacion];
+      m += `<path d="${cam(f.geometry)}" fill="${colorRampa(RAMPAS[METEO.vari], v ? v[METEO.vari] : null)}" stroke="#fff" stroke-width="1.2"><title>${f.properties.estacion}</title></path>`;
+    });
+    geo.contorno.features.forEach(f => m += `<path d="${cam(f.geometry)}" fill="none" stroke="#14231c" stroke-width="1.6"/>`);
+    geo.zonas.features.forEach(f => {
+      const pr = f.properties, v = valores[pr.estacion]; if (!v || pr.lat == null) return;
+      const [cx, cy] = P([pr.lon, pr.lat]), [ic] = WMO(v.code), sur = esSurDir(v.dir) && v.W >= 3;
+      const txt = METEO.vari === 'T' ? fmt(v.T) + '°' : METEO.vari === 'H' ? '% ' + fmt(v.H, 0) : METEO.vari === 'R' ? fmt(v.R) + ' mm' : fmt(v.W, 0) + ' km/h';
+      m += `<g transform="translate(${cx.toFixed(1)},${cy.toFixed(1)})" style="cursor:pointer" data-est="${pr.estacion}">
+        <rect x="-38" y="-24" width="76" height="40" rx="9" fill="#fff" fill-opacity=".92" stroke="#14231c" stroke-width=".8"/>
+        <text x="-24" y="2" font-size="18" text-anchor="middle">${ic}</text>
+        <text x="12" y="-6" font-size="12" font-weight="700" text-anchor="middle" fill="#14231c">${txt}</text>
+        <g transform="translate(12,7) rotate(${Math.round((v.dir || 0) + 180)})"><path d="M0,-7 L3.5,3.5 L0,1 L-3.5,3.5Z" fill="${sur ? '#d9382b' : '#14231c'}"/></g>
+        <text x="0" y="29" font-size="10.5" text-anchor="middle" fill="#14231c" stroke="#fff" stroke-width="3" paint-order="stroke">${pr.estacion}</text>
+        <title>${pr.estacion}: ${fmt(v.T)} °C · % ${fmt(v.H,0)} · ${fmt(v.R)} mm · ${fmt(v.W,0)} km/h ${sector8(v.dir)} (${Tm('boladak','rachas')} ${fmt(v.g,0)})</title></g>`;
+    });
+    m += '</svg>';
+    const r = RAMPAS[METEO.vari], grad = `linear-gradient(90deg, ${r.map(([v, c]) => `rgb(${c}) ${Math.round(100*(v - r[0][0])/(r[r.length-1][0] - r[0][0]))}%`).join(', ')})`;
+    const ahoraIso = hoy + 'T' + String(horaE).padStart(2,'0') + ':00';
+    $('#mtGip').innerHTML = `
+      <div class="mt-ctl">
+        <div class="grp" role="group" aria-label="${Tm('Ordua','Hora')}"><b>${nomD(fd, Math.round((fecha(fd) - fecha(hoy)) / 864e5))}:</b>
+          ${[0,1,2,3,4,5,6,7].map(i => { const t = fd + 'T' + String(i*3).padStart(2,'0') + ':00', pas = fd === hoy && t < ahoraIso.slice(0,11) + String(Math.floor(horaE/3)*3).padStart(2,'0') + ':00';
+            return `<button type="button" data-slot="${i}" aria-pressed="${i === METEO.slot}"${pas ? ' class="pasado"' : ''}>${String(i*3).padStart(2,'0')}:00</button>`; }).join('')}
+          <button type="button" data-play="1" title="${Tm('Animazioa','Animación')}">${METEO.anim ? '⏸' : '▶'}</button></div>
+        <div class="grp" role="group" aria-label="${Tm('Aldagaia','Variable')}">${Object.entries(V).map(([k, [n]]) => `<button type="button" data-var="${k}" aria-pressed="${k === METEO.vari}">${n}</button>`).join('')}</div>
+      </div>
+      <div class="mapa-gip">${m}</div>
+      <div class="esc"><span>${fmt(r[0][0],0)} ${V[METEO.vari][1]}</span><span class="bar" style="background:${grad}"></span><span>${fmt(r[r.length-1][0],0)} ${V[METEO.vari][1]}</span>
+        <span>· ➤ ${Tm('haizearen norabidea (gorriz: hegoaldekoa)','dirección del viento (en rojo: del sur)')}</span></div>`;
+    $('#mtNota').innerHTML = Tm(`Eremu bakoitza bere estazioaren puntuko iragarpenaren kolorez (${V[METEO.vari][0].toLowerCase()}). Sakatu egun bat, ordu-tarte bat edo estazio bat (mapan) xehetasuna ikusteko. Iragarpena: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), eskatua ${fmtOrdua(new Date(METEO.cuando))}etan.`,
+      `Cada zona, con el color de la previsión en el punto de su estación (${V[METEO.vari][0].toLowerCase()}). Pulsa un día, una franja horaria o una estación (en el mapa) para ver el detalle. Previsión: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), consultada a las ${fmtOrdua(new Date(METEO.cuando))}.`);
+  }
+
   function meteoIniciar(){
+    $('#mtGip').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-slot],[data-var],[data-play],[data-est]'); if (!b) return;
+      if (b.dataset.slot != null){ METEO.slot = +b.dataset.slot; if (METEO.anim){ clearInterval(METEO.anim); METEO.anim = null; } }
+      else if (b.dataset.var){ METEO.vari = b.dataset.var; }
+      else if (b.dataset.play){
+        if (METEO.anim){ clearInterval(METEO.anim); METEO.anim = null; }
+        else METEO.anim = setInterval(() => { METEO.slot = (METEO.slot + 1) % 8; meteoRender(); }, 1300);
+      }
+      else if (b.dataset.est){ seleccionarEstacion(b.dataset.est); meteoElegir(b.dataset.est); return; }
+      meteoRender();
+    });
     $('#mtSel').addEventListener('change', e => { seleccionarEstacion(e.target.value); meteoElegir(e.target.value); });
-    const elegirDia = ev => { const c = ev.target.closest('.mt-dia'); if (!c) return; METEO.dia = +c.dataset.dia; meteoRender(); };
+    const elegirDia = ev => { const c = ev.target.closest('.mt-dia'); if (!c) return; METEO.dia = +c.dataset.dia;
+      if (!METEO.anim) METEO.slot = null; meteoRender(); };
     $('#mtDias').addEventListener('click', elegirDia);
     $('#mtDias').addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); elegirDia(ev); } });
-    const e0 = DATA && DATA.estaciones[sel]; METEO.nombre = e0 && !e0.resumen ? e0.nombre : null;
+    const e0 = DATA && DATA.estaciones[sel]; METEO.nombre = e0 && !e0.resumen ? e0.nombre : 'GIPUZKOA';
     meteoRender();
     meteoCargar().then(meteoRender).catch(() => { $('#mtDias').innerHTML = `<p class="nota">${Tm('Ezin izan da eguraldi-iragarpena kargatu (Open-Meteo). Saiatu berriro geroago.','No se ha podido cargar la previsión meteorológica (Open-Meteo). Inténtalo más tarde.')}</p>`; });
     setInterval(() => meteoCargar().then(meteoRender).catch(() => {}), 3600e3);
   }
   // estazio bat aukeratzean (iragarpenaren hautatzailea edo mapa), panel osoan hautatzen da: txartela, xehetasuna...
   function seleccionarEstacion(nombre){
-    const i = DATA ? DATA.estaciones.findIndex(e => e.nombre === nombre) : -1;
+    const i = DATA ? DATA.estaciones.findIndex(e => nombre === 'GIPUZKOA' ? e.resumen : e.nombre === nombre) : -1;
     if (i >= 0 && i !== sel){ sel = i; todo = false; render(); }
   }
   window.FWI_API_METEO = (n) => { seleccionarEstacion(n); meteoElegir(n, true); };
@@ -1847,7 +1971,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     if (!b || !DATA) return;
     sel = +b.dataset.st; todo = false;
     render();
-    meteoElegir(DATA.estaciones[sel].resumen ? null : DATA.estaciones[sel].nombre);
+    meteoElegir(DATA.estaciones[sel].resumen ? 'GIPUZKOA' : DATA.estaciones[sel].nombre);
   });
   $('#todo').addEventListener('click', () => { todo = !todo; detalle(); });
 })();
