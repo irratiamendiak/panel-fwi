@@ -328,8 +328,8 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg
 2026-10-01,Altzola,2026-10-03,2,1.9,0.7,5.5,Muy bajo,0,0.28,Muy bajo
 2026-10-01,Altzola,2026-10-04,3,0.0,0.0,3.9,Muy bajo,0,0.08,Muy bajo
 2026-10-01,Arrasate,2026-10-01,0,6.4,2.9,11.5,Bajo,1,0.8,Bajo
-2026-10-01,Arrasate,2026-10-02,1,9.4,4.5,14.9,Bajo,0,1.15,Moderado
-2026-10-01,Arrasate,2026-10-03,2,11.2,5.5,18.0,Bajo,0,1.38,Moderado
+2026-10-01,Arrasate,2026-10-02,1,6.5,1.7,12.1,Bajo,0,0.81,Bajo
+2026-10-01,Arrasate,2026-10-03,2,9.5,3.8,16.4,Bajo,0,1.18,Moderado
 2026-10-01,Arrasate,2026-10-04,3,0.0,0.0,3.9,Muy bajo,0,0.08,Muy bajo
 2026-10-01,Berastegi,2026-10-01,0,0.2,0.0,2.0,Muy bajo,1,0.1,Muy bajo
 2026-10-01,Berastegi,2026-10-02,1,0.3,0.0,3.3,Muy bajo,0,0.18,Muy bajo
@@ -340,8 +340,8 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg
 2026-10-01,Bidania,2026-10-03,2,2.0,0.7,5.6,Muy bajo,0,0.29,Muy bajo
 2026-10-01,Bidania,2026-10-04,3,0.0,0.0,3.9,Muy bajo,0,0.09,Muy bajo
 2026-10-01,Gipuzkoa,2026-10-01,0,1.0,0.3,3.3,Muy bajo,1,0.2,Muy bajo
-2026-10-01,Gipuzkoa,2026-10-02,1,2.0,0.7,5.3,Muy bajo,0,0.3,Muy bajo
-2026-10-01,Gipuzkoa,2026-10-03,2,3.4,1.6,7.5,Muy bajo,0,0.5,Muy bajo
+2026-10-01,Gipuzkoa,2026-10-02,1,1.5,0.3,4.9,Muy bajo,0,0.3,Muy bajo
+2026-10-01,Gipuzkoa,2026-10-03,2,3.2,1.4,7.3,Muy bajo,0,0.4,Muy bajo
 2026-10-01,Gipuzkoa,2026-10-04,3,0.0,0.0,3.9,Muy bajo,0,0.1,Muy bajo
 2026-10-01,Miramon,2026-10-01,0,0.3,0.0,2.2,Muy bajo,1,0.12,Muy bajo
 2026-10-01,Miramon,2026-10-02,1,0.2,0.0,3.2,Muy bajo,0,0.1,Muy bajo
