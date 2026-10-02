@@ -434,7 +434,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     <details class="met">
       <summary>🌦️ Eguraldia fitxa</summary>
       <p><b>Eguzki-eguerdiko neurketak</b>: indizeak kalkulatzeko erabiltzen diren datuak (13:00 neguan, 14:00 udan): tenperatura, hezetasuna, haizea eta haren norabidea, eta aurreko 24 orduetako euria, euririk gabeko egunekin eta hego haizearekin.</p>
-      <p><b>Eguneko laburpena</b>: egun naturalaren itxiera (00:00-24:00), estazio bakoitzeko: batez besteko tenperatura (eta maximoa eta minimoa), batez besteko hezetasuna eta haizea, batez besteko norabidea (bektorialki kalkulatua, abiaduraren arabera haztatuta) eta egun osoko euria. 10 minuturo irakurketekin kalkulatzen da, hurrengo goizean, eta gorde egiten da; "Txostenak" leihoko CSV deskargan ere badago. Altzolak ez du haize-neurgailurik, eta Mutriku eredua da: horietan ez dago dagokion daturik.</p>
+      <p><b>Eguneko laburpena</b>: egun naturalaren itxiera (00:00-24:00), estazio bakoitzeko: batez besteko tenperatura (eta maximoa eta minimoa), batez besteko hezetasuna eta haizea, batez besteko norabidea (bektorialki kalkulatua, abiaduraren arabera haztatuta) eta egun osoko euria. 10 minuturo irakurketekin kalkulatzen da, hurrengo goizean, eta gorde egiten da; "Txostenak" leihoko CSV deskargan ere badago. Mutrikun ez dago estaziorik eta Altzolak ez du haize-neurgailurik: Mutrikuko laburpen osoa eta Altzolako haizea Open-Meteo ereduaren orduroko datuekin kalkulatzen dira, puntu horien koordenatuetan (🖥️ eredua).</p>
       <p><b>Eguraldi-iragarpena</b>: GIPUZKOA osorako mapa (3 orduro) eta estazio bakoitzeko iragarpen zehatza, Open-Meteo-ren eskutik.</p>
     </details>
 
@@ -583,7 +583,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     <details class="met">
       <summary>🌦️ Pestaña de meteorología</summary>
       <p><b>Mediciones del mediodía solar</b>: los datos con los que se calculan los índices (13:00 en invierno, 14:00 en verano): temperatura, humedad, viento y su dirección, y lluvia de las 24 horas anteriores, junto con los días sin lluvia y con viento sur.</p>
-      <p><b>Resumen del día</b>: el cierre del día natural (00:00-24:00) de cada estación: temperatura media (y máxima y mínima), humedad y viento medios, dirección media (calculada vectorialmente, ponderada por la velocidad) y lluvia del día completo. Se calcula con las lecturas cada 10 minutos a la mañana siguiente y queda guardado; también se incluye en la descarga CSV de la ventana "Informes". Altzola no tiene anemómetro y Mutriku es un punto de modelo: en ellos no hay el dato correspondiente.</p>
+      <p><b>Resumen del día</b>: el cierre del día natural (00:00-24:00) de cada estación: temperatura media (y máxima y mínima), humedad y viento medios, dirección media (calculada vectorialmente, ponderada por la velocidad) y lluvia del día completo. Se calcula con las lecturas cada 10 minutos a la mañana siguiente y queda guardado; también se incluye en la descarga CSV de la ventana "Informes". En Mutriku no hay estación y Altzola no tiene anemómetro: el resumen completo de Mutriku y el viento de Altzola se calculan con los datos horarios del modelo Open-Meteo en sus coordenadas (🖥️ modelo).</p>
       <p><b>Previsión meteorológica</b>: el mapa de toda GIPUZKOA (cada 3 horas) y la previsión detallada de cada estación, de Open-Meteo.</p>
     </details>
 
@@ -1599,6 +1599,8 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
 
   // ---- Eguraldia fitxa: eguzki-eguerdiko neurketak eta egunaren itxiera (00:00-24:00)
   let LAB = null;   // data/laburpena.json: {estazioa: {data: [Tmedia, Tmax, Tmin, HRmedia, haizea, norabidea, euria]}}
+  // Euririk gabeko egunak Eguraldia fitxako eguerdiko txarteletan: ezkutatuta (kalkulua mantentzen da, historikorako)
+  const MO_DIAS_SIN_LLUVIA = false;
   function cargarLaburpena(){
     return fetch('data/laburpena.json', {cache: 'no-store'}).then(r => r.ok ? r.json() : null).then(j => { LAB = j; }).catch(() => {});
   }
@@ -1622,9 +1624,9 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         <div class="n">${est.nombre}${est.modelo ? ' 🖥️' : ''}</div>
         <div class="f">${fmtFecha(u.fecha)}${marca}</div>
         <div class="big"><span class="t">${fmt(u.T)}°</span><span class="hr${u.H < 45 ? ' seco' : ''}">% ${fmt(u.H,0)}</span></div>
-        <div class="l">${u.W != null ? flecha(u.dir, u.W) + ' ' + Tm('Haizea','Viento') + ': <b>' + fmt(u.W) + ' km/h ' + sector8(u.dir) + '</b>' + (u.dir != null ? ' (' + Math.round(u.dir) + '°)' : '') + (sur ? ' · 💨' : '') : Tm('Haizea','Viento') + ': —'}</div>
+        <div class="l">${u.W != null ? flecha(u.dir, u.W) + ' ' + Tm('Haizea','Viento') + ': <b>' + fmt(u.W) + ' km/h ' + sector8(u.dir) + '</b>' + (u.dir != null ? ' (' + Math.round(u.dir) + '°)' : '') + (sur ? ' · 💨' : '') + (est.nombre === 'Altzola' ? ' <small>· 🖥️ ' + Tm('eredua','modelo') + '</small>' : '') : Tm('Haizea','Viento') + ': —'}</div>
         <div class="l">💧 ${Tm('Euria 24 h','Lluvia 24 h')}: <b>${fmt(u.R)} mm</b></div>
-        ${sl ? `<div class="l">☀️ ${Tm('Euririk gabe','Sin lluvia')}: <b>${sl.hutsunea ? '≥ ' : ''}${sl.n} ${sl.n === 1 ? Tm('egun','día') : Tm('egun','días')}</b></div>` : ''}
+        ${MO_DIAS_SIN_LLUVIA && sl ? `<div class="l">☀️ ${Tm('Euririk gabe','Sin lluvia')}: <b>${sl.hutsunea ? '≥ ' : ''}${sl.n} ${sl.n === 1 ? Tm('egun','día') : Tm('egun','días')}</b></div>` : ''}
         ${vs ? `<div class="l">🧭 ${Tm('Hego haizea','Viento sur')}: <b>${vs.hutsunea ? '≥ ' : ''}${vs.n} ${vs.n === 1 ? Tm('egun','día') : Tm('egun','días')}</b></div>` : ''}
       </button>`;
     }).join('');
@@ -1641,10 +1643,11 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         est.modelo ? Tm('Eredua: ez dago neurketarik','Modelo: sin mediciones') : Tm('Ez dago laburpenik egun honetarako','No hay resumen para este día')}</div></button>`;
       const [tm, tx, tn, hm, wm, dm, ll] = x;
       return `<button class="mo-c" type="button" data-mt="${est.nombre}" aria-pressed="${est.nombre === marcada}">
-        <div class="n">${est.nombre}</div>
+        <div class="n">${est.nombre}${est.modelo ? ' 🖥️' : ''}</div>
+        ${est.modelo ? `<div class="f">${Tm('Open-Meteo eredua (ez dago estaziorik)','Modelo Open-Meteo (sin estación)')}</div>` : ''}
         <div class="big"><span class="t">${tm != null ? fmt(tm) + '°' : '—'}</span><span class="hr${hm != null && hm < 45 ? ' seco' : ''}">${hm != null ? '% ' + fmt(hm,0) : ''}</span></div>
         <div class="l">🌡️ ${tx != null ? Tm('Maximoa','Máxima') + ' <b>' + fmt(tx) + '°</b> · ' + Tm('minimoa','mínima') + ' <b>' + fmt(tn) + '°</b>' : ''}</div>
-        <div class="l">${wm != null ? (dm != null ? flecha(dm, wm) + ' ' : '') + Tm('Haizea','Viento') + ': <b>' + fmt(wm) + ' km/h' + (dm != null ? ' ' + sector8(dm) + '</b> (' + Math.round(dm) + '°)' : '</b>') : (est.nombre === 'Altzola' ? Tm('Haizea: ez dago neurgailurik','Viento: sin anemómetro') : Tm('Haizea','Viento') + ': —')}</div>
+        <div class="l">${wm != null ? (dm != null ? flecha(dm, wm) + ' ' : '') + Tm('Haizea','Viento') + ': <b>' + fmt(wm) + ' km/h' + (dm != null ? ' ' + sector8(dm) + '</b> (' + Math.round(dm) + '°)' : '</b>') + (est.nombre === 'Altzola' ? ' <small>· 🖥️ ' + Tm('eredua','modelo') + '</small>' : '') : (est.nombre === 'Altzola' ? Tm('Haizea: ez dago neurgailurik','Viento: sin anemómetro') : Tm('Haizea','Viento') + ': —')}</div>
         <div class="l">💧 ${Tm('Euria egunean','Lluvia del día')}: <b>${ll != null ? fmt(ll) + ' mm' : '—'}</b></div>
       </button>`;
     }).join('');
