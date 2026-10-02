@@ -863,7 +863,7 @@ def verificar_previsiones(cascadas, hoy, dias=365):
 LABURPENA = Path("datos/eguneko_laburpena.csv")          # resumen de cada día natural, por estación
 LABURPENA_WEB = Path("docs/data/laburpena.json")          # lo mismo, para la web
 LAB_CAMPOS = ["fecha", "estacion", "T_media", "T_max", "T_min", "HR_media", "viento_media_kmh",
-              "direccion_media", "lluvia_dia_mm", "lecturas_T", "lecturas_lluvia"]
+              "direccion_media", "lluvia_dia_mm", "lecturas_T", "lecturas_lluvia", "origen"]
 LAB_DIAS_ATRAS = 3        # si una mañana no se ejecutó, se recuperan hasta 3 días
 
 
@@ -915,6 +915,26 @@ def resumen_dia(alm, fuentes, dia):
     return r
 
 
+def resumen_modelo(tabla, dia):
+    """Cierre de un día natural con los datos horarios de Open-Meteo (pv.descargar_horario):
+    {'AAAA-MM-DDTHH:MM': (T, HR, viento_kmh, dirección, lluvia de la hora previa)}."""
+    horas = [tabla.get(f"{dia.isoformat()}T{h:02d}:00") for h in range(24)]
+    if any(x is None or None in x[:4] for x in horas):
+        return {}
+    T = [x[0] for x in horas]; H = [x[1] for x in horas]; W = [x[2] for x in horas]; D = [x[3] for x in horas]
+    u = sum(-w * math.sin(math.radians(d)) for w, d in zip(W, D))
+    v = sum(-w * math.cos(math.radians(d)) for w, d in zip(W, D))
+    r = {"T_media": round(sum(T) / 24, 1), "T_max": round(max(T), 1), "T_min": round(min(T), 1),
+         "HR_media": round(sum(H) / 24, 0), "viento_media_kmh": round(sum(W) / 24, 1)}
+    if abs(u) + abs(v) > 1e-9:
+        r["direccion_media"] = round(math.degrees(math.atan2(-u, -v))) % 360
+    # la lluvia de cada marca horaria es la de la hora anterior: el día va de la 01:00 a las 24:00 (00:00 del día siguiente)
+    lluvias = [tabla.get(f"{dia.isoformat()}T{h:02d}:00") for h in range(1, 24)] + [tabla.get(f"{(dia + timedelta(days=1)).isoformat()}T00:00")]
+    if all(x is not None and x[4] is not None for x in lluvias):
+        r["lluvia_dia_mm"] = round(sum(x[4] for x in lluvias), 1)
+    return r
+
+
 def actualizar_laburpena(alm, sensores, ahora, limite=None):
     """Calcula el cierre de los días naturales ya terminados que falten (hasta LAB_DIAS_ATRAS atrás),
     lo añade a datos/eguneko_laburpena.csv y publica docs/data/laburpena.json."""
@@ -947,6 +967,31 @@ def actualizar_laburpena(alm, sensores, ahora, limite=None):
                 continue          # ayer: puede que aún no esté todo publicado; se reintenta
             filas[(dia.isoformat(), nombre)] = dict(r, fecha=dia.isoformat(), estacion=nombre)
             nuevos += 1
+    # Puntos sin medición (o sin una variable): datos horarios de Open-Meteo en sus coordenadas.
+    # Mutriku: todo el cierre (no hay estación); Altzola: solo el viento (no tiene anemómetro).
+    if pv is not None:
+        for nombre, solo_viento in (("Mutriku", False), ("Altzola", True)):
+            pendientes = [ahora.date() - timedelta(days=k) for k in range(LAB_DIAS_ATRAS, 0, -1)]
+            pendientes = [d for d in pendientes if (solo_viento and (d.isoformat(), nombre) in filas and not filas[(d.isoformat(), nombre)].get("viento_media_kmh"))
+                          or (not solo_viento and (d.isoformat(), nombre) not in filas)]
+            if not pendientes or nombre not in COORD:
+                continue
+            try:
+                tabla = pv.descargar_horario(*COORD[nombre])
+            except Exception as e:
+                print(f"Cierre del día {nombre} (Open-Meteo): {e}")
+                continue
+            for d in pendientes:
+                r = resumen_modelo(tabla, d)
+                if not r:
+                    continue
+                k = (d.isoformat(), nombre)
+                if solo_viento:
+                    filas[k].update({c: r[c] for c in ("viento_media_kmh", "direccion_media") if c in r})
+                    filas[k]["origen"] = "viento:Open-Meteo"
+                else:
+                    filas[k] = dict(r, fecha=d.isoformat(), estacion=nombre, origen="Open-Meteo")
+                nuevos += 1
     if nuevos:
         LABURPENA.parent.mkdir(parents=True, exist_ok=True)
         with open(LABURPENA, "w", newline="", encoding="utf-8") as f:
