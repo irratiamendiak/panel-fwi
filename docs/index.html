@@ -1601,6 +1601,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   let LAB = null;   // data/laburpena.json: {estazioa: {data: [Tmedia, Tmax, Tmin, HRmedia, haizea, norabidea, euria]}}
   // Euririk gabeko egunak Eguraldia fitxako eguerdiko txarteletan: ezkutatuta (kalkulua mantentzen da, historikorako)
   const MO_DIAS_SIN_LLUVIA = false;
+  const MO_DIAS_VIENTO_SUR = false;   // hego haizeko egunak ere ezkutatuta (kalkulua mantentzen da)
   function cargarLaburpena(){
     return fetch('data/laburpena.json', {cache: 'no-store'}).then(r => r.ok ? r.json() : null).then(j => { LAB = j; }).catch(() => {});
   }
@@ -1627,7 +1628,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         <div class="l">${u.W != null ? flecha(u.dir, u.W) + ' ' + Tm('Haizea','Viento') + ': <b>' + fmt(u.W) + ' km/h ' + sector8(u.dir) + '</b>' + (u.dir != null ? ' (' + Math.round(u.dir) + '°)' : '') + (sur ? ' · 💨' : '') + (est.nombre === 'Altzola' ? ' <small>· 🖥️ ' + Tm('eredua','modelo') + '</small>' : '') : Tm('Haizea','Viento') + ': —'}</div>
         <div class="l">💧 ${Tm('Euria 24 h','Lluvia 24 h')}: <b>${fmt(u.R)} mm</b></div>
         ${MO_DIAS_SIN_LLUVIA && sl ? `<div class="l">☀️ ${Tm('Euririk gabe','Sin lluvia')}: <b>${sl.hutsunea ? '≥ ' : ''}${sl.n} ${sl.n === 1 ? Tm('egun','día') : Tm('egun','días')}</b></div>` : ''}
-        ${vs ? `<div class="l">🧭 ${Tm('Hego haizea','Viento sur')}: <b>${vs.hutsunea ? '≥ ' : ''}${vs.n} ${vs.n === 1 ? Tm('egun','día') : Tm('egun','días')}</b></div>` : ''}
+        ${MO_DIAS_VIENTO_SUR && vs ? `<div class="l">🧭 ${Tm('Hego haizea','Viento sur')}: <b>${vs.hutsunea ? '≥ ' : ''}${vs.n} ${vs.n === 1 ? Tm('egun','día') : Tm('egun','días')}</b></div>` : ''}
       </button>`;
     }).join('');
     // --- egunaren itxiera: aukeratutako eguna (gaur bada, oraindik amaitu gabe dagoenez, atzokoa)
