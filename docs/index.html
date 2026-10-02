@@ -1127,10 +1127,10 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       const linViento = (!est.resumen && u.W != null) ? `<span class="st-date">Haizea: ${fmt(u.W)} km/h${u.dir!=null?' ('+sector8(u.dir)+')':''}</span>` : '';
       const sl = diasSinLluvia(est, u.fecha, u);
       const linLluvia = !sl ? '' : `<span class="st-date" title="Jarraian, 24 orduko euria 1 mm-tik behera izan duten egunak">${
-        sl.n === 0 ? '🌧️ Euria azken 24 h-etan' : '☀️ Euririk gabe: <b>'+(sl.hutsunea ? '≥ ' : '')+sl.n+' egun</b>'}</span>`;
+        '☀️ Euririk gabe: <b>'+(sl.hutsunea ? '≥ ' : '')+sl.n+' egun</b>'}</span>`;
       const vs = diasVientoSur(est, u.fecha, u);
       const linSur = !vs ? '' : `<span class="st-date" title="Jarraian, datuaren orduan SE, S edo SO haizea (3 km/h gutxienez) izan duten egunak">${
-        vs.n === 0 ? '🧭 Hego haizerik ez' : '🧭 Hego haizea: <b>'+(vs.hutsunea ? '≥ ' : '')+vs.n+' egun</b>'}</span>`;
+        '🧭 Hego haizea: <b>'+(vs.hutsunea ? '≥ ' : '')+vs.n+' egun</b>'}</span>`;
       // En GIPUZKOA solo el índice: promediar temperatura, humedad o lluvia entre estaciones no aporta.
       const linDatos = est.resumen ? '' : `<span class="st-date">T ${fmt(u.T)} °C · HR % ${fmt(u.H,0)} · euria 24 h ${fmt(u.R)} mm</span>`;
       const insigniaResumen = '';
@@ -1145,7 +1145,8 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         <span class="st-date${viejo?' viejo':''}">${esISO(u.fecha)?fmtFecha(u.fecha):''}${u.calculado?' · kalkulatua':''}${u.prev?' · iragarpena':''}${viejo?' · datu berri gabe':''}</span>
         ${extra}
         ${notaCobertura}
-        
+        ${linDatos}
+        ${linViento}
         ${linLluvia}
         ${linSur}
         ${est.resumen ? '' : chipViento(u)}${chipSute}
@@ -1621,15 +1622,16 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         <div class="n">${est.nombre}${est.modelo ? ' 🖥️' : ''}</div>
         <div class="f">${fmtFecha(u.fecha)}${marca}</div>
         <div class="big"><span class="t">${fmt(u.T)}°</span><span class="hr${u.H < 45 ? ' seco' : ''}">% ${fmt(u.H,0)}</span></div>
-        <div class="l">${u.W != null ? flecha(u.dir, u.W) + ' ' + fmt(u.W) + ' km/h <b>' + sector8(u.dir) + '</b>' + (sur ? ' · 💨' : '') : '—'}</div>
+        <div class="l">${u.W != null ? flecha(u.dir, u.W) + ' ' + Tm('Haizea','Viento') + ': <b>' + fmt(u.W) + ' km/h ' + sector8(u.dir) + '</b>' + (u.dir != null ? ' (' + Math.round(u.dir) + '°)' : '') + (sur ? ' · 💨' : '') : Tm('Haizea','Viento') + ': —'}</div>
         <div class="l">💧 ${Tm('Euria 24 h','Lluvia 24 h')}: <b>${fmt(u.R)} mm</b></div>
-        ${sl ? `<div class="l">☀️ ${sl.n === 0 ? Tm('Euria azken 24 h-etan','Lluvia en las últimas 24 h') : Tm('Euririk gabe','Sin lluvia') + ': <b>' + (sl.hutsunea ? '≥ ' : '') + sl.n + ' ' + Tm('egun','días') + '</b>'}</div>` : ''}
-        ${vs ? `<div class="l">🧭 ${vs.n === 0 ? Tm('Hego haizerik ez','Sin viento sur') : Tm('Hego haizea','Viento sur') + ': <b>' + (vs.hutsunea ? '≥ ' : '') + vs.n + ' ' + Tm('egun','días') + '</b>'}</div>` : ''}
+        ${sl ? `<div class="l">☀️ ${Tm('Euririk gabe','Sin lluvia')}: <b>${sl.hutsunea ? '≥ ' : ''}${sl.n} ${sl.n === 1 ? Tm('egun','día') : Tm('egun','días')}</b></div>` : ''}
+        ${vs ? `<div class="l">🧭 ${Tm('Hego haizea','Viento sur')}: <b>${vs.hutsunea ? '≥ ' : ''}${vs.n} ${vs.n === 1 ? Tm('egun','día') : Tm('egun','días')}</b></div>` : ''}
       </button>`;
     }).join('');
     // --- egunaren itxiera: aukeratutako eguna (gaur bada, oraindik amaitu gabe dagoenez, atzokoa)
     const fc = fv >= hoy ? masDias(hoy, -1) : fv;
     $('#moCierreTit').textContent = Tm('Eguneko laburpena', 'Resumen del día') + ': ' + fmtFechaLuzea(fecha(fc));
+    $('#moMediodia').setAttribute('title', Tm('Gorriz, tenperatura; urdinez, hezetasun erlatiboa','En rojo, temperatura; en azul, humedad relativa'));
     $('#moCierreSub').textContent = Tm('Egun osoko datuak (00:00-24:00): batez besteko tenperatura (maximoa eta minimoa), hezetasuna eta haizea, batez besteko norabidea eta egun naturaleko euria. Hurrengo goizean kalkulatzen da.',
                                        'Datos del día completo (00:00-24:00): temperatura media (máxima y mínima), humedad y viento medios, dirección media y lluvia del día natural. Se calcula a la mañana siguiente.')
       + (fv >= hoy ? ' ' + Tm('Gaurkoa oraindik ez da amaitu: atzokoa erakusten da.', 'El de hoy aún no ha terminado: se muestra el de ayer.') : '');
@@ -1641,8 +1643,8 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       return `<button class="mo-c" type="button" data-mt="${est.nombre}" aria-pressed="${est.nombre === marcada}">
         <div class="n">${est.nombre}</div>
         <div class="big"><span class="t">${tm != null ? fmt(tm) + '°' : '—'}</span><span class="hr${hm != null && hm < 45 ? ' seco' : ''}">${hm != null ? '% ' + fmt(hm,0) : ''}</span></div>
-        <div class="l">${tx != null ? '↑ ' + fmt(tx) + '° · ↓ ' + fmt(tn) + '°' : ''}</div>
-        <div class="l">${wm != null ? (dm != null ? flecha(dm, wm) + ' ' : '') + fmt(wm) + ' km/h' + (dm != null ? ' <b>' + sector8(dm) + '</b>' : '') : (est.nombre === 'Altzola' ? Tm('Haizea: ez dago neurgailurik','Viento: sin anemómetro') : '—')}</div>
+        <div class="l">🌡️ ${tx != null ? Tm('Maximoa','Máxima') + ' <b>' + fmt(tx) + '°</b> · ' + Tm('minimoa','mínima') + ' <b>' + fmt(tn) + '°</b>' : ''}</div>
+        <div class="l">${wm != null ? (dm != null ? flecha(dm, wm) + ' ' : '') + Tm('Haizea','Viento') + ': <b>' + fmt(wm) + ' km/h' + (dm != null ? ' ' + sector8(dm) + '</b> (' + Math.round(dm) + '°)' : '</b>') : (est.nombre === 'Altzola' ? Tm('Haizea: ez dago neurgailurik','Viento: sin anemómetro') : Tm('Haizea','Viento') + ': —')}</div>
         <div class="l">💧 ${Tm('Euria egunean','Lluvia del día')}: <b>${ll != null ? fmt(ll) + ' mm' : '—'}</b></div>
       </button>`;
     }).join('');
