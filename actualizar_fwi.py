@@ -859,6 +859,112 @@ def verificar_previsiones(cascadas, hoy, dias=365):
     return {"emisiones": len(emisiones), "desde": min(emisiones), "hasta": max(emisiones), "grupos": grupos}
 
 
+# ---------------------------------------------------------------- cierre del día (00:00-24:00)
+LABURPENA = Path("datos/eguneko_laburpena.csv")          # resumen de cada día natural, por estación
+LABURPENA_WEB = Path("docs/data/laburpena.json")          # lo mismo, para la web
+LAB_CAMPOS = ["fecha", "estacion", "T_media", "T_max", "T_min", "HR_media", "viento_media_kmh",
+              "direccion_media", "lluvia_dia_mm", "lecturas_T", "lecturas_lluvia"]
+LAB_DIAS_ATRAS = 3        # si una mañana no se ejecutó, se recuperan hasta 3 días
+
+
+def _lecturas_dia(alm, cod, sens, var, dia):
+    """Las 144 lecturas de 10 minutos del día natural (hora oficial) de una variable: {(fecha_utc, h, m): valor}."""
+    if not sens or var not in sens:
+        return {}
+    du, hu, _ = ew.a_utc(dia, 0)
+    ini = datetime.combine(du, datetime.min.time()).replace(hour=hu)
+    out = {}
+    for h in range(24):
+        t = ini + timedelta(hours=h)
+        try:
+            d = alm.hora(cod, var, sens, t.date(), t.hour)
+        except RuntimeError:
+            continue
+        for m in range(0, 60, 10):
+            v = d.get((t.hour, m))
+            if v is not None:
+                out[(t.date(), t.hour, m)] = float(v)
+    return out
+
+
+def resumen_dia(alm, fuentes, dia):
+    """Cierre de un día natural. fuentes: {variable: (código de estación, sensores)}.
+    Medias, máximo y mínimo de temperatura, dirección media vectorial (ponderada por la velocidad) y
+    lluvia total. Un valor solo se da si hay suficientes lecturas (lluvia: 138 de 144; el resto: 100)."""
+    lec = {v: _lecturas_dia(alm, cod, sens, v, dia) for v, (cod, sens) in fuentes.items()}
+    r = {"lecturas_T": len(lec.get("temperatura", {})), "lecturas_lluvia": len(lec.get("lluvia", {}))}
+    T = list(lec.get("temperatura", {}).values())
+    if len(T) >= 100:
+        r.update(T_media=round(sum(T) / len(T), 1), T_max=round(max(T), 1), T_min=round(min(T), 1))
+    H = list(lec.get("humedad", {}).values())
+    if len(H) >= 100:
+        r["HR_media"] = round(sum(H) / len(H), 0)
+    W = lec.get("viento", {})
+    if len(W) >= 100:
+        r["viento_media_kmh"] = round(sum(W.values()) / len(W) * ew.VIENTO_FACTOR, 1)
+        D = lec.get("direccion", {})
+        comunes = [k for k in W if k in D]
+        if len(comunes) >= 100:
+            u = sum(-W[k] * math.sin(math.radians(D[k])) for k in comunes)
+            v = sum(-W[k] * math.cos(math.radians(D[k])) for k in comunes)
+            if abs(u) + abs(v) > 1e-9:
+                r["direccion_media"] = round(math.degrees(math.atan2(-u, -v))) % 360
+    R = list(lec.get("lluvia", {}).values())
+    if len(R) >= ew.LECTURAS_POR_DIA - 6:
+        r["lluvia_dia_mm"] = round(sum(R), 1)
+    return r
+
+
+def actualizar_laburpena(alm, sensores, ahora, limite=None):
+    """Calcula el cierre de los días naturales ya terminados que falten (hasta LAB_DIAS_ATRAS atrás),
+    lo añade a datos/eguneko_laburpena.csv y publica docs/data/laburpena.json."""
+    filas = {}
+    if LABURPENA.exists():
+        with open(LABURPENA, newline="", encoding="utf-8") as f:
+            for x in csv.DictReader(f):
+                filas[(x["fecha"], x["estacion"])] = x
+    fuentes = {n: {v: (c, sensores.get(c)) for v in ("temperatura", "humedad", "viento", "direccion", "lluvia")}
+               for n, c in ew.ESTACIONES.items()}
+    if zr is not None and sensores.get(zr.NOMBRE):
+        sz = sensores[zr.NOMBRE]
+        fuentes[zr.NOMBRE] = {v: (zr.ESTACION_LLUVIA if v == "lluvia" else zr.ESTACION, sz) for v in ("temperatura", "humedad", "viento", "direccion", "lluvia")}
+    if az is not None and sensores.get(az.NOMBRE):
+        fuentes[az.NOMBRE] = {v: (az.ESTACION, sensores[az.NOMBRE]) for v in ("temperatura", "humedad", "lluvia")}   # sin anemómetro
+    ayer = ahora.date() - timedelta(days=1)
+    nuevos = 0
+    for k in range(LAB_DIAS_ATRAS, 0, -1):
+        dia = ahora.date() - timedelta(days=k)
+        for nombre, fu in fuentes.items():
+            if (dia.isoformat(), nombre) in filas:
+                continue
+            if limite and time.monotonic() > limite:
+                print("Cierre del día: sin tiempo; se completará en la siguiente ejecución.")
+                break
+            r = resumen_dia(alm, fu, dia)
+            if "T_media" not in r and "lluvia_dia_mm" not in r:
+                if dia < ayer:
+                    print(f"Cierre {dia} {nombre}: sin lecturas suficientes.")
+                continue          # ayer: puede que aún no esté todo publicado; se reintenta
+            filas[(dia.isoformat(), nombre)] = dict(r, fecha=dia.isoformat(), estacion=nombre)
+            nuevos += 1
+    if nuevos:
+        LABURPENA.parent.mkdir(parents=True, exist_ok=True)
+        with open(LABURPENA, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=LAB_CAMPOS, lineterminator="\n")
+            w.writeheader()
+            for k in sorted(filas):
+                w.writerow({c: filas[k].get(c, "") for c in LAB_CAMPOS})
+        print(f"Cierre del día: {nuevos} resúmenes nuevos.")
+    # para la web: {estación: {fecha: [Tmedia, Tmax, Tmin, HRmedia, viento, dirección, lluvia]}}
+    web = {}
+    num = lambda v: None if v in ("", None) else float(v)
+    for (f_, n), x in sorted(filas.items()):
+        web.setdefault(n, {})[f_] = [num(x.get(c)) for c in ("T_media", "T_max", "T_min", "HR_media", "viento_media_kmh", "direccion_media", "lluvia_dia_mm")]
+    LABURPENA_WEB.parent.mkdir(parents=True, exist_ok=True)
+    LABURPENA_WEB.write_text(json.dumps({"campos": ["T_media", "T_max", "T_min", "HR_media", "viento_media_kmh", "direccion_media", "lluvia_dia_mm"],
+                                         "estaciones": web}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+
+
 def escribir(datos, inicial, hora, ahora, dias_json, previsor=None):
     orden = list(ew.ESTACIONES) + list(NOMBRES_EXTRA) + list(MODELO_ESTACIONES)
     filas_csv = []
@@ -1028,6 +1134,12 @@ def main() -> int:
     nuevas += descargar_altzola(cli, alm, sensores, datos, dia_fin, hora, a.max_dias)
     if sensores != sensores_inicio:
         SENSORES.write_text(json.dumps(sensores, ensure_ascii=False, indent=2), encoding="utf-8")
+    # cierre del día natural (00:00-24:00) de los días ya terminados que falten; normalmente lo hace la
+    # primera ejecución de la mañana. Si falla, no impide nada más.
+    try:
+        actualizar_laburpena(alm, sensores, ahora, limite)
+    except Exception as e:
+        print("No se ha podido calcular el cierre del día:", type(e).__name__, e)
     previsor = None if a.sin_prevision else crear_previsor(alm, sensores, hora)
     escribir(datos, (a.ffmc, a.dmc, a.dc), hora, ahora, a.dias_json, previsor)
     print(f"\nListo: {nuevas} filas nuevas, {cli.llamadas} llamadas a la API. "
