@@ -34,19 +34,36 @@ jobs:
       - name: Instalar dependencias
         run: pip install pyjwt cryptography requests
 
-      - name: Descargar datos y calcular el FWI
+      - name: Calcular el FWI y guardar los datos
+        # Si al subir los datos resulta que otra ejecución ya ha subido los suyos, NO se mezclan ficheros
+        # (eso daba conflictos): se toma la versión del repositorio, se recalcula encima y se vuelve a subir.
         env:
           EUSKALMET_KEY: ${{ secrets.EUSKALMET_KEY }}
           EUSKALMET_EMAIL: ${{ secrets.EUSKALMET_EMAIL }}
         run: |
           umask 077
-          printf '%s\n' "$EUSKALMET_KEY" > "$RUNNER_TEMP/clave.pem"
-          python actualizar_fwi.py --clave "$RUNNER_TEMP/clave.pem"
-          rm -f "$RUNNER_TEMP/clave.pem"
+          CLAVE="$RUNNER_TEMP/clave.pem"
+          printf '%s\n' "$EUSKALMET_KEY" > "$CLAVE"
+          trap 'rm -f "$CLAVE"' EXIT
+          git config user.name "fwi-bot"
+          git config user.email "fwi-bot@users.noreply.github.com"
+          for intento in 1 2 3 4; do
+            python actualizar_fwi.py --clave "$CLAVE"
+            git add datos docs/data
+            if git diff --staged --quiet; then echo "Sin cambios que guardar."; exit 0; fi
+            git commit -q -m "Actualiza datos FWI $(date -u +%F)"
+            if git push -q; then echo "Datos guardados (intento $intento)."; exit 0; fi
+            echo "Otra ejecución ha guardado datos antes (intento $intento): se recalcula sobre la versión actual..."
+            sleep $((intento * 10))
+            git fetch -q origin main
+            git reset -q --hard origin/main
+          done
+          echo "No se han podido guardar los datos tras 4 intentos."
+          exit 1
 
       - name: Notificaciones (correo y Telegram)
         # informe diario por correo y avisos por Telegram; solo actúa tras el cierre del dato y una vez al día.
-        # Si falla, no impide guardar los datos.
+        # Si falla, no impide nada más.
         continue-on-error: true
         env:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -60,19 +77,22 @@ jobs:
           TELEGRAM_CHAT_TEC: ${{ secrets.TELEGRAM_CHAT_TEC }}
         run: python notificar.py
 
-      - name: Guardar los cambios
+      - name: Guardar el registro de notificaciones
+        # el registro evita repetir avisos; si otra ejecución ha guardado algo entretanto, se toma su versión
+        # del repositorio y se le pone encima este registro (que es el más reciente).
+        continue-on-error: true
         run: |
-          git config user.name "fwi-bot"
-          git config user.email "fwi-bot@users.noreply.github.com"
-          git add datos docs/data
+          git add datos/notificaciones.json 2>/dev/null || exit 0
           git diff --staged --quiet && exit 0
-          git commit -m "Actualiza datos FWI $(date -u +%F)"
-          # si GitHub da un error puntual al subir, se reintenta hasta 3 veces
-          for intento in 1 2 3; do
-            git push && exit 0
-            echo "Fallo al subir (intento $intento); se reintenta en 20 s..."
-            sleep 20
-            git pull --rebase || true
+          cp datos/notificaciones.json "$RUNNER_TEMP/notif.json"
+          for intento in 1 2 3 4; do
+            git commit -q -m "Registro de notificaciones $(date -u +%F)" || true
+            git push -q && exit 0
+            sleep $((intento * 5))
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/notif.json" datos/notificaciones.json
+            git add datos/notificaciones.json
           done
           exit 1
 
