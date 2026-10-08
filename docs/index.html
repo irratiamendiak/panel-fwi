@@ -1661,19 +1661,36 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       </button>`;
     }).join('');
     // --- egunaren itxiera: aukeratutako eguna (gaur bada, oraindik amaitu gabe dagoenez, atzokoa)
-    const fc = fv >= hoy ? masDias(hoy, -1) : fv;
-    $('#moCierreTit').textContent = Tm('Eguneko laburpena', 'Resumen del día') + ': ' + fmtFechaLuzea(fecha(fc));
+    const enVivo = !FECHA;                                   // situación actual (sin fecha elegida en el selector)
+    const fc = enVivo || fv >= hoy ? masDias(hoy, -1) : fv;
+    // Consultando el día actual: si el resumen de ayer aún no está, se muestra el último disponible de cada
+    // estación (hasta 10 días atrás), con su fecha. Con una fecha pasada concreta, solo la de ese día.
+    const resumenDe = nombre => {
+      const lab = LAB && LAB.estaciones && LAB.estaciones[nombre];
+      if (!lab) return null;
+      if (lab[fc]) return [fc, lab[fc]];
+      if (!enVivo && fv < hoy) return null;
+      for (let k = 1; k <= 10; k++){ const f = masDias(fc, -k); if (lab[f]) return [f, lab[f]]; }
+      return null;
+    };
+    const fechasUsadas = new Set(ests.map(e => (resumenDe(e.nombre) || [null])[0]).filter(Boolean));
+    const fTit = fechasUsadas.size === 1 ? [...fechasUsadas][0] : fc;
+    $('#moCierreTit').textContent = Tm('Eguneko laburpena', 'Resumen del día') + ': ' + fmtFechaLuzea(fecha(fTit));
     $('#moMediodia').setAttribute('title', Tm('Gorriz, tenperatura; urdinez, hezetasun erlatiboa','En rojo, temperatura; en azul, humedad relativa'));
     $('#moCierreSub').textContent = Tm('Egun osoko datuak (00:00-24:00): batez besteko tenperatura (maximoa eta minimoa), hezetasuna eta haizea, batez besteko norabidea eta egun naturaleko euria. Hurrengo goizean kalkulatzen da.',
                                        'Datos del día completo (00:00-24:00): temperatura media (máxima y mínima), humedad y viento medios, dirección media y lluvia del día natural. Se calcula a la mañana siguiente.')
-      + (fv >= hoy ? ' ' + Tm('Gaurkoa oraindik ez da amaitu: atzokoa erakusten da.', 'El de hoy aún no ha terminado: se muestra el de ayer.') : '');
+      + (enVivo || fv >= hoy ? ' ' + (fTit === fc && fechasUsadas.size <= 1
+            ? Tm('Gaurkoa oraindik ez da amaitu: atzokoa erakusten da.', 'El de hoy aún no ha terminado: se muestra el de ayer.')
+            : Tm('Atzokoa oraindik ez dago: eskuragarri dagoen azkena erakusten da (data txartel bakoitzean).',
+                 'El de ayer todavía no está disponible: se muestra el último que hay (fecha en cada tarjeta).')) : '');
     $('#moCierre').innerHTML = ests.map(est => {
-      const x = LAB && LAB.estaciones && LAB.estaciones[est.nombre] && LAB.estaciones[est.nombre][fc];
+      const rs = resumenDe(est.nombre), x = rs && rs[1], fx = rs && rs[0];
       if (!x) return `<button class="mo-c" type="button" data-mt="${est.nombre}"><div class="n">${est.nombre}${est.modelo ? ' 🖥️' : ''}</div><div class="f">${
         est.modelo ? Tm('Eredua: ez dago neurketarik','Modelo: sin mediciones') : Tm('Ez dago laburpenik egun honetarako','No hay resumen para este día')}</div></button>`;
       const [tm, tx, tn, hm, wm, dm, ll] = x;
       return `<button class="mo-c" type="button" data-mt="${est.nombre}" aria-pressed="${est.nombre === marcada}">
         <div class="n">${est.nombre}${est.modelo ? ' 🖥️' : ''}</div>
+        <div class="f">${fmtFecha(fx)}${fx !== fc ? ' · <b>' + Tm('aurreko eguneko datua','dato de un día anterior') + '</b>' : ''}</div>
         ${est.modelo ? `<div class="f">${Tm('Open-Meteo eredua (ez dago estaziorik)','Modelo Open-Meteo (sin estación)')}</div>` : ''}
         <div class="big"><span class="t">${tm != null ? fmt(tm) + '°' : '—'}</span><span class="hr${hm != null && hm < 45 ? ' seco' : ''}">${hm != null ? '% ' + fmt(hm,0) : ''}</span></div>
         <div class="l">🌡️ ${tx != null ? Tm('Maximoa','Máxima') + ' <b>' + fmt(tx) + '°</b> · ' + Tm('minimoa','mínima') + ' <b>' + fmt(tn) + '°</b>' : ''}</div>
