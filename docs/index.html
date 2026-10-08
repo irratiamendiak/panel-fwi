@@ -156,6 +156,17 @@ body:not(.modo-meteo) .solo-meteo{display:none !important}
 .mt-gip .esc{display:flex;align-items:center;gap:6px;justify-content:center;font-size:12px;margin:4px 0}
 .mt-gip .esc .bar{width:220px;height:10px;border-radius:5px}
 .mt-graf{overflow-x:auto}.mt-graf svg{display:block;min-width:720px}
+#m72Sec{margin-top:18px}
+.m72-ctl{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.m72-ctl button,#m72Play{font:inherit;font-size:13.5px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.m72-ctl button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.m72-tiempo{display:flex;align-items:center;gap:10px;margin:2px 0 8px}.m72-tiempo input{flex:1}.m72-tiempo b{min-width:210px}
+.m72-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+#m72Cv{width:100%;height:auto;display:block}
+.m72-esc{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:6px;flex-wrap:wrap}.m72-esc .bar{flex:1;min-width:140px;height:12px;border-radius:6px}
+.m72-mini{display:grid;grid-template-columns:1fr 1fr;gap:8px}.m72-mini button{font:inherit;font-size:12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);padding:4px;cursor:pointer}
+.m72-mini canvas{width:100%;height:auto;display:block;border-radius:6px}
+@media (max-width:860px){.m72-wrap{grid-template-columns:1fr}}
 @media (max-width:760px){.mt-dias{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .verif h3{margin:0 0 4px;font-size:17px}
 .verif table{border-collapse:collapse;width:100%;font-size:14px}
@@ -385,6 +396,22 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     </div>
   </section>
 
+  <section id="m72Sec" class="solo-meteo" data-lang="auto" aria-label="Mapak 72 h / Mapas 72 h">
+    <h2 id="m72Tit">🗺️ Mapak: hurrengo 72 orduak</h2>
+    <div class="card">
+      <div class="m72-ctl" id="m72Vars"></div>
+      <div class="m72-tiempo" id="m72Tiempo">
+        <button type="button" id="m72Play" title="▶">▶</button>
+        <b id="m72Lab">…</b>
+        <input type="range" id="m72Sl" min="0" max="23" value="0" step="1">
+      </div>
+      <div class="m72-wrap">
+        <div><canvas id="m72Cv" width="760" height="520"></canvas><div class="m72-esc" id="m72Esc"></div></div>
+        <div><div class="nota" id="m72MiniTit"></div><div class="m72-mini" id="m72Mini"></div><p class="nota" id="m72Nota"></p></div>
+      </div>
+    </div>
+  </section>
+
   <section id="meteoSec" class="solo-meteo" data-lang="auto" aria-label="Eguraldi-iragarpena / Previsión meteorológica">
     <h2 id="mtTit">Eguraldi-iragarpena</h2>
     <div class="card mt">
@@ -435,6 +462,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <summary>🌦️ Eguraldia fitxa</summary>
       <p><b>Eguzki-eguerdiko neurketak</b>: indizeak kalkulatzeko erabiltzen diren datuak (13:00 neguan, 14:00 udan): tenperatura, hezetasuna, haizea eta haren norabidea, eta aurreko 24 orduetako euria, euririk gabeko egunekin eta hego haizearekin.</p>
       <p><b>Eguneko laburpena</b>: egun naturalaren itxiera (00:00-24:00), estazio bakoitzeko: batez besteko tenperatura (eta maximoa eta minimoa), batez besteko hezetasuna eta haizea, batez besteko norabidea (bektorialki kalkulatua, abiaduraren arabera haztatuta) eta egun osoko euria. 10 minuturo irakurketekin kalkulatzen da, hurrengo goizean, eta gorde egiten da; "Txostenak" leihoko CSV deskargan ere badago. Mutrikun ez dago estaziorik eta Altzolak ez du haize-neurgailurik: Mutrikuko laburpen osoa eta Altzolako haizea Open-Meteo ereduaren orduroko datuekin kalkulatzen dira, puntu horien koordenatuetan (🖥️ eredua).</p>
+      <p><b>Mapak: hurrengo 72 orduak</b>: euria (3 orduko metatua), hurrengo 72 orduetako euri metatua, hezetasuna, tenperatura, haizea (norabidearekin) eta boladak, Gipuzkoa osorako mapa jarraituetan, 3 orduro. Open-Meteo-ren iragarpena da, ~5 km-ko sareta batean.</p>
       <p><b>Eguraldi-iragarpena</b>: GIPUZKOA osorako mapa (3 orduro) eta estazio bakoitzeko iragarpen zehatza, Open-Meteo-ren eskutik.</p>
     </details>
 
@@ -584,6 +612,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <summary>🌦️ Pestaña de meteorología</summary>
       <p><b>Mediciones del mediodía solar</b>: los datos con los que se calculan los índices (13:00 en invierno, 14:00 en verano): temperatura, humedad, viento y su dirección, y lluvia de las 24 horas anteriores, junto con los días sin lluvia y con viento sur.</p>
       <p><b>Resumen del día</b>: el cierre del día natural (00:00-24:00) de cada estación: temperatura media (y máxima y mínima), humedad y viento medios, dirección media (calculada vectorialmente, ponderada por la velocidad) y lluvia del día completo. Se calcula con las lecturas cada 10 minutos a la mañana siguiente y queda guardado; también se incluye en la descarga CSV de la ventana "Informes". En Mutriku no hay estación y Altzola no tiene anemómetro: el resumen completo de Mutriku y el viento de Altzola se calculan con los datos horarios del modelo Open-Meteo en sus coordenadas (🖥️ modelo).</p>
+      <p><b>Mapas: próximas 72 horas</b>: lluvia (acumulada en 3 horas), lluvia acumulada en las próximas 72 horas, humedad, temperatura, viento (con su dirección) y rachas, en mapas continuos de toda Gipuzkoa, cada 3 horas. Es la previsión de Open-Meteo en una malla de ~5 km.</p>
       <p><b>Previsión meteorológica</b>: el mapa de toda GIPUZKOA (cada 3 horas) y la previsión detallada de cada estación, de Open-Meteo.</p>
     </details>
 
@@ -1880,7 +1909,173 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       `Cada zona, con el color de la previsión en el punto de su estación (${V[METEO.vari][0].toLowerCase()}). Pulsa un día, una franja horaria o una estación (en el mapa) para ver el detalle. Previsión: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), consultada a las ${fmtOrdua(new Date(METEO.cuando))}.`);
   }
 
+  // ---- Mapak: hurrengo 72 orduak. Open-Meteo-ren iragarpena ~5 km-ko sareta batean, 3 orduro.
+  const M72 = {datos: null, red: null, cuando: 0, cargando: null, vari: 'R', paso: 0, anim: null};
+  const M72_RAMP = {
+    R: [[0,[244,246,248]],[0.3,[207,227,245]],[2,[134,184,232]],[6,[63,134,214]],[12,[31,79,158]],[25,[122,63,176]]],
+    A: [[0,[244,246,248]],[2,[207,227,245]],[10,[134,184,232]],[25,[63,134,214]],[50,[31,79,158]],[90,[122,63,176]]],
+    H: [[20,[217,96,43]],[40,[242,196,107]],[60,[232,238,240]],[80,[156,195,230]],[100,[59,120,182]]],
+    T: [[0,[59,111,182]],[8,[127,183,217]],[15,[242,230,160]],[22,[240,160,75]],[32,[217,56,43]]],
+    W: [[0,[244,246,248]],[10,[215,234,223]],[20,[159,208,176]],[35,[240,192,64]],[55,[217,56,43]]],
+    G: [[0,[244,246,248]],[20,[215,234,223]],[40,[159,208,176]],[60,[240,192,64]],[90,[217,56,43]],[120,[122,31,77]]]
+  };
+  const M72_VARS = () => ({R: [Tm('🌧️ Euria (3 h)','🌧️ Lluvia (3 h)'), 'mm'], A: [Tm('Σ Euria metatua (72 h)','Σ Lluvia acumulada (72 h)'), 'mm'],
+    H: [Tm('💧 Hezetasuna','💧 Humedad'), '%'], T: [Tm('🌡️ Tenperatura','🌡️ Temperatura'), '°C'],
+    W: [Tm('🌬️ Haizea','🌬️ Viento'), 'km/h'], G: [Tm('💨 Boladak','💨 Rachas'), 'km/h']});
+  const m72Color = (r, v) => {
+    if (v == null || isNaN(v)) return [200, 205, 210];
+    if (v <= r[0][0]) return r[0][1];
+    for (let i = 1; i < r.length; i++) if (v <= r[i][0]){
+      const [a, ca] = r[i-1], [b, cb] = r[i], t = (v - a) / (b - a);
+      return ca.map((c, k) => c + t * (cb[k] - c));
+    }
+    return r[r.length-1][1];
+  };
+  const m72Anillos = g => !g ? [] : (g.type === 'Polygon' ? [g.coordinates[0]] : g.coordinates.map(p => p[0]));
+  function m72Red(geo){
+    const r = geo.contorno.features.flatMap(f => m72Anillos(f.geometry)).flat();
+    let x0 = 99, x1 = -99, y0 = 99, y1 = -99;
+    r.forEach(([x, y]) => { x0 = Math.min(x0,x); x1 = Math.max(x1,x); y0 = Math.min(y0,y); y1 = Math.max(y1,y); });
+    const dla = 0.05, dlo = 0.068;
+    const la0 = y0 - 0.02, lo0 = x0 - 0.03, nf = Math.ceil((y1 + 0.02 - la0) / dla) + 1, nc = Math.ceil((x1 + 0.03 - lo0) / dlo) + 1;
+    return {x0, x1, y0, y1, la0, lo0, dla, dlo, nf, nc};
+  }
+  function m72Cargar(forzar){
+    if (M72.cargando) return M72.cargando;
+    if (!forzar && M72.datos && Date.now() - M72.cuando < 3600e3) return Promise.resolve();
+    M72.cargando = cargarGeo().then(geo => {
+      METEO.geo = METEO.geo || geo;
+      const red = m72Red(geo), lat = [], lon = [];
+      for (let f = 0; f < red.nf; f++) for (let c = 0; c < red.nc; c++){ lat.push((red.la0 + f*red.dla).toFixed(3)); lon.push((red.lo0 + c*red.dlo).toFixed(3)); }
+      const q = new URLSearchParams({latitude: lat.join(','), longitude: lon.join(','),
+        hourly: 'temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m',
+        timezone: 'Europe/Madrid', forecast_days: '5', wind_speed_unit: 'kmh'});
+      return fetch('https://api.open-meteo.com/v1/forecast?' + q.toString()).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(j => { M72.datos = Array.isArray(j) ? j : [j]; M72.red = red; M72.cuando = Date.now(); });
+    }).finally(() => { M72.cargando = null; });
+    return M72.cargando;
+  }
+  // primer paso: la franja de 3 horas en curso (hora de Euskadi)
+  function m72Inicio(){
+    const h = M72.datos[0].hourly.time, hh = Math.floor(Math.floor(minutosEuskadi() / 60) / 3) * 3;
+    const iso = hoyISO() + 'T' + String(hh).padStart(2,'0') + ':00';
+    const i = h.indexOf(iso);
+    return i >= 0 ? i : Math.max(0, h.findIndex(t => t >= iso));
+  }
+  // valores de la variable en cada nodo de la sareta para el paso (3 h) elegido
+  function m72Valores(vari, paso){
+    const i0 = m72Inicio(), k = i0 + 3 * paso;
+    return M72.datos.map(d => {
+      const h = d.hourly, n = h.time.length, suma = (a, b) => { let s = 0; for (let x = a; x <= b && x < n; x++) s += h.precipitation[x] || 0; return s; };
+      if (vari === 'R') return suma(k + 1, k + 3);
+      if (vari === 'A') return suma(i0 + 1, i0 + 72);
+      if (vari === 'T') return h.temperature_2m[k];
+      if (vari === 'H') return h.relative_humidity_2m[k];
+      if (vari === 'W') return h.wind_speed_10m[k];
+      if (vari === 'G') return Math.max(...[k+1, k+2, k+3].filter(x => x < n).map(x => h.wind_gusts_10m[x] || 0));
+      return null;
+    });
+  }
+  function m72Dibujar(cv, vari, paso, completo){
+    const geo = METEO.geo, red = M72.red, W = cv.width, H = cv.height, pad = 8;
+    const kx = Math.cos((red.y0 + red.y1) / 2 * Math.PI / 180);
+    const esc = Math.min((W - 2*pad) / ((red.x1 - red.x0) * kx), (H - 2*pad) / (red.y1 - red.y0));
+    const P = ([x, y]) => [pad + (x - red.x0) * kx * esc, pad + (red.y1 - y) * esc];
+    const inv = (px, py) => [red.x0 + (px - pad) / (kx * esc), red.y1 - (py - pad) / esc];
+    const val = m72Valores(vari, paso), nodo = (f, c) => val[Math.max(0, Math.min(red.nf-1, f)) * red.nc + Math.max(0, Math.min(red.nc-1, c))];
+    const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, W, H);
+    const rings = geo.contorno.features.flatMap(f => m72Anillos(f.geometry));
+    const trazar = () => { ctx.beginPath(); rings.forEach(r => { r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); }); };
+    // superficie continua (interpolación bilineal entre los nodos de la sareta)
+    const img = ctx.createImageData(W, H), st = completo ? 2 : 3, ramp = M72_RAMP[vari];
+    for (let py = 0; py < H; py += st) for (let px = 0; px < W; px += st){
+      const [x, y] = inv(px, py), fr = (y - red.la0) / red.dla, fc = (x - red.lo0) / red.dlo;
+      const f = Math.floor(fr), c = Math.floor(fc), u = fr - f, v = fc - c;
+      const z = (1-u)*(1-v)*nodo(f,c) + (1-u)*v*nodo(f,c+1) + u*(1-v)*nodo(f+1,c) + u*v*nodo(f+1,c+1);
+      const col = m72Color(ramp, z);
+      for (let dy = 0; dy < st && py+dy < H; dy++) for (let dx = 0; dx < st && px+dx < W; dx++){
+        const i = ((py+dy) * W + (px+dx)) * 4; img.data[i] = col[0]; img.data[i+1] = col[1]; img.data[i+2] = col[2]; img.data[i+3] = 240;
+      }
+    }
+    const tmp = document.createElement('canvas'); tmp.width = W; tmp.height = H; tmp.getContext('2d').putImageData(img, 0, 0);
+    ctx.save(); trazar(); ctx.clip(); ctx.drawImage(tmp, 0, 0);
+    ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = 1;
+    geo.zonas.features.forEach(z => m72Anillos(z.geometry).forEach(r => { ctx.beginPath(); r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.stroke(); }));
+    ctx.restore();
+    ctx.strokeStyle = '#14231c'; ctx.lineWidth = completo ? 1.6 : 1; trazar(); ctx.stroke();
+    if (!completo) return;
+    // flechas de viento en los nodos de la sareta que caen dentro de Gipuzkoa
+    if (vari === 'W' || vari === 'G'){
+      const i0 = m72Inicio(), k = i0 + 3 * paso;
+      M72.datos.forEach((d, n) => {
+        const f = Math.floor(n / red.nc), c = n % red.nc;
+        if (f % 2 || c % 2) return;                               // una de cada cuatro, para no saturar
+        const lon = red.lo0 + c * red.dlo, lat = red.la0 + f * red.dla;
+        ctx.save(); trazar(); if (!ctx.isPointInPath(...P([lon, lat]))){ ctx.restore(); return; } ctx.restore();
+        const dir = d.hourly.wind_direction_10m[k], vel = d.hourly.wind_speed_10m[k];
+        if (dir == null) return;
+        const sur = ['SE','S','SO'].includes(sector8(dir)) && vel >= 3, [a, b] = P([lon, lat]), s = 6 + Math.min(vel, 60) / 6;
+        ctx.save(); ctx.translate(a, b); ctx.rotate((dir + 180) * Math.PI / 180);
+        ctx.fillStyle = sur ? '#d9382b' : '#14231c'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(s*.45, s*.5); ctx.lineTo(0, s*.15); ctx.lineTo(-s*.45, s*.5); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+      });
+    }
+    // estaciones como referencia
+    ctx.font = '12px system-ui, sans-serif';
+    geo.zonas.features.forEach(z => {
+      const p = z.properties; if (p.lat == null) return;
+      const [a, b] = P([p.lon, p.lat]);
+      ctx.fillStyle = '#14231c'; ctx.beginPath(); ctx.arc(a, b, 2.6, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeText(p.estacion, a + 5, b + 4); ctx.fillText(p.estacion, a + 5, b + 4);
+    });
+  }
+  function m72Etiqueta(paso){
+    const t = M72.datos[0].hourly.time[m72Inicio() + 3 * paso] || '';
+    return t ? fmtFecha(t.slice(0, 10)) + ' · ' + t.slice(11, 16) + '–' + String((+t.slice(11, 13) + 3) % 24).padStart(2,'0') + ':00 (+' + (3 * paso) + ' h)' : '';
+  }
+  function m72Render(){
+    const V = M72_VARS();
+    $('#m72Tit').textContent = Tm('🗺️ Mapak: hurrengo 72 orduak', '🗺️ Mapas: próximas 72 horas');
+    $('#m72Vars').innerHTML = Object.entries(V).map(([k, [n]]) => `<button type="button" data-v="${k}" aria-pressed="${k === M72.vari}">${n}</button>`).join('');
+    if (!M72.datos){ $('#m72Lab').textContent = Tm('Kargatzen…','Cargando…'); return; }
+    const acum = M72.vari === 'A';
+    $('#m72Tiempo').style.visibility = acum ? 'hidden' : 'visible';
+    $('#m72Sl').value = M72.paso;
+    $('#m72Lab').textContent = m72Etiqueta(M72.paso);
+    $('#m72Play').textContent = M72.anim ? '⏸' : '▶';
+    m72Dibujar($('#m72Cv'), M72.vari, M72.paso, true);
+    const r = M72_RAMP[M72.vari], u = V[M72.vari][1], max = r[r.length-1][0], min = r[0][0];
+    $('#m72Esc').innerHTML = `<span>${fmt(min,0)} ${u}</span><span class="bar" style="background:linear-gradient(90deg,${r.map(([v, c]) => `rgb(${c}) ${Math.round(100*(v-min)/(max-min))}%`).join(',')})"></span><span>${fmt(max,0)} ${u}</span>`+
+      (M72.vari === 'W' || M72.vari === 'G' ? `<span>· ➤ ${Tm('norabidea (gorriz: hegoaldekoa)','dirección (en rojo: del sur)')}</span>` : '')+
+      (acum ? `<span>· ${Tm('hurrengo 72 orduetan','en las próximas 72 horas')}</span>` : '');
+    // mapas pequeños de resumen (pulsando uno se abre en grande)
+    const minis = [['A', Tm('Σ Euria metatua (72 h)','Σ Lluvia acumulada (72 h)')], ['G', V.G[0]], ['T', V.T[0]], ['H', V.H[0]]];
+    $('#m72MiniTit').innerHTML = `<b>${Tm('Laburpena','Resumen')}</b> · ${m72Etiqueta(M72.paso)}`;
+    if (!$('#m72Mini').children.length)
+      $('#m72Mini').innerHTML = minis.map(([k, n]) => `<button type="button" data-v="${k}"><canvas width="300" height="205"></canvas>${n}</button>`).join('');
+    [...$('#m72Mini').querySelectorAll('button')].forEach((b, i) => { b.lastChild.textContent = minis[i][1]; m72Dibujar(b.querySelector('canvas'), minis[i][0], M72.paso, false); });
+    $('#m72Nota').innerHTML = Tm(`Open-Meteo-ren iragarpena, ~5 km-ko sareta batean, 3 orduro. Euria: 3 orduko metatua; boladak: 3 orduetako handiena. Ereduak joera orokorrak ondo erakusten ditu, baina ez haran bakoitzeko xehetasuna. <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0).`,
+      `Previsión de Open-Meteo en una malla de ~5 km, cada 3 horas. Lluvia: acumulada en 3 horas; rachas: la máxima de las 3 horas. El modelo muestra bien las tendencias generales, pero no el detalle de cada valle. <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0).`);
+  }
+  function m72Iniciar(){
+    const parar = () => { if (M72.anim){ clearInterval(M72.anim); M72.anim = null; } };
+    $('#m72Sec').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-v]');
+      if (b){ M72.vari = b.dataset.v; m72Render(); }
+    });
+    $('#m72Sl').addEventListener('input', e => { parar(); M72.paso = +e.target.value; m72Render(); });
+    $('#m72Play').addEventListener('click', () => {
+      if (M72.anim) parar();
+      else M72.anim = setInterval(() => { M72.paso = (M72.paso + 1) % 24; m72Render(); }, 1200);
+      m72Render();
+    });
+    m72Render();
+    m72Cargar().then(m72Render).catch(() => { $('#m72Lab').textContent = Tm('Ezin izan dira mapak kargatu (Open-Meteo).','No se han podido cargar los mapas (Open-Meteo).'); });
+    setInterval(() => m72Cargar().then(m72Render).catch(() => {}), 3600e3);
+  }
+
   function meteoIniciar(){
+    m72Iniciar();
     $('#meteoObs').addEventListener('click', ev => {
       const b = ev.target.closest('[data-mt]'); if (!b) return;
       seleccionarEstacion(b.dataset.mt); meteoElegir(b.dataset.mt, true); meteoObsRender();
