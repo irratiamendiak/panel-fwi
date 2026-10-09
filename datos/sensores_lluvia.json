@@ -1,0 +1,162 @@
+{
+ "B096": {
+  "sensor": "PA05",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C017": {
+  "sensor": "G4DB",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C023": {
+  "sensor": "G4AS",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C026": {
+  "sensor": "G4B3",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C028": {
+  "sensor": "G4AF",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C029": {
+  "sensor": "G4AB",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C043": {
+  "sensor": "G4AG",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C052": {
+  "sensor": "G4AL",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C058": {
+  "sensor": "G460",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C077": {
+  "sensor": "G4C4",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C078": {
+  "sensor": "G4RC",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C080": {
+  "sensor": "G4B6",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C084": {
+  "sensor": "G4AM",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C086": {
+  "sensor": "G465",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0D0": {
+  "sensor": "G451",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0D1": {
+  "sensor": "G404",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0D2": {
+  "sensor": "G4R9",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0D3": {
+  "sensor": "G4AE",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0DB": {
+  "sensor": "G480",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0DC": {
+  "sensor": "G496",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0DD": {
+  "sensor": "G4F4",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0DE": {
+  "sensor": "PTAK",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0E1": {
+  "sensor": "G4F0",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0E5": {
+  "sensor": "G4AP",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0E7": {
+  "sensor": "G457",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0E8": {
+  "sensor": "G433",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0E9": {
+  "sensor": "G4D0",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0EA": {
+  "sensor": "G4D2",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0EC": {
+  "sensor": "G415",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0F0": {
+  "sensor": "G4DB",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0F1": {
+  "sensor": "GIF1",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ },
+ "C0F4": {
+  "sensor": "G4RG",
+  "tipo": "measuresForWater",
+  "medida": "precipitation"
+ }
+}
