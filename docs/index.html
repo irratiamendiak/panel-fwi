@@ -157,6 +157,7 @@ body:not(.modo-meteo) .solo-meteo{display:none !important}
 .mt-gip .esc .bar{width:220px;height:10px;border-radius:5px}
 .mt-graf{overflow-x:auto}.mt-graf svg{display:block;min-width:720px}
 #m72Sec{margin-top:18px}
+#redSec{margin-top:18px}.red-wrap{max-width:820px}#redCv{width:100%;height:auto;display:block}
 .m72-ctl{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
 .m72-ctl button,#m72Play{font:inherit;font-size:13.5px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 .m72-ctl button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -396,6 +397,17 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     </div>
   </section>
 
+  <section id="redSec" class="solo-meteo" data-lang="auto" aria-label="Euri neurtua / Lluvia medida">
+    <h2 id="redTit">🌧️ Euri neurtua</h2>
+    <div class="card">
+      <div class="m72-ctl" id="redVars"></div>
+      <p class="nota" id="redLab"></p>
+      <div class="red-wrap"><canvas id="redCv" width="760" height="520"></canvas></div>
+      <div class="m72-esc" id="redEsc"></div>
+      <p class="nota" id="redNota"></p>
+    </div>
+  </section>
+
   <section id="m72Sec" class="solo-meteo" data-lang="auto" aria-label="Mapak 72 h / Mapas 72 h">
     <h2 id="m72Tit">🗺️ Mapak: hurrengo 72 orduak</h2>
     <div class="card">
@@ -462,6 +474,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <summary>🌦️ Eguraldia fitxa</summary>
       <p><b>Eguzki-eguerdiko neurketak</b>: indizeak kalkulatzeko erabiltzen diren datuak (13:00 neguan, 14:00 udan): tenperatura, hezetasuna, haizea eta haren norabidea, eta aurreko 24 orduetako euria, euririk gabeko egunekin eta hego haizearekin.</p>
       <p><b>Eguneko laburpena</b>: egun naturalaren itxiera (00:00-24:00), estazio bakoitzeko: batez besteko tenperatura (eta maximoa eta minimoa), batez besteko hezetasuna eta haizea, batez besteko norabidea (bektorialki kalkulatua, abiaduraren arabera haztatuta) eta egun osoko euria. 10 minuturo irakurketekin kalkulatzen da, hurrengo goizean, eta gorde egiten da; "Txostenak" leihoko CSV deskargan ere badago. Mutrikun ez dago estaziorik eta Altzolak ez du haize-neurgailurik: Mutrikuko laburpen osoa eta Altzolako haizea Open-Meteo ereduaren orduroko datuekin kalkulatzen dira, puntu horien koordenatuetan (🖥️ eredua).</p>
+      <p><b>Euri neurtua</b>: Euskalmeten 32 euri-neurgailuen datuak Gipuzkoan (gehi Eskas, mugan), 10 minuturo irakurketekin: azken 60 minutuak, gaur 00:00etatik azken irakurketara arte eta atzo osoa, estazioen artean interpolatutako mapa batean. Kalitate-kontrol bat dago: estazio batek ia ezer ez badu inguruan argi euria egin duenean, baztertu eta "?" ikurrarekin markatzen da. Prozesua exekutatzen den bakoitzean eguneratzen da.</p>
       <p><b>Mapak: hurrengo 72 orduak</b>: euria (3 orduko metatua), hurrengo 72 orduetako euri metatua, hezetasuna, tenperatura, haizea (norabidearekin) eta boladak, Gipuzkoa osorako mapa jarraituetan, 3 orduro. Open-Meteo-ren iragarpena da, ~5 km-ko sareta batean.</p>
       <p><b>Eguraldi-iragarpena</b>: GIPUZKOA osorako mapa (3 orduro) eta estazio bakoitzeko iragarpen zehatza, Open-Meteo-ren eskutik.</p>
     </details>
@@ -478,9 +491,9 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <div class="tabla-met"><table>
         <thead><tr><th>Tartea</th><th>Maiztasuna</th><th>Zer egiten du</th></tr></thead>
         <tbody>
-          <tr><td>07:20 – 13:20</td><td>Orduro</td><td>Gaurko estimazioa kalkulatzen du berriro, aurreko ordura arteko benetako euriarekin, eta indizeen 3 eguneko iragarpena berritzen du.</td></tr>
+          <tr><td>07:20 – 13:20</td><td>Orduro</td><td>Gaurko estimazioa kalkulatzen du berriro, azken irakurketara arteko benetako euriarekin, indizeen 3 eguneko iragarpena berritzen du eta euri neurtuaren mapa eguneratzen du.</td></tr>
           <tr><td>14:10 · 14:40 · 15:10 · 15:40</td><td>30 minuturo</td><td>Eguzki-eguerdiko datua (14:00) jaisten du Euskalmetek argitaratu ondoren; 15:10ekoak eguna ixten du (15:00etako itxieraren ondoren) eta posta eta Telegram abisuak bidaltzen ditu; 15:40koa babeskopia da.</td></tr>
-          <tr><td>17:20 · 20:20 · 23:20</td><td>3 orduro</td><td>Biharko estimazioa kalkulatzen du berriro, gaurko 14:00etatik aurrera egindako benetako euriarekin.</td></tr>
+          <tr><td>16:20 – 23:20</td><td>Orduro</td><td>Biharko estimazioa kalkulatzen du berriro, gaurko 14:00etatik aurrera egindako benetako euriarekin, eta euri neurtuaren mapa eguneratzen du.</td></tr>
           <tr><td>02:20 · 05:20</td><td>3 orduro</td><td>Gaurko estimazioa (eguna aldatu da). Gauerdiaren ondorengo lehenengoak aurreko egunaren laburpena ere kalkulatzen du.</td></tr>
         </tbody>
       </table></div>
@@ -627,6 +640,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <summary>🌦️ Pestaña de meteorología</summary>
       <p><b>Mediciones del mediodía solar</b>: los datos con los que se calculan los índices (13:00 en invierno, 14:00 en verano): temperatura, humedad, viento y su dirección, y lluvia de las 24 horas anteriores, junto con los días sin lluvia y con viento sur.</p>
       <p><b>Resumen del día</b>: el cierre del día natural (00:00-24:00) de cada estación: temperatura media (y máxima y mínima), humedad y viento medios, dirección media (calculada vectorialmente, ponderada por la velocidad) y lluvia del día completo. Se calcula con las lecturas cada 10 minutos a la mañana siguiente y queda guardado; también se incluye en la descarga CSV de la ventana "Informes". En Mutriku no hay estación y Altzola no tiene anemómetro: el resumen completo de Mutriku y el viento de Altzola se calculan con los datos horarios del modelo Open-Meteo en sus coordenadas (🖥️ modelo).</p>
+      <p><b>Lluvia medida</b>: los 32 pluviómetros de Euskalmet en Gipuzkoa (más Eskas, en la muga), con lecturas cada 10 minutos: últimos 60 minutos, hoy desde las 00:00 hasta la última lectura y ayer completo, en un mapa interpolado entre estaciones. Hay un control de calidad: si una estación marca casi nada cuando alrededor ha llovido claramente, se descarta y se marca con "?". Se actualiza en cada ejecución del proceso.</p>
       <p><b>Mapas: próximas 72 horas</b>: lluvia (acumulada en 3 horas), lluvia acumulada en las próximas 72 horas, humedad, temperatura, viento (con su dirección) y rachas, en mapas continuos de toda Gipuzkoa, cada 3 horas. Es la previsión de Open-Meteo en una malla de ~5 km.</p>
       <p><b>Previsión meteorológica</b>: el mapa de toda GIPUZKOA (cada 3 horas) y la previsión detallada de cada estación, de Open-Meteo.</p>
     </details>
@@ -643,9 +657,9 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <div class="tabla-met"><table>
         <thead><tr><th>Franja</th><th>Frecuencia</th><th>Qué hace</th></tr></thead>
         <tbody>
-          <tr><td>07:20 – 13:20</td><td>Cada hora</td><td>Recalcula la estimación de hoy con la lluvia real hasta la hora anterior y renueva la previsión de los índices a 3 días.</td></tr>
+          <tr><td>07:20 – 13:20</td><td>Cada hora</td><td>Recalcula la estimación de hoy con la lluvia real hasta la última lectura, renueva la previsión de los índices a 3 días y actualiza el mapa de lluvia medida.</td></tr>
           <tr><td>14:10 · 14:40 · 15:10 · 15:40</td><td>Cada 30 minutos</td><td>Descarga el dato del mediodía solar (14:00) cuando Euskalmet lo ha publicado; la de las 15:10 cierra el día (cierre de las 15:00) y envía el correo y los avisos de Telegram; la de las 15:40 es de respaldo.</td></tr>
-          <tr><td>17:20 · 20:20 · 23:20</td><td>Cada 3 horas</td><td>Recalcula la estimación de mañana con la lluvia real caída desde las 14:00 de hoy.</td></tr>
+          <tr><td>16:20 – 23:20</td><td>Cada hora</td><td>Recalcula la estimación de mañana con la lluvia real caída desde las 14:00 de hoy y actualiza el mapa de lluvia medida.</td></tr>
           <tr><td>02:20 · 05:20</td><td>Cada 3 horas</td><td>Estimación de hoy (el día ya ha cambiado). La primera tras la medianoche calcula además el resumen del día anterior.</td></tr>
         </tbody>
       </table></div>
@@ -913,6 +927,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
             origen: g('org') || '', calentando: !!g('cal'), cobertura: g('cob'), hist: true};
   }
   // Estazio baten egun jakin bateko balioa: neurtua, iragarpena edo historikoa
+  const HIST_DIAS = 400;   // días del "historial completo" de la tabla de detalle
   function diaEst(est, f){
     if (!est._porFecha) est._porFecha = new Map(est.dias.map(d => [d.fecha, d]));
     const d = est._porFecha.get(f);
@@ -2121,7 +2136,79 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     setInterval(() => m72Cargar().then(m72Render).catch(() => {}), 3600e3);
   }
 
+  // ---- Euri neurtua: Euskalmeten 32 euri-neurgailuen datuak (data/lluvia_red.json), mapa jarraitua
+  const RED = {datos: null, vari: 'hoy'};
+  const RED_RAMP = {
+    ultima: [[0,[244,246,248]],[0.2,[207,227,245]],[1,[134,184,232]],[3,[63,134,214]],[6,[31,79,158]],[10,[122,63,176]]],
+    hoy: [[0,[244,246,248]],[0.5,[207,227,245]],[3,[134,184,232]],[8,[63,134,214]],[15,[31,79,158]],[25,[122,63,176]]]
+  };
+  function redCargar(){
+    return fetch('data/lluvia_red.json', {cache: 'no-store'}).then(r => r.ok ? r.json() : null).then(j => { RED.datos = j; }).catch(() => {});
+  }
+  function redDibujar(){
+    const cv = $('#redCv'), geo = METEO.geo, d = RED.datos, campo = RED.vari;
+    if (!geo || !d) return;
+    const rings = geo.contorno.features.flatMap(f => m72Anillos(f.geometry));
+    let x0 = 99, x1 = -99, y0 = 99, y1 = -99;
+    rings.flat().forEach(([x, y]) => { x0 = Math.min(x0,x); x1 = Math.max(x1,x); y0 = Math.min(y0,y); y1 = Math.max(y1,y); });
+    const W = cv.width, H = cv.height, pad = 10, kx = Math.cos((y0 + y1) / 2 * Math.PI / 180);
+    const esc = Math.min((W - 2*pad) / ((x1 - x0) * kx), (H - 2*pad) / (y1 - y0));
+    const P = ([x, y]) => [pad + (x - x0) * kx * esc, pad + (y1 - y) * esc], inv = (px, py) => [x0 + (px - pad) / (kx * esc), y1 - (py - pad) / esc];
+    const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, W, H);
+    const validas = d.estaciones.filter(e => e[campo] != null && !e[campo + '_sospechoso']);
+    const ramp = RED_RAMP[campo === 'ultima' ? 'ultima' : 'hoy'];
+    if (validas.length >= 3){
+      // interpolación por distancia inversa (peso 1/d⁴) entre los pluviómetros válidos
+      const img = ctx.createImageData(W, H), st = 2;
+      for (let py = 0; py < H; py += st) for (let px = 0; px < W; px += st){
+        const [x, y] = inv(px, py); let sw = 0, sv = 0, ex = null;
+        for (const e of validas){ const dx = (x - e.lon) * kx, dy = y - e.lat, dd = dx*dx + dy*dy; if (dd < 1e-10){ ex = e[campo]; break; } const w = 1 / (dd * dd); sw += w; sv += w * e[campo]; }
+        const col = m72Color(ramp, ex != null ? ex : sv / sw);
+        for (let a = 0; a < st && py+a < H; a++) for (let b = 0; b < st && px+b < W; b++){ const i = ((py+a) * W + (px+b)) * 4; img.data[i] = col[0]; img.data[i+1] = col[1]; img.data[i+2] = col[2]; img.data[i+3] = 240; }
+      }
+      const tmp = document.createElement('canvas'); tmp.width = W; tmp.height = H; tmp.getContext('2d').putImageData(img, 0, 0);
+      const tr = () => { ctx.beginPath(); rings.forEach(r => { r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); }); };
+      ctx.save(); tr(); ctx.clip(); ctx.drawImage(tmp, 0, 0);
+      ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1;
+      geo.zonas.features.forEach(z => m72Anillos(z.geometry).forEach(r => { ctx.beginPath(); r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.stroke(); }));
+      ctx.restore(); ctx.strokeStyle = '#14231c'; ctx.lineWidth = 1.6; tr(); ctx.stroke();
+    }
+    // pluviómetros con su valor (gris y con "?" si el control de calidad lo descarta)
+    ctx.font = 'bold 11px system-ui, sans-serif'; ctx.textAlign = 'center';
+    d.estaciones.forEach(e => {
+      const v = e[campo], malo = e[campo + '_sospechoso'], [a, b] = P([e.lon, e.lat]);
+      ctx.beginPath(); ctx.arc(a, b, 3, 0, 7);
+      if (malo || v == null){ ctx.strokeStyle = '#8a969c'; ctx.lineWidth = 1.5; ctx.stroke(); } else { ctx.fillStyle = '#14231c'; ctx.fill(); }
+      const t = v == null ? '—' : fmt(v) + (malo ? ' ?' : '');
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeText(t, a, b - 6); ctx.fillStyle = malo || v == null ? '#8a969c' : '#14231c'; ctx.fillText(t, a, b - 6);
+    });
+  }
+  function redRender(){
+    const d = RED.datos;
+    $('#redTit').textContent = Tm('🌧️ Euri neurtua', '🌧️ Lluvia medida');
+    const V = {ultima: Tm('Azken 60 minutuak','Últimos 60 minutos'), hoy: Tm('Gaur','Hoy'), ayer: Tm('Atzo','Ayer')};
+    $('#redVars').innerHTML = Object.entries(V).map(([k, n]) => `<button type="button" data-rv="${k}" aria-pressed="${k === RED.vari}">${n}</button>`).join('');
+    if (!d){ $('#redLab').textContent = Tm('Oraindik ez dago daturik (prozesuaren hurrengo exekuzioan sortuko da).','Todavía no hay datos (se generarán en la próxima ejecución del proceso).'); return; }
+    const hasta = d.hasta, act = new Date(d.actualizado);
+    $('#redLab').innerHTML = RED.vari === 'ayer' ? `<b>${fmtFechaLuzea(fecha(d.ayer))}</b> · 00:00 – 24:00`
+      : RED.vari === 'hoy' ? `<b>${fmtFechaLuzea(fecha(d.hoy))}</b> · 00:00 – ${hasta}`
+      : Tm(`<b>${hasta}</b> arteko azken 60 minutuak`, `Últimos 60 minutos hasta las <b>${hasta}</b>`);
+    redDibujar();
+    const r = RED_RAMP[RED.vari === 'ultima' ? 'ultima' : 'hoy'], max = r[r.length-1][0];
+    const n = d.estaciones.filter(e => e[RED.vari] != null && !e[RED.vari + '_sospechoso']).length, malos = d.estaciones.filter(e => e[RED.vari + '_sospechoso']).map(e => e.nombre);
+    $('#redEsc').innerHTML = `<span>0 mm</span><span class="bar" style="background:linear-gradient(90deg,${r.map(([v, c]) => `rgb(${c}) ${Math.round(100*v/max)}%`).join(',')})"></span><span>${fmt(max,0)} mm</span><span>· ● ${Tm('euri-neurgailua (mm)','pluviómetro (mm)')}</span>`;
+    $('#redNota').innerHTML = Tm(`Euskalmeten ${n} euri-neurgailu, 10 minuturo irakurketak. Estazioen arteko balioak interpolatuak dira. ${malos.length ? 'Kalitate-kontrola: ' + malos.join(', ') + ' baztertuak (inguruan euria egin du eta haiek ia ezer ez; "?" ikurrarekin). ' : ''}Prozesua exekutatzen den bakoitzean eguneratzen da; azkena: ${fmtOrdua(act)}.`,
+      `${n} pluviómetros de Euskalmet, lecturas cada 10 minutos. Valores entre estaciones interpolados. ${malos.length ? 'Control de calidad: ' + malos.join(', ') + ' descartados (ha llovido alrededor y en ellos casi nada; marcados con "?"). ' : ''}Se actualiza en cada ejecución del proceso; la última: ${fmtOrdua(act)}.`);
+  }
+  function redIniciar(){
+    $('#redSec').addEventListener('click', ev => { const b = ev.target.closest('[data-rv]'); if (b){ RED.vari = b.dataset.rv; redRender(); } });
+    redRender();
+    Promise.all([cargarGeo().then(g => { METEO.geo = METEO.geo || g; }), redCargar()]).then(redRender);
+    setInterval(() => redCargar().then(redRender), 5 * 60e3);
+  }
+
   function meteoIniciar(){
+    redIniciar();
     m72Iniciar();
     $('#meteoObs').addEventListener('click', ev => {
       const b = ev.target.closest('[data-mt]'); if (!b) return;
@@ -2193,7 +2280,14 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   function detalle(){
     const est = DATA.estaciones[sel];
     $('#detTitle').textContent = 'Xehetasuna: '+nombreVis(est)+(est.codigo?' ('+est.codigo+')':'');
-    const dias = (todo ? est.dias : est.dias.slice(-DIAS_POR_DEFECTO)).concat(conPrevision(est).prev);
+    // historial completo: los últimos HIST_DIAS días, de fwi.json o del histórico (data/historico.json)
+    let base = est.dias.slice(-DIAS_POR_DEFECTO);
+    if (todo && est.dias.length){
+      const ult = est.dias[est.dias.length-1].fecha, lista = [];
+      for (let k = HIST_DIAS - 1; k >= 0; k--){ const d = diaEst(est, masDias(ult, -k)); if (d && !d.prev) lista.push(d); }
+      base = lista;
+    }
+    const dias = base.concat(conPrevision(est).prev);
     grafico(dias, est);
     tabla(dias, est);
     climatologia(est);
@@ -2285,7 +2379,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     $('#nota').textContent = notas.join(' ');
     const btn = $('#todo');
     btn.hidden = est.dias.length <= DIAS_POR_DEFECTO;
-    btn.textContent = todo ? 'Ikusi azken '+DIAS_POR_DEFECTO+' egunak soilik' : 'Ikusi historial osoa ('+est.dias.length+' egun)';
+    btn.textContent = todo ? 'Ikusi azken '+DIAS_POR_DEFECTO+' egunak soilik' : 'Ikusi historial osoa ('+HIST_DIAS+' egun)';
   }
 
   function cerrarInfos(excepto){
@@ -2321,7 +2415,10 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     render();
     meteoElegir(DATA.estaciones[sel].resumen ? 'GIPUZKOA' : DATA.estaciones[sel].nombre);
   });
-  $('#todo').addEventListener('click', () => { todo = !todo; detalle(); });
+  $('#todo').addEventListener('click', () => {
+    todo = !todo;
+    if (todo && !HIST){ cargarHist().then(detalle).catch(detalle); } else detalle();
+  });
 })();
 </script>
 
