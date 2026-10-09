@@ -473,6 +473,21 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     </details>
 
     <details class="met">
+      <summary>Eguneratze-ordutegia</summary>
+      <p>Panela bere kabuz eguneratzen da egun osoan zehar (udako ordua; neguan, ordubete lehenago):</p>
+      <div class="tabla-met"><table>
+        <thead><tr><th>Tartea</th><th>Maiztasuna</th><th>Zer egiten du</th></tr></thead>
+        <tbody>
+          <tr><td>07:20 – 13:20</td><td>Orduro</td><td>Gaurko estimazioa kalkulatzen du berriro, aurreko ordura arteko benetako euriarekin, eta indizeen 3 eguneko iragarpena berritzen du.</td></tr>
+          <tr><td>14:00 – 15:50</td><td>10 minuturo</td><td>Eguzki-eguerdiko datua (14:00) jaisten du Euskalmetek argitaratu bezain laster; 15:00etan eguna ixten du eta posta eta Telegram abisuak bidaltzen ditu.</td></tr>
+          <tr><td>17:20 · 20:20 · 23:20</td><td>3 orduro</td><td>Biharko estimazioa kalkulatzen du berriro, gaurko 14:00etatik aurrera egindako benetako euriarekin.</td></tr>
+          <tr><td>02:20 · 05:20</td><td>3 orduro</td><td>Gaurko estimazioa (eguna aldatu da). Gauerdiaren ondorengo lehenengoak aurreko egunaren laburpena ere kalkulatzen du.</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Estimazioa</b> ("kalkulatua"): euriarentzat, estazioak dagoeneko neurtutako ordu osoak hartzen dira (aurreko eguneko 14:00etatik) eta falta direnak iragarpenarekin osatzen dira; tenperatura, hezetasuna eta haizea beti estimatuak dira, Open-Meteo-ren iragarpenarekin. <b>Eguraldia</b> fitxako iragarpena eta mapak, berriz, nabigatzaileak eskatzen dizkio zuzenean Open-Meteo-ri, orduro, egunean zehar edozein unetan.</p>
+    </details>
+
+    <details class="met">
       <summary>Datuak falta direnean</summary>
       <ul>
         <li><b>Euria.</b> 24 orduetako 144 irakurketetatik (10 minuturo bat) 6 edo gutxiago falta badira, estazioaren datua erabiltzen da. Gehiago falta badira, edo egun osoa, euria <b>gertuen dagoen estaziotik</b> hartzen da (datu osoak baditu; bestela, hurrengotik). Guztiek huts eginez gero (akats orokorra), Open-Meteo eredutik.</li>
@@ -620,6 +635,21 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <summary>Días sin lluvia y viento del sur</summary>
       <p>En cada tarjeta, bajo el viento, aparecen los días que la estación lleva <b>seguidos sin lluvia</b> hasta el día que se está viendo (incluido). Un día cuenta como "de lluvia" si en las 24 horas hasta el mediodía solar cayó <b>1 mm o más</b>; por debajo, la lluvia apenas humedece el combustible. Si hay un hueco de datos en los días anteriores, aparece el signo "≥": como mínimo lleva esos días sin llover.</p>
       <p>Debajo, los días que lleva <b>seguidos con viento del sur</b>: días en que, a la hora del dato, el viento sopló del <b>sureste, sur o suroeste</b> (SE, S, SO), con al menos 3 km/h (en calma la veleta puede marcar cualquier dirección). Junto con los días sin lluvia, indica cuánto tiempo lleva secándose la vegetación.</p>
+    </details>
+
+    <details class="met">
+      <summary>Horario de actualización</summary>
+      <p>El panel se actualiza solo a lo largo de todo el día (hora de verano; en invierno, una hora antes):</p>
+      <div class="tabla-met"><table>
+        <thead><tr><th>Franja</th><th>Frecuencia</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td>07:20 – 13:20</td><td>Cada hora</td><td>Recalcula la estimación de hoy con la lluvia real hasta la hora anterior y renueva la previsión de los índices a 3 días.</td></tr>
+          <tr><td>14:00 – 15:50</td><td>Cada 10 minutos</td><td>Descarga el dato del mediodía solar (14:00) en cuanto Euskalmet lo publica; a las 15:00 cierra el día y envía el correo y los avisos de Telegram.</td></tr>
+          <tr><td>17:20 · 20:20 · 23:20</td><td>Cada 3 horas</td><td>Recalcula la estimación de mañana con la lluvia real caída desde las 14:00 de hoy.</td></tr>
+          <tr><td>02:20 · 05:20</td><td>Cada 3 horas</td><td>Estimación de hoy (el día ya ha cambiado). La primera tras la medianoche calcula además el resumen del día anterior.</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Estimación</b> ("calculado"): para la lluvia se toman las horas completas ya medidas por la estación (desde las 14:00 del día anterior) y las que faltan se completan con la previsión; temperatura, humedad y viento son siempre estimados, con la previsión de Open-Meteo. La previsión y los mapas de la pestaña <b>Meteorología</b>, en cambio, los pide el navegador directamente a Open-Meteo, cada hora, a cualquier hora del día.</p>
     </details>
 
     <details class="met">
