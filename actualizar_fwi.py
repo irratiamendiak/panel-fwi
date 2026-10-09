@@ -678,9 +678,12 @@ def crear_previsor(alm, sensores, hora):
                     cod_lluvia, sens_lluvia = CODIGO_HIBRIDO[nombre], sensores.get(nombre)
                 else:                                  # Mutriku u otro punto sin estación real: no hay nada que mezclar
                     cod_lluvia, sens_lluvia = None, None
-                # Estimación del día en curso: la lluvia ya caída desde la hora del dato de ayer se toma de la
-                # estación (horas completas) y el resto, de la previsión. Los días siguientes, solo previsión.
-                if j == 0 and cod_lluvia and sens_lluvia and alm.cli.errores_conexion == 0 and alm.cli.limite_agotado < 2:
+                # Primera estimación pendiente: la de hoy (por la mañana) o, si el dato de hoy ya está cerrado,
+                # la de mañana (por la tarde y la noche). Su ventana de lluvia ya ha empezado (desde la hora del
+                # último dato), así que la lluvia caída en las horas completas se toma de la estación y el resto,
+                # de la previsión. Los días siguientes, solo previsión.
+                primera = dia == est["fecha"] + timedelta(days=1)
+                if primera and j <= 1 and cod_lluvia and sens_lluvia and alm.cli.errores_conexion == 0 and alm.cli.limite_agotado < 2:
                     try:
                         P, medidas = lluvia_con_observada(alm, cod_lluvia, sens_lluvia, horas)
                     except (RuntimeError, KeyError):
