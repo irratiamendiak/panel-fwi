@@ -110,7 +110,7 @@ if zr is not None:
 if az is not None:
     CODIGO_HIBRIDO[az.NOMBRE] = az.ESTACION
 IDENTIDAD = {"T": ("id", 0), "H": ("id", 0), "W": ("id", 0)}   # sin corrección: no hay estación con la que calibrarla
-DIAS_JSON = 400      # días recientes que se publican en la web
+DIAS_JSON = 60       # días recientes que se publican en fwi.json (los anteriores, en historico.json)
 # Multiplicador de la tasa de incendios con viento del cuadrante sur (SE-S-SO, 120-240°) de al menos
 # VIENTO_SUR_MIN km/h a la hora del dato. Calibrado con el registro EGIF de Gipuzkoa 2010-2025 (497
 # incendios, 63.831 días-estación, histórico al mediodía solar): a igualdad de FWI, con viento sur hubo
@@ -1013,6 +1013,168 @@ def actualizar_laburpena(alm, sensores, ahora, limite=None):
                                          "estaciones": web}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
+# ---------------------------------------------------------------- red de pluviómetros (lluvia medida)
+RED_LLUVIA = [   # (código, nombre, latitud, longitud): pluviómetros de Euskalmet en Gipuzkoa (Eskas, en la muga navarra)
+    ('B096', 'Puerto de Pasaia', 43.33703, -1.92752),
+    ('C017', 'Miramon', 43.2868, -1.97121),
+    ('C023', 'Arrasate', 43.06958, -2.49308),
+    ('C026', 'Berastegi', 43.1248, -1.98168),
+    ('C028', 'Zegama', 42.9588, -2.29852),
+    ('C029', 'Zizurkil', 43.1901, -2.06181),
+    ('C043', 'Ordizia', 43.0484, -2.17755),
+    ('C052', 'Ameraun', 43.1417, -1.95085),
+    ('C058', 'Bidania', 43.146, -2.15502),
+    ('C077', 'Andoain', 43.2109, -2.01559),
+    ('C078', 'Altzola', 43.2419, -2.39784),
+    ('C080', 'Añarbe', 43.2276, -1.84981),
+    ('C084', 'Behobia', 43.346, -1.76117),
+    ('C086', 'Inurritza', 43.27798, -2.16936),
+    ('C0D0', 'Urkulu', 43.013, -2.47239),
+    ('C0D1', 'Oñati', 43.0621, -2.43755),
+    ('C0D2', 'San Prudentzio', 43.0835, -2.44745),
+    ('C0D3', 'Aixola', 43.1547, -2.50123),
+    ('C0DB', 'Aitzu', 43.1141, -2.323),
+    ('C0DC', 'Ibai Eder', 43.1751, -2.25601),
+    ('C0DD', 'Aizarnazabal', 43.2553, -2.24219),
+    ('C0DE', 'Matxinbenta', 43.1135, -2.23513),
+    ('C0E1', 'Amundarain', 43.0335, -2.15086),
+    ('C0E5', 'Agauntza', 43.0179, -2.17748),
+    ('C0E7', 'Estanda', 43.052, -2.21877),
+    ('C0E8', 'Araxes', 43.1148, -2.04772),
+    ('C0E9', 'Alegia', 43.1018, -2.10488),
+    ('C0EA', 'Belauntza', 43.1424, -2.04845),
+    ('C0EC', 'Lasarte', 43.2527, -2.02109),
+    ('C0F0', 'Ereñozu', 43.242, -1.93922),
+    ('C0F1', 'Eskas', 43.23939, -1.80332),
+    ('C0F4', 'Oiartzun', 43.3087, -1.88459),
+]
+RED_ESTADO = Path("datos/lluvia_red.json")     # lluvia por hora (hora oficial) de hoy y ayer, por estación
+RED_WEB = Path("docs/data/lluvia_red.json")     # resumen para el mapa de la web
+RED_SENSORES = Path("datos/sensores_lluvia.json")
+RED_QC_VECINAS, RED_QC_MIN_MM, RED_QC_FRAC = 4, 3.0, 0.1   # control de calidad (ver qc_red)
+
+
+def _sensor_red(alm, sensores_red, cod, dia):
+    if cod in sensores_red:
+        return sensores_red[cod]
+    r = alm.cli.get(f"/euskalmet/readings/aggregated/summarized/byDay/forStation/{cod}/at/{dia:%Y}/{dia:%m}/{dia:%d}")
+    if r.status_code != 200:
+        return None
+    for it in r.json().get("items", []):
+        k = it.get("key") or ""
+        if k.endswith("/" + ew.MEDIDAS["lluvia"]):
+            s_, t_, m_ = k.split("/")
+            sensores_red[cod] = {"sensor": s_, "tipo": t_, "medida": m_}
+            return sensores_red[cod]
+    return None
+
+
+def _lluvia_hora(alm, cod, sens, dia, h):
+    """Las seis lecturas de 10 minutos (mm, o None si no están) de la hora oficial h..h+1 del día."""
+    du, hu, _ = ew.a_utc(dia, 0)
+    t = datetime.combine(du, datetime.min.time()).replace(hour=hu) + timedelta(hours=h)
+    d = alm.hora(cod, "lluvia", {"lluvia": sens}, t.date(), t.hour)
+    return [None if d.get((t.hour, m)) is None else round(float(d.get((t.hour, m))), 2) for m in range(0, 60, 10)]
+
+
+def qc_red(valores):
+    """Control de calidad: una estación con casi nada de lluvia mientras sus vecinas más cercanas tienen
+    lluvia clara (mediana >= 3 mm) se considera sospechosa (pluviómetro atascado, mantenimiento...).
+    valores: {cod: mm}. Devuelve el conjunto de códigos sospechosos."""
+    pos = {c: (la, lo) for c, _, la, lo in RED_LLUVIA}
+    kx = math.cos(math.radians(43.15))
+    malos = set()
+    for c, v in valores.items():
+        if v is None or c not in pos:
+            continue
+        otros = sorted((((pos[o][0] - pos[c][0]) ** 2 + ((pos[o][1] - pos[c][1]) * kx) ** 2), w)
+                       for o, w in valores.items() if o != c and w is not None and o in pos)[:RED_QC_VECINAS]
+        if len(otros) < 3:
+            continue
+        ws = sorted(w for _, w in otros)
+        med = (ws[len(ws) // 2] + ws[(len(ws) - 1) // 2]) / 2
+        if med >= RED_QC_MIN_MM and v <= RED_QC_FRAC * med:
+            malos.add(c)
+    return malos
+
+
+def actualizar_red_lluvia(alm, ahora, limite=None):
+    """Descarga las lecturas de 10 minutos nuevas de los pluviómetros de la red (hoy y, si falta algo, ayer)
+    y publica la lluvia de los últimos 60 minutos, de hoy desde las 00:00 hasta la última lectura publicada
+    y de ayer completo. Se guardan las lecturas por hora oficial; una hora incompleta se vuelve a pedir en
+    las ejecuciones siguientes (durante 3 horas) hasta tener sus seis lecturas."""
+    hoy, ayer = ahora.date(), ahora.date() - timedelta(days=1)
+    try:
+        est = json.loads(RED_ESTADO.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        est = {}
+    dias = {k: v for k, v in est.get("dias", {}).items() if k in (hoy.isoformat(), ayer.isoformat())}
+    try:
+        sensores_red = json.loads(RED_SENSORES.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        sensores_red = {}
+    tope = ahora.replace(tzinfo=None) - timedelta(minutes=10)      # lecturas ya publicadas (margen de 10 min)
+    llamadas = 0
+    for dia in (ayer, hoy):
+        reg = dias.setdefault(dia.isoformat(), {})
+        base = datetime.combine(dia, datetime.min.time())
+        for cod, nombre, _, _ in RED_LLUVIA:
+            if limite and time.monotonic() > limite:
+                break
+            horas = reg.setdefault(cod, {})
+            for h in range(24):
+                ini_h = base + timedelta(hours=h)
+                if ini_h + timedelta(minutes=10) > tope:          # ni una lectura de esa hora publicada aún
+                    break
+                prev = horas.get(str(h))
+                completa = prev is not None and all(v is not None for v in prev)
+                vieja = ini_h + timedelta(hours=4) < tope           # tras 3 h, se acepta lo que haya
+                if completa or (prev is not None and vieja):
+                    continue
+                sens = _sensor_red(alm, sensores_red, cod, dia)
+                if not sens:
+                    break
+                try:
+                    horas[str(h)] = _lluvia_hora(alm, cod, sens, dia, h); llamadas += 1
+                except RuntimeError:
+                    break
+    RED_ESTADO.parent.mkdir(parents=True, exist_ok=True)
+    RED_ESTADO.write_text(json.dumps({"dias": dias}, separators=(",", ":")), encoding="utf-8")
+    RED_SENSORES.write_text(json.dumps(sensores_red, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    def lecturas(dia, cod):
+        """[(inicio de la lectura, mm o None)] del día, en orden."""
+        base = datetime.combine(dia, datetime.min.time())
+        hs = dias.get(dia.isoformat(), {}).get(cod, {})
+        return [(base + timedelta(hours=h, minutes=10 * k), (hs.get(str(h)) or [None] * 6)[k]) for h in range(24) for k in range(6)]
+    filas = []
+    ultimo_ok = None
+    for cod, nombre, la, lo in RED_LLUVIA:
+        hoy_l = [(t, v) for t, v in lecturas(hoy, cod) if t + timedelta(minutes=10) <= tope]
+        ayer_l = lecturas(ayer, cod)
+        vh = [v for _, v in hoy_l if v is not None]
+        va = [v for _, v in ayer_l if v is not None]
+        ult = (ayer_l + hoy_l)
+        ult = [x for x in ult if x[0] + timedelta(minutes=10) <= tope][-6:]
+        vu = [v for _, v in ult if v is not None]
+        if hoy_l:
+            ultimo_ok = max(ultimo_ok or hoy_l[-1][0], hoy_l[-1][0])
+        filas.append({"cod": cod, "nombre": nombre, "lat": la, "lon": lo,
+                      "hoy": round(sum(vh), 1) if hoy_l and len(vh) >= 0.8 * len(hoy_l) else None, "hoy_lecturas": len(vh),
+                      "ayer": round(sum(va), 1) if len(va) >= 138 else None, "ayer_lecturas": len(va),
+                      "ultima": round(sum(vu), 1) if len(vu) >= 5 else None})
+    for campo in ("ultima", "hoy", "ayer"):
+        malos = qc_red({f["cod"]: f[campo] for f in filas})
+        for f in filas:
+            f[campo + "_sospechoso"] = f["cod"] in malos
+    hasta = (ultimo_ok + timedelta(minutes=10)).strftime("%H:%M") if ultimo_ok else "00:00"
+    RED_WEB.parent.mkdir(parents=True, exist_ok=True)
+    RED_WEB.write_text(json.dumps({"actualizado": ahora.isoformat(timespec="minutes"), "hoy": hoy.isoformat(),
+                                   "ayer": ayer.isoformat(), "hasta": hasta, "estaciones": filas},
+                                  ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"Red de pluviómetros: {llamadas} horas descargadas; hoy hasta las {hasta}.")
+
+
 def escribir(datos, inicial, hora, ahora, dias_json, previsor=None):
     orden = list(ew.ESTACIONES) + list(NOMBRES_EXTRA) + list(MODELO_ESTACIONES)
     filas_csv = []
@@ -1188,6 +1350,11 @@ def main() -> int:
         actualizar_laburpena(alm, sensores, ahora, limite)
     except Exception as e:
         print("No se ha podido calcular el cierre del día:", type(e).__name__, e)
+    # lluvia medida en la red de pluviómetros de Gipuzkoa (mapa de la web); si falla, no impide nada más
+    try:
+        actualizar_red_lluvia(alm, ahora, limite)
+    except Exception as e:
+        print("No se ha podido actualizar la red de pluviómetros:", type(e).__name__, e)
     previsor = None if a.sin_prevision else crear_previsor(alm, sensores, hora)
     escribir(datos, (a.ffmc, a.dmc, a.dc), hora, ahora, a.dias_json, previsor)
     print(f"\nListo: {nuevas} filas nuevas, {cli.llamadas} llamadas a la API. "
