@@ -455,7 +455,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     <details class="met">
       <summary>Datuak eta ordua: eguzki-eguerdia</summary>
       <p>Egunero <b>eguzki-eguerdiko</b> datuak erabiltzen dira: <b>12:00 UTC</b>, hau da, ordu ofizialean <b>13:00 neguan eta 14:00 udan</b>. Estazio bakoitzeko ordu horretako tenperatura, hezetasun erlatiboa eta haizearen abiadura eta norabidea hartzen dira, eta aurreko <b>24 orduetako euri metatua</b>. Hori da FWI sistemaren irizpide estandarra, eta EFFISek erabiltzen duen bera.</p>
-      <p>Euskalmetek datuak argitaratzeko denbora behar duenez, datuak <b>14:10etik 15:00ra, 10 minuturo</b> deskargatzen dira, eta <b>15:00etan eguna ixten da</b> (udan; neguan ordubete lehenago). Eguna beti ixten da 14:00etako datuarekin: <b>ez da inoiz geroagoko irakurketarik erabiltzen</b>. Webguneak eguneko datua erakusten du Euskalmeten datu neurtua iritsi bezain laster (normalean 14:10 eta 14:30 artean); ordura arte, aurreko egunekoa. Estazio batek oraindik daturik ez badu, orduan arte neurtutakoarekin kalkulatutako balioa agertzen da, "kalkulatua" markarekin, datu neurtua iritsi arte. Orria bakarrik eguneratzen da: minuturo datuak iristen diren orduetan, eta bost minuturo gainerakoan.</p>
+      <p>Euskalmetek datuak argitaratzeko denbora behar duenez, datuak <b>14:10ean eta 14:40an</b> deskargatzen dira, eta <b>15:00etan eguna ixten da</b>, 15:10eko exekuzioan (udan; neguan ordubete lehenago). Eguna beti ixten da 14:00etako datuarekin: <b>ez da inoiz geroagoko irakurketarik erabiltzen</b>. Webguneak eguneko datua erakusten du Euskalmeten datu neurtua iritsi bezain laster (normalean 14:10ean edo 14:40an); ordura arte, aurreko egunekoa. Estazio batek oraindik daturik ez badu, orduan arte neurtutakoarekin kalkulatutako balioa agertzen da, "kalkulatua" markarekin, datu neurtua iritsi arte. Orria bakarrik eguneratzen da: minuturo datuak iristen diren orduetan, eta bost minuturo gainerakoan.</p>
     </details>
 
     <details class="met">
@@ -479,7 +479,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         <thead><tr><th>Tartea</th><th>Maiztasuna</th><th>Zer egiten du</th></tr></thead>
         <tbody>
           <tr><td>07:20 – 13:20</td><td>Orduro</td><td>Gaurko estimazioa kalkulatzen du berriro, aurreko ordura arteko benetako euriarekin, eta indizeen 3 eguneko iragarpena berritzen du.</td></tr>
-          <tr><td>14:00 – 15:50</td><td>10 minuturo</td><td>Eguzki-eguerdiko datua (14:00) jaisten du Euskalmetek argitaratu bezain laster; 15:00etan eguna ixten du eta posta eta Telegram abisuak bidaltzen ditu.</td></tr>
+          <tr><td>14:10 · 14:40 · 15:10 · 15:40</td><td>30 minuturo</td><td>Eguzki-eguerdiko datua (14:00) jaisten du Euskalmetek argitaratu ondoren; 15:10ekoak eguna ixten du (15:00etako itxieraren ondoren) eta posta eta Telegram abisuak bidaltzen ditu; 15:40koa babeskopia da.</td></tr>
           <tr><td>17:20 · 20:20 · 23:20</td><td>3 orduro</td><td>Biharko estimazioa kalkulatzen du berriro, gaurko 14:00etatik aurrera egindako benetako euriarekin.</td></tr>
           <tr><td>02:20 · 05:20</td><td>3 orduro</td><td>Gaurko estimazioa (eguna aldatu da). Gauerdiaren ondorengo lehenengoak aurreko egunaren laburpena ere kalkulatzen du.</td></tr>
         </tbody>
@@ -620,7 +620,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     <details class="met">
       <summary>Datos y hora: el mediodía solar</summary>
       <p>Cada día se usan los datos del <b>mediodía solar</b>: las <b>12:00 UTC</b>, es decir, en hora oficial, las <b>13:00 en invierno y las 14:00 en verano</b>. De cada estación se toman la temperatura, la humedad relativa y la velocidad y dirección del viento a esa hora, y la <b>lluvia acumulada en las 24 horas</b> anteriores. Es el criterio estándar del sistema FWI y el mismo que usa el EFFIS.</p>
-      <p>Como Euskalmet necesita un tiempo para publicar los datos, se descargan <b>cada 10 minutos entre las 14:10 y las 15:00</b>, y <b>a las 15:00 se cierra el día</b> (en verano; en invierno, una hora antes). El día se cierra siempre con el dato de las 14:00: <b>nunca se usan lecturas posteriores</b>. La web muestra el dato del día en cuanto llega el dato medido de Euskalmet (normalmente entre las 14:10 y las 14:30); hasta entonces, el del día anterior. Si alguna estación aún no tiene su dato, aparece el valor calculado con lo medido hasta ese momento, marcado como "calculado", hasta que llega el dato medido. La página se actualiza sola: cada minuto en las horas en que llegan los datos y cada cinco minutos el resto del día.</p>
+      <p>Como Euskalmet necesita un tiempo para publicar los datos, se descargan <b>a las 14:10 y a las 14:40</b>, y <b>a las 15:00 se cierra el día</b>, en la ejecución de las 15:10 (en verano; en invierno, una hora antes). El día se cierra siempre con el dato de las 14:00: <b>nunca se usan lecturas posteriores</b>. La web muestra el dato del día en cuanto llega el dato medido de Euskalmet (normalmente a las 14:10 o a las 14:40); hasta entonces, el del día anterior. Si alguna estación aún no tiene su dato, aparece el valor calculado con lo medido hasta ese momento, marcado como "calculado", hasta que llega el dato medido. La página se actualiza sola: cada minuto en las horas en que llegan los datos y cada cinco minutos el resto del día.</p>
     </details>
 
     <details class="met">
@@ -644,7 +644,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         <thead><tr><th>Franja</th><th>Frecuencia</th><th>Qué hace</th></tr></thead>
         <tbody>
           <tr><td>07:20 – 13:20</td><td>Cada hora</td><td>Recalcula la estimación de hoy con la lluvia real hasta la hora anterior y renueva la previsión de los índices a 3 días.</td></tr>
-          <tr><td>14:00 – 15:50</td><td>Cada 10 minutos</td><td>Descarga el dato del mediodía solar (14:00) en cuanto Euskalmet lo publica; a las 15:00 cierra el día y envía el correo y los avisos de Telegram.</td></tr>
+          <tr><td>14:10 · 14:40 · 15:10 · 15:40</td><td>Cada 30 minutos</td><td>Descarga el dato del mediodía solar (14:00) cuando Euskalmet lo ha publicado; la de las 15:10 cierra el día (cierre de las 15:00) y envía el correo y los avisos de Telegram; la de las 15:40 es de respaldo.</td></tr>
           <tr><td>17:20 · 20:20 · 23:20</td><td>Cada 3 horas</td><td>Recalcula la estimación de mañana con la lluvia real caída desde las 14:00 de hoy.</td></tr>
           <tr><td>02:20 · 05:20</td><td>Cada 3 horas</td><td>Estimación de hoy (el día ya ha cambiado). La primera tras la medianoche calcula además el resumen del día anterior.</td></tr>
         </tbody>
