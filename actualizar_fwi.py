@@ -101,6 +101,10 @@ NOTAS_ESTACIONES = {"Zarautz": "Puntu honetako euria Inurritzako estaziotik (C08
                                  "Haizea ez da batez besteratzen (norabide bat batez besteratzeak ez du zentzurik)."}
 if az is not None:
     NOTAS_ESTACIONES[az.NOMBRE] = az.NOTA
+# Estaciones cuyos índices usarían la lluvia de otra estación cercana, p. ej. {"Pasaia": "Miramon"} (el
+# dato en bruto se guarda igual en historial.csv). Desactivado: cada estación usa su propio pluviómetro.
+# Nota: el de Pasaia (plataforma del puerto) recoge ~60 % de la lluvia de Miramon (2023-2025).
+LLUVIA_DE = {}
 # "Gipuzkoa" tiene nota (arriba), pero no es una estación real: no cuenta para el histórico ni
 # para la lista de estaciones que se recorre en cada ejecución (eso lo decide media_ponderada()).
 NOMBRES_EXTRA = set(NOTAS_ESTACIONES) - {"Gipuzkoa"}
@@ -359,7 +363,7 @@ def media_ponderada(cascadas, pesos, cobertura_minima=0.30):
             "isi": round(prom["isi"], 1), "bui": round(prom["bui"], 1), "fwi": round(prom["fwi"], 1),
             "clase": clase(prom["fwi"]), "hueco": False, "calentando": False,
             "ifg": round(prom["ifg"], 2), "clase_ifg": clase_ifg(prom["ifg"]),
-            "icona": round(prom["icona"], 1), "clase_icona": ico.nivel(prom["icona"]),
+            "icona": int(round(prom["icona"])), "clase_icona": ico.nivel(prom["icona"]),   # entero, como el de las estaciones
             "cobertura": round(100 * peso_dia / total),
         })
     return salida
@@ -401,7 +405,7 @@ def prevision_media(previsiones, pesos, ref, cobertura_minima=0.30):
             **{k: round(prom[k], 1) for k in VARS},
             "clase": clase(fwi), "pct": rango_percentil(v, fwi) if (v and len(v) >= 30) else None,
             "clase_ifg": clase_ifg(prom["ifg"]),
-            "icona": round(p_ico, 1) if p_ico is not None else None, "clase_icona": ico.nivel(p_ico) if p_ico is not None else None,
+            "icona": int(round(p_ico)) if p_ico is not None else None, "clase_icona": ico.nivel(p_ico) if p_ico is not None else None,
             "calentando": False, "lluvia_medida_h": None, "cobertura": round(100 * peso_dia / total),
         })
     return salida
@@ -684,7 +688,10 @@ def crear_previsor(alm, sensores, hora):
                 T, H, W = pv.corregir(corr.get(f"{nombre}|{min(3, max(0, j))}", IDENTIDAD), T, H, W)
                 medidas = 0
                 cod_est = ew.ESTACIONES.get(nombre)
-                if cod_est:
+                if nombre in LLUVIA_DE and ew.ESTACIONES.get(LLUVIA_DE[nombre]):   # Pasaia: lluvia real de Miramon
+                    cod_lluvia = ew.ESTACIONES[LLUVIA_DE[nombre]]
+                    sens_lluvia = sensores.get(cod_lluvia)
+                elif cod_est:
                     cod_lluvia, sens_lluvia = cod_est, sensores.get(cod_est)
                 elif zr and nombre == zr.NOMBRE:      # Zarautz: la lluvia es de Inurritza (otra estación)
                     cod_lluvia, sens_lluvia = zr.ESTACION_LLUVIA, sensores.get(nombre)
@@ -1212,6 +1219,11 @@ def escribir(datos, inicial, hora, ahora, dias_json, previsor=None):
         filas_csv += [[f["fecha"], nombre, f["temperatura"], f["humedad"], f["viento"], f["lluvia"],
                        f.get("direccion") if f.get("direccion") is not None else "",
                        f.get("origen", "")] for f in filas]
+        fuente = LLUVIA_DE.get(nombre)
+        if fuente and fuente in datos:          # índices con la lluvia de la estación vecina (ver LLUVIA_DE)
+            otra = datos[fuente]
+            filas = [dict(f, lluvia=otra[f["fecha"]]["lluvia"]) if f["fecha"] in otra and otra[f["fecha"]].get("lluvia") is not None
+                     else f for f in filas]
         estados[nombre] = {}
         cascadas[nombre] = cascada(filas, inicial, estados[nombre])
     filas_csv.sort(key=lambda r: (r[0], orden.index(r[1])))
