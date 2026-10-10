@@ -1,6 +1,8 @@
 {
- "correo": "2026-10-09",
- "activos": {},
+ "correo": "2026-10-10",
+ "activos": {
+  "Pasaia": "2026-10-10"
+ },
  "preavisos": {},
- "avisos": "2026-10-09"
+ "avisos": "2026-10-10"
 }
