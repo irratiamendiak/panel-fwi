@@ -878,7 +878,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   const CLASE_EU = window.LANG === 'es' ? {'Muy bajo':'Muy bajo','Bajo':'Bajo','Moderado':'Moderado','Alto':'Alto','Muy alto':'Muy alto','Extremo':'Extremo'}
                                          : {'Muy bajo':'Oso baxua','Bajo':'Baxua','Moderado':'Ertaina','Alto':'Handia','Muy alto':'Oso handia','Extremo':'Muturrekoa'};
   const colorDe = n => COLORES[n] || {c:'#888', fg:'#fff'};
-  const claseEu = n => (MODO === 'icona' && n === 'Muy bajo') ? (window.LANG === 'es' ? 'Nulo' : 'Hutsa') : (CLASE_EU[n] || n);
+  const claseEu = n => n == null ? '—' : (MODO === 'icona' && n === 'Muy bajo') ? (window.LANG === 'es' ? 'Nulo' : 'Hutsa') : (CLASE_EU[n] || n);
   const fmt = (x,dec=1) => x == null ? '—' : Number(x).toLocaleString('es-ES',{minimumFractionDigits:dec,maximumFractionDigits:dec});
   const esISO = s => /^\d{4}-\d{2}-\d{2}$/.test(s);
   const fecha = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); };
