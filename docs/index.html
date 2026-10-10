@@ -157,7 +157,17 @@ body:not(.modo-meteo) .solo-meteo{display:none !important}
 .mt-gip .esc .bar{width:220px;height:10px;border-radius:5px}
 .mt-graf{overflow-x:auto}.mt-graf svg{display:block;min-width:720px}
 #m72Sec{margin-top:18px}
-#redSec{margin-top:18px}.red-wrap{max-width:820px}#redCv{width:100%;height:auto;display:block}
+#redSec{margin-top:18px}
+.res-tabla{overflow-x:auto}
+.res-tabla table{border-collapse:collapse;width:100%;min-width:860px;font-size:13.5px}
+.res-tabla th,.res-tabla td{padding:5px 4px;text-align:center;border-bottom:1px solid var(--line)}
+.res-tabla thead th{background:var(--field);font-weight:600}
+.res-tabla th.dia{border-left:2px solid var(--line)}.res-tabla td.d0{border-left:2px solid var(--line)}
+.res-tabla .sub th{font-weight:500;font-size:12px;color:var(--muted)}
+.res-tabla td:first-child,.res-tabla th:first-child{text-align:left;position:sticky;left:0;background:var(--card);white-space:nowrap;z-index:1}
+.res-tabla thead th:first-child{background:var(--field)}
+.res-tabla .v{display:inline-block;min-width:36px;padding:2px 6px;border-radius:999px;font-weight:700}
+.res-tabla .tipo{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}.red-wrap{max-width:820px}#redCv{width:100%;height:auto;display:block}
 .m72-ctl{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
 .m72-ctl button,#m72Play{font:inherit;font-size:13.5px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 .m72-ctl button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -397,6 +407,14 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p class="nota" id="verifIntro"></p>
       <div class="tabla" id="verifTabla"></div>
       <p class="nota" id="verifNota"></p>
+    </div>
+  </section>
+
+  <section id="resSec" class="solo-indize" aria-label="Laburpen-taula / Tabla resumen" hidden>
+    <h2 id="resTit">Laburpen-taula: indize guztiak</h2>
+    <div class="card">
+      <div class="res-tabla" id="resTabla"></div>
+      <p class="nota" id="resNota"></p>
     </div>
   </section>
 
@@ -1300,7 +1318,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         ${spark(Array.from({length: 10}, (_, k) => valorVista(est, masDias(fv, k-9))).filter(d => d && (!d.prev || d.calculado)))}
       </button>`;
     }).join('');
-    previsionTabla();
+    previsionTabla(); resumenTabla();
     verificacionTabla();
     detalle();
   }
@@ -2324,6 +2342,42 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     if (i >= 0 && i !== sel){ sel = i; todo = false; render(); }
   }
   window.FWI_API_METEO = (n) => { seleccionarEstacion(n); meteoElegir(n, true); };
+
+  // ---- Laburpen-taula: azken datua eta hurrengo 3 egunetako iragarpena, hiru indizeekin
+  function resumenTabla(){
+    const sec = $('#resSec');
+    if (!DATA || FECHA){ sec.hidden = true; return; }          // solo para la situación actual
+    const ests = DATA.estaciones;
+    const cols = ests.map(e => [ultimo(e), ...conPrevision(e).prev.slice(0, 3)]);
+    const n = Math.max(...cols.map(c => c.length));
+    if (n < 2){ sec.hidden = true; return; }
+    sec.hidden = false;
+    // cabecera de cada día (fecha y tipo de dato), tomada de la primera estación que lo tenga
+    const cab = [...Array(n).keys()].map(i => {
+      const d = cols.map(c => c[i]).find(Boolean);
+      if (!d) return '';
+      const tipo = i === 0 ? Tm('azken datua', 'último dato') : (d.k === 0 ? Tm('kalkulatua', 'calculado') : Tm('iragarpena', 'previsión'));
+      return `${fmtFecha(d.fecha)}<span class="tipo">${tipo}</span>`;
+    });
+    const pill = (txt, clase) => { const c = colorDe(clase); return `<span class="v" style="background:${c.c};color:${c.fg}">${txt}</span>`; };
+    const celdas = (d, i) => {
+      const cl = ' class="' + (i ? '' : '') + '"';
+      if (!d) return `<td class="d0">—</td><td>—</td><td>—</td>`;
+      const b = bgx(ifgDe(d));
+      return `<td class="d0">${d.fwi != null ? pill(fmt(d.fwi), d.clase || claseDeFwi(d.fwi)) : '—'}</td>`
+           + `<td>${b != null ? pill(fmt(b), claseBgx(b)) : '—'}</td>`
+           + `<td>${d.icona != null ? pill(String(Math.round(d.icona)), claseIco(d.icona)) : '—'}</td>`;
+    };
+    let h = `<table><thead><tr><th rowspan="2">${Tm('Estazioa','Estación')}</th>` + cab.map(c => `<th class="dia" colspan="3">${c}</th>`).join('') + '</tr>'
+          + '<tr class="sub">' + cab.map(() => '<th class="dia">FWI</th><th>Basugix</th><th>ICONA</th>').join('') + '</tr></thead><tbody>';
+    ests.forEach((e, k) => {
+      h += `<tr><td>${e.resumen ? '<b>' + nombreVis(e) + '</b>' : e.nombre}${e.modelo ? ' 🖥️' : ''}</td>` + [...Array(n).keys()].map(i => celdas(cols[k][i], i)).join('') + '</tr>';
+    });
+    $('#resTabla').innerHTML = h + '</tbody></table>';
+    $('#resTit').textContent = Tm('Laburpen-taula: indize guztiak', 'Tabla resumen: todos los índices');
+    $('#resNota').innerHTML = Tm('Estazio bakoitzeko azken datua eta hurrengo egunetako iragarpena, hiru indizeekin, bakoitza bere mailaren kolorearekin. FWI: EFFIS mailak · Basugix: 20 = egun ertaina · ICONA: 0–16.',
+                                 'Último dato de cada estación y previsión de los días siguientes, con los tres índices, cada uno con el color de su nivel. FWI: niveles del EFFIS · Basugix: 20 = día medio · ICONA: 0–16.');
+  }
 
   function previsionTabla(){
     const sec = $('#prevSec');
