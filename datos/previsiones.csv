@@ -771,10 +771,10 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg,icona
 2026-10-10,Bidania,2026-10-11,1,0.7,0.0,3.7,Muy bajo,0,0.15,Muy bajo,5
 2026-10-10,Bidania,2026-10-12,2,1.0,0.0,4.6,Muy bajo,0,0.18,Muy bajo,5
 2026-10-10,Bidania,2026-10-13,3,2.2,0.8,6.1,Muy bajo,0,0.31,Muy bajo,6
-2026-10-10,Gipuzkoa,2026-10-10,0,1.7,0.6,3.8,Muy bajo,1,0.3,Muy bajo,4.6
-2026-10-10,Gipuzkoa,2026-10-11,1,2.0,0.5,5.2,Muy bajo,0,0.3,Muy bajo,4.7
-2026-10-10,Gipuzkoa,2026-10-12,2,4.2,1.3,9.1,Muy bajo,0,0.5,Bajo,6.5
-2026-10-10,Gipuzkoa,2026-10-13,3,5.5,1.2,10.4,Bajo,0,0.7,Bajo,6.9
+2026-10-10,Gipuzkoa,2026-10-10,0,1.7,0.6,3.8,Muy bajo,1,0.3,Muy bajo,5
+2026-10-10,Gipuzkoa,2026-10-11,1,2.0,0.5,5.2,Muy bajo,0,0.3,Muy bajo,5
+2026-10-10,Gipuzkoa,2026-10-12,2,4.2,1.3,9.1,Muy bajo,0,0.5,Bajo,6
+2026-10-10,Gipuzkoa,2026-10-13,3,5.5,1.2,10.4,Bajo,0,0.7,Bajo,7
 2026-10-10,Miramon,2026-10-10,0,2.2,1.2,4.1,Muy bajo,1,0.31,Muy bajo,3
 2026-10-10,Miramon,2026-10-11,1,2.8,1.3,5.7,Muy bajo,0,0.37,Muy bajo,4
 2026-10-10,Miramon,2026-10-12,2,5.0,3.8,8.6,Muy bajo,0,0.63,Bajo,5
