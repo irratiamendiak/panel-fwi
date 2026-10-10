@@ -4,7 +4,7 @@ Notificaciones del panel FWI / Basugix (euskera y castellano).
 
   * Correo: informe del día y previsión a 3 días, una vez al día, al cerrarse el dato
     (hora del dato + 60 min: 15:00 en verano, 14:00 en invierno).
-  * Telegram: avisos de riesgo alto (Basugix >= 30 o FWI >= 21,3), subidas bruscas,
+  * Telegram: avisos de riesgo alto (Basugix >= 30, FWI >= 21,3 o ICONA >= 9), subidas bruscas,
     viento sur con riesgo alto, y avisos técnicos (estaciones sin datos, fallo del proceso).
 
 Lee docs/data/fwi.json (lo escribe actualizar_fwi.py) y guarda en datos/notificaciones.json lo ya
@@ -35,6 +35,9 @@ ESTADO = Path("datos/notificaciones.json")
 WEB = "https://irratiamendiak.github.io/panel-fwi/"
 UMBRAL_BGX = 30.0      # Basugix "Handia"
 UMBRAL_FWI = 21.3      # FWI "Handia" (EFFIS)
+UMBRAL_ICO = 9         # ICONA "Alto" (9-12); 13 o más, "Extremo"
+NOM_ICO = {"eu": ["Hutsa", "Baxua", "Ertaina", "Handia", "Muturrekoa"], "es": ["Nulo", "Bajo", "Moderado", "Alto", "Extremo"]}
+COL_ICO = [0, 1, 2, 3, 5]   # colores de COL para Nulo, Bajo, Moderado, Alto y Extremo
 SALTO_NIVELES = 2      # subida brusca: 2 niveles o más de un día para otro
 MARGEN_CIERRE = 60     # minutos tras la hora del dato
 
@@ -82,6 +85,21 @@ def idx_fwi(v):
 def idx_fwi_de(u):
     """Nivel del FWI tal como lo calcula el proceso (con el valor sin redondear); si no viene, por umbrales."""
     return CLASES.index(u["clase"]) if u.get("clase") in CLASES else idx_fwi(u["fwi"])
+
+
+def nivel_ico(v):
+    """0 Nulo, 1 Bajo (1-4), 2 Moderado (5-8), 3 Alto (9-12), 4 Extremo (13 o más)."""
+    v = round(v)
+    return 0 if v <= 0 else 1 if v <= 4 else 2 if v <= 8 else 3 if v <= 12 else 4
+
+
+def celda_ico(v, extra=""):
+    if v is None:
+        return "<td>—</td>"
+    i = COL_ICO[nivel_ico(v)]
+    txt = str(int(v)) if float(v).is_integer() else fnum(v)
+    return (f'<td style="padding:4px 6px;text-align:center"><span style="display:inline-block;min-width:34px;padding:2px 8px;'
+            f'border-radius:999px;background:{COL[i]};color:{FG[i]};font-weight:700">{txt}</span>{extra}</td>')
 
 
 def fnum(v, dec=1):
@@ -181,8 +199,8 @@ T = {
     "viento": {"eu": "Haizea", "es": "Viento"}, "lluvia": {"eu": "Euria 24 h", "es": "Lluvia 24 h"},
     "prev": {"eu": "Hurrengo egunetako iragarpena", "es": "Previsión de los próximos días"},
     "sur": {"eu": "💨 hego haizea", "es": "💨 viento sur"}, "calc": {"eu": "kalkulatua", "es": "calculado"},
-    "leyenda": {"eu": "FWI: nazioarteko indizea (EFFIS mailak). Basugix: Gipuzkoarako egokitua (20 = egun ertaina; 10 puntu gehiago = sute-probabilitatea bikoitza).",
-                "es": "FWI: índice internacional (niveles del EFFIS). Basugix: adaptado a Gipuzkoa (20 = día medio; 10 puntos más = el doble de probabilidad de incendio)."},
+    "leyenda": {"eu": "FWI: nazioarteko indizea (EFFIS mailak). Basugix: Gipuzkoarako egokitua (20 = egun ertaina; 10 puntu gehiago = sute-probabilitatea bikoitza). ICONA: indize sintetikoa, 0-16 (hutsa 0, baxua 1-4, ertaina 5-8, handia 9-12, muturrekoa 13 edo gehiago).",
+                "es": "FWI: índice internacional (niveles del EFFIS). Basugix: adaptado a Gipuzkoa (20 = día medio; 10 puntos más = el doble de probabilidad de incendio). ICONA: índice sintético, 0-16 (nulo 0, bajo 1-4, moderado 5-8, alto 9-12, extremo 13 o más)."},
     "web": {"eu": "Ikusi webgunean", "es": "Ver en la web"},
     "pie": {"eu": "Tresna orientagarria: ez ditu ordezkatzen abisu ofizialak. Datuak: Euskalmet; iragarpena: Open-Meteo.",
             "es": "Herramienta orientativa: no sustituye a los avisos oficiales. Datos: Euskalmet; previsión: Open-Meteo."},
@@ -200,7 +218,7 @@ def bloque_correo(d, l, hoy):
     h = [f'<h2 style="margin:0 0 2px;font:700 20px system-ui">{T["tit"][l]}</h2>',
          f'<p style="margin:0 0 10px;color:#444">{ffecha(hoy, l)} · {T["sub"][l]} ({d["hora_dato"]}:00)</p>',
          f'<table style="border-collapse:collapse;font:13px system-ui;width:100%"><tr><th {th}>{T["est"][l]}</th>'
-         f'<th {th}>FWI</th><th {th}>Basugix</th><th {th}>T · HR</th><th {th}>{T["viento"][l]}</th><th {th}>{T["lluvia"][l]}</th><th {th}>{T["sinll"][l]}</th></tr>']
+         f'<th {th}>FWI</th><th {th}>Basugix</th><th {th}>ICONA</th><th {th}>T · HR</th><th {th}>{T["viento"][l]}</th><th {th}>{T["lluvia"][l]}</th><th {th}>{T["sinll"][l]}</th></tr>']
     for e in ests:
         u = e["dias"][-1] if e.get("dias") else None
         if not u or u["fecha"] != hoy:
@@ -210,7 +228,7 @@ def bloque_correo(d, l, hoy):
             calc = False
         nom = "<b>GIPUZKOA</b>" if e.get("resumen") else html.escape(e["nombre"])
         if not u:
-            h.append(f'<tr><td style="padding:4px 6px">{nom}</td><td colspan="6" style="color:#777">—</td></tr>')
+            h.append(f'<tr><td style="padding:4px 6px">{nom}</td><td colspan="7" style="color:#777">—</td></tr>')
             continue
         b = bgx(ifg_de(u))
         meteo = "" if e.get("resumen") else f'{fnum(u.get("T"))} °C · {fnum(u.get("H"),0)} %'
@@ -221,6 +239,7 @@ def bloque_correo(d, l, hoy):
         h.append(f'<tr style="border-bottom:1px solid #ddd"><td style="padding:4px 6px">{nom}'
                  f'{" <i style=color:#777>(" + T["calc"][l] + ")</i>" if calc else ""}</td>'
                  + celda(u["fwi"], idx_fwi_de(u)) + (celda(b, idx_bgx(b)) if b is not None else "<td>—</td>")
+                 + celda_ico(u.get("icona"))
                  + f'<td style="padding:4px 6px">{meteo}</td><td style="padding:4px 6px">{vto}</td>'
                  f'<td style="padding:4px 6px">{ll}</td><td style="padding:4px 6px">{sl}</td></tr>')
     h.append("</table>")
@@ -228,7 +247,7 @@ def bloque_correo(d, l, hoy):
     if fechas:
         h.append(f'<h3 style="margin:16px 0 4px;font:700 16px system-ui">{T["prev"][l]}</h3>'
                  f'<table style="border-collapse:collapse;font:13px system-ui;width:100%"><tr><th {th}>{T["est"][l]}</th>'
-                 + "".join(f'<th {th} colspan="2">{ffecha(f, l, False)}<br><span style="font-weight:400">FWI · Basugix</span></th>' for f in fechas) + "</tr>")
+                 + "".join(f'<th {th} colspan="3">{ffecha(f, l, False)}<br><span style="font-weight:400">FWI · Basugix · ICONA</span></th>' for f in fechas) + "</tr>")
         for e in ests:
             pv = {p["fecha"]: p for p in e.get("prevision", [])}
             nom = "<b>GIPUZKOA</b>" if e.get("resumen") else html.escape(e["nombre"])
@@ -236,10 +255,11 @@ def bloque_correo(d, l, hoy):
             for f in fechas:
                 p = pv.get(f)
                 if not p:
-                    fila += '<td colspan="2" style="text-align:center;color:#777">—</td>'
+                    fila += '<td colspan="3" style="text-align:center;color:#777">—</td>'
                     continue
                 b = bgx(ifg_de(p))
                 fila += celda(p["fwi"], idx_fwi_de(p)) + (celda(b, idx_bgx(b), " 💨" if hay_sur(p) else "") if b is not None else "<td>—</td>")
+                fila += celda_ico(p.get("icona"))
             h.append(fila + "</tr>")
         h.append("</table>")
     h.append(f'<p style="font:12px system-ui;color:#555;margin:10px 0 2px">{T["leyenda"][l]}</p>'
@@ -256,7 +276,8 @@ def correo_diario(d, hoy, prueba):
     extra = ""
     if u and u["fecha"] == hoy:
         b = bgx(ifg_de(u))
-        extra = f" · GIPUZKOA FWI {fnum(u['fwi'])}" + (f" / Basugix {fnum(b)}" if b is not None else "")
+        extra = (f" · GIPUZKOA FWI {fnum(u['fwi'])}" + (f" / Basugix {fnum(b)}" if b is not None else "")
+                 + (f" / ICONA {fnum(u['icona'])}" if u.get("icona") is not None else ""))
     enviar_correo(f"Sute arriskua / Riesgo de incendio · {hoy}{extra}", cuerpo, prueba)
 
 
@@ -271,7 +292,9 @@ def valor_dia(e, f):
 
 def alto(u):
     b = bgx(ifg_de(u))
-    return (b is not None and round(b, 1) >= UMBRAL_BGX) or idx_fwi_de(u) >= 3   # FWI "Handia" o más
+    ic = u.get("icona")
+    return ((b is not None and round(b, 1) >= UMBRAL_BGX) or idx_fwi_de(u) >= 3      # FWI "Handia" o más
+            or (ic is not None and round(ic) >= UMBRAL_ICO))                       # ICONA "Alto" o más
 
 
 def txt_valor(u, l):
@@ -279,6 +302,9 @@ def txt_valor(u, l):
     s = f"FWI {fnum(u['fwi'])} ({NOM[l][idx_fwi_de(u)]})"
     if b is not None:
         s += f" · Basugix {fnum(b)} ({NOM[l][idx_bgx(b)]})"
+    if u.get("icona") is not None:
+        ic = u["icona"]
+        s += f" · ICONA {int(ic) if float(ic).is_integer() else fnum(ic)} ({NOM_ICO[l][nivel_ico(ic)]})"
     if hay_sur(u):
         s += " · 💨"
     return s

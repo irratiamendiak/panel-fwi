@@ -35,6 +35,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import euskalmet_fwi_datos as ew
+import icona as ico          # índice sintético de peligro del ICONA (peligro meteorológico diario)
 
 try:
     import prevision as pv
@@ -258,6 +259,9 @@ def mult_viento(fwi, sur, W=None):
     return MULT_VIENTO_SUR
 
 
+ICONA_HUECO = 3        # días sin dato a partir de los cuales el ICONA vuelve a empezar desde 0
+
+
 def cascada(filas, inicial, estado=None):
     """filas: lista de dicts de UNA estación ordenados por fecha.
 
@@ -267,6 +271,7 @@ def cascada(filas, inicial, estado=None):
     climatología.
     """
     F, M, D = inicial
+    S, Pi = 0, 0          # ICONA: índice de sequía y de peligro del día anterior
     prev = None
     inicio = None
     salida = []
@@ -277,6 +282,8 @@ def cascada(filas, inicial, estado=None):
         elif (d - prev).days > HUECO_MAX:
             F, M, D = inicial
             inicio = d
+        if prev is not None and (d - prev).days > ICONA_HUECO:   # ICONA: tras un hueco de más de 3 días, se reinicia
+            S, Pi = 0, 0
         hueco = prev is not None and (d - prev).days != 1
         prev = d
         T, H, W, R = f["temperatura"], f["humedad"], f["viento"], f["lluvia"]
@@ -286,6 +293,7 @@ def cascada(filas, inicial, estado=None):
         isi = isi_calc(F, W)
         bui = bui_calc(M, D)
         fwi = fwi_calc(isi, bui)
+        S, Pi = ico.paso(S, Pi, R, H, W, d)
         sur = componente_sur(f.get("direccion"))
         salida.append({
             "fecha": f["fecha"], "T": T, "H": H, "W": W, "R": R, "dir": f.get("direccion"), "sur": sur,
@@ -296,9 +304,10 @@ def cascada(filas, inicial, estado=None):
             "clase_ifg": clase_ifg(ifg_calc(fwi, f["fecha"], sur, W)),
             "calentando": (d - inicio).days < CALENTAMIENTO,
             "origen": f.get("origen") or "",
+            "icona": Pi, "icona_seq": S, "clase_icona": ico.nivel(Pi),
         })
     if estado is not None and prev is not None:      # último estado real, sin redondear, para la previsión
-        estado.update(fecha=prev, F=F, M=M, D=D, calentando=(prev - inicio).days < CALENTAMIENTO)
+        estado.update(fecha=prev, F=F, M=M, D=D, S=S, Pi=Pi, calentando=(prev - inicio).days < CALENTAMIENTO)
     return salida
 
 
@@ -335,7 +344,7 @@ def media_ponderada(cascadas, pesos, cobertura_minima=0.30):
             if d["calentando"]:
                 continue
             por_fecha.setdefault(d["fecha"], {})[nombre] = d
-    VARS = ("ffmc", "dmc", "dc", "isi", "bui", "fwi", "ifg")   # solo índices: no se promedian T, HR ni lluvia
+    VARS = ("ffmc", "dmc", "dc", "isi", "bui", "fwi", "ifg", "icona")   # solo índices: no se promedian T, HR ni lluvia
     salida = []
     for fecha in sorted(por_fecha):
         dias = por_fecha[fecha]
@@ -350,6 +359,7 @@ def media_ponderada(cascadas, pesos, cobertura_minima=0.30):
             "isi": round(prom["isi"], 1), "bui": round(prom["bui"], 1), "fwi": round(prom["fwi"], 1),
             "clase": clase(prom["fwi"]), "hueco": False, "calentando": False,
             "ifg": round(prom["ifg"], 2), "clase_ifg": clase_ifg(prom["ifg"]),
+            "icona": round(prom["icona"], 1), "clase_icona": ico.nivel(prom["icona"]),
             "cobertura": round(100 * peso_dia / total),
         })
     return salida
@@ -382,6 +392,8 @@ def prevision_media(previsiones, pesos, ref, cobertura_minima=0.30):
             continue
         prom = {v: sum(pesos[n] * dias[n][v] for n in dias) / peso_dia for v in VARS}
         fwi = prom["fwi"]
+        con_ico = [n for n in dias if dias[n].get("icona") is not None]
+        p_ico = sum(pesos[n] * dias[n]["icona"] for n in con_ico) / sum(pesos[n] for n in con_ico) if con_ico else None
         v = ref.get(("Gipuzkoa", int(fecha[5:7])))
         salida.append({
             "fecha": fecha, "k": min(d["k"] for d in dias.values()),
@@ -389,6 +401,7 @@ def prevision_media(previsiones, pesos, ref, cobertura_minima=0.30):
             **{k: round(prom[k], 1) for k in VARS},
             "clase": clase(fwi), "pct": rango_percentil(v, fwi) if (v and len(v) >= 30) else None,
             "clase_ifg": clase_ifg(prom["ifg"]),
+            "icona": round(p_ico, 1) if p_ico is not None else None, "clase_icona": ico.nivel(p_ico) if p_ico is not None else None,
             "calentando": False, "lluvia_medida_h": None, "cobertura": round(100 * peso_dia / total),
         })
     return salida
@@ -660,6 +673,7 @@ def crear_previsor(alm, sensores, hora):
                 continue
             tabla = pv.descargar_horario(lat, lon, alt)
             F, M, D = est["F"], est["M"], est["D"]
+            S, Pi = est.get("S", 0), est.get("Pi", 0)
             filas, dia = [], est["fecha"] + timedelta(days=1)
             while dia <= hoy + timedelta(days=3):
                 j = (dia - hoy).days
@@ -693,6 +707,7 @@ def crear_previsor(alm, sensores, hora):
                 D = dc_step(T, P, D, DC_L[dia.month - 1])
                 isi, bui = isi_calc(F, W), bui_calc(M, D)
                 fwi = fwi_calc(isi, bui)
+                S, Pi = ico.paso(S, Pi, P, H, W, dia)
                 if j >= 0:
                     lo, hi = pv.rango(inc, j, fwi)
                     v = ref.get((nombre, dia.month))
@@ -706,6 +721,7 @@ def crear_previsor(alm, sensores, hora):
                         "ifg": round(ifg_calc(fwi, dia.isoformat(), sur, W), 2),
                         "clase_ifg": clase_ifg(ifg_calc(fwi, dia.isoformat(), sur, W)),
                         "pct": rango_percentil(v, fwi) if (v and len(v) >= 30 and not est["calentando"]) else None,
+                        "icona": Pi, "clase_icona": ico.nivel(Pi),
                         "calentando": est["calentando"], "lluvia_medida_h": medidas})
                 dia += timedelta(days=1)
             resultado[nombre] = filas
@@ -720,7 +736,7 @@ def registrar_previsiones(previsiones, ahora):
     """Guarda en datos/previsiones.csv la previsión emitida hoy, para poder compararla después con el
     FWI medido (fiabilidad a 1, 2 y 3 días). Una fila por (día de emisión, estación, día previsto):
     si el proceso corre varias veces el mismo día, se queda la última previsión de ese día."""
-    campos = ["emitida", "estacion", "fecha", "adelanto", "fwi", "min", "max", "clase", "calculado", "ifg", "clase_ifg"]
+    campos = ["emitida", "estacion", "fecha", "adelanto", "fwi", "min", "max", "clase", "calculado", "ifg", "clase_ifg", "icona"]
     hoy = ahora.date()
     filas = {}
     if REGISTRO_PREVISIONES.exists():
@@ -738,7 +754,8 @@ def registrar_previsiones(previsiones, ahora):
             filas[(hoy.isoformat(), nombre, pr["fecha"])] = {
                 "emitida": hoy.isoformat(), "estacion": nombre, "fecha": pr["fecha"], "adelanto": adelanto,
                 "fwi": pr.get("fwi"), "min": pr.get("min"), "max": pr.get("max"), "clase": pr.get("clase"),
-                "calculado": 1 if pr.get("k") == 0 else 0, "ifg": pr.get("ifg"), "clase_ifg": pr.get("clase_ifg")}
+                "calculado": 1 if pr.get("k") == 0 else 0, "ifg": pr.get("ifg"), "clase_ifg": pr.get("clase_ifg"),
+                "icona": pr.get("icona")}
     REGISTRO_PREVISIONES.parent.mkdir(parents=True, exist_ok=True)
     with open(REGISTRO_PREVISIONES, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=campos, lineterminator="\n")
@@ -759,13 +776,14 @@ def escribir_historico(cascadas, ref, orden_json):
         ini = date.fromisoformat(dias[0]["fecha"])
         n = (date.fromisoformat(dias[-1]["fecha"]) - ini).days + 1
         cols = {k: [None] * n for k in ("fwi", "pct", "T", "H", "W", "R", "dir", "ffmc", "dmc", "dc", "isi", "bui",
-                                         "cal", "cob", "ifg", "org")}
+                                         "cal", "cob", "ifg", "org", "ico")}
         for d in dias:
             i = (date.fromisoformat(d["fecha"]) - ini).days
             v = ref.get((nombre, int(d["fecha"][5:7])))
             cols["fwi"][i] = d["fwi"]
             cols["pct"][i] = rango_percentil(v, d["fwi"]) if (v and len(v) >= 30 and not d.get("calentando")) else None
             cols["ifg"][i] = d.get("ifg")
+            cols["ico"][i] = d.get("icona")
             cols["org"][i] = d.get("origen") or None   # datos rellenados y de dónde (vacío = todo medido)
             for k in ("T", "H", "W", "R", "ffmc", "dmc", "dc", "isi", "bui"):
                 x = d.get(k)
@@ -818,7 +836,7 @@ def verificar_previsiones(cascadas, hoy, dias=365):
                 continue
             emisiones.add(r["emitida"])
             grupo = "Gipuzkoa" if r["estacion"] == "Gipuzkoa" else "estaciones"
-            a = acum.setdefault((grupo, ad), {"n": 0, "fwi": [0, 0, 0, 0, 0], "bgx": [0, 0, 0, 0, 0]})
+            a = acum.setdefault((grupo, ad), {"n": 0, "fwi": [0, 0, 0, 0, 0], "bgx": [0, 0, 0, 0, 0], "ico": [0, 0, 0, 0, 0]})
             a["n"] += 1
             # FWI: |error|, error, dentro del tramo, casos con tramo, nivel acertado
             e = pf - o["fwi"]
@@ -847,12 +865,22 @@ def verificar_previsiones(cascadas, hoy, dias=365):
                     a["bgx"][3] += 1
                     a["bgx"][2] += 1 if bmn - 0.05 <= ob <= bmx + 0.05 else 0
                 a["bgx"][4] += 1 if clase_bgx(pb) == clase_bgx(ob) else 0
+            # ICONA (si la previsión lo guardó): sin tramo mín-máx
+            try:
+                pc = float(r.get("icona") or "")
+            except ValueError:
+                pc = None
+            if pc is not None and o.get("icona") is not None:
+                ec = pc - o["icona"]
+                a.setdefault("nc", 0); a["nc"] += 1
+                a["ico"][0] += abs(ec); a["ico"][1] += ec
+                a["ico"][4] += 1 if ico.nivel(pc) == ico.nivel(o["icona"]) else 0
     if not acum:
         return {"emisiones": 0, "grupos": {}}
     grupos = {}
     for (g, ad), a in sorted(acum.items()):
         res = {"n": a["n"]}
-        for k, n in (("fwi", a["n"]), ("bgx", a.get("nb", 0))):
+        for k, n in (("fwi", a["n"]), ("bgx", a.get("nb", 0)), ("ico", a.get("nc", 0))):
             v = a[k]
             if n:
                 res[k] = {"mae": round(v[0] / n, 1), "sesgo": round(v[1] / n, 1),
