@@ -275,7 +275,7 @@ def cascada(filas, inicial, estado=None):
     climatología.
     """
     F, M, D = inicial
-    S, Pi = 0, 0          # ICONA: índice de sequía y de peligro del día anterior
+    EI = ico.estado_inicial()   # ICONA: estado del día anterior (sequía, peligro base, días secos o de lluvia)
     prev = None
     inicio = None
     salida = []
@@ -287,7 +287,7 @@ def cascada(filas, inicial, estado=None):
             F, M, D = inicial
             inicio = d
         if prev is not None and (d - prev).days > ICONA_HUECO:   # ICONA: tras un hueco de más de 3 días, se reinicia
-            S, Pi = 0, 0
+            EI = ico.estado_inicial()
         hueco = prev is not None and (d - prev).days != 1
         prev = d
         T, H, W, R = f["temperatura"], f["humedad"], f["viento"], f["lluvia"]
@@ -297,7 +297,7 @@ def cascada(filas, inicial, estado=None):
         isi = isi_calc(F, W)
         bui = bui_calc(M, D)
         fwi = fwi_calc(isi, bui)
-        S, Pi = ico.paso(S, Pi, R, H, W, d)
+        IC = ico.paso_completo(EI, R, H, W, f.get("direccion"), d)
         sur = componente_sur(f.get("direccion"))
         salida.append({
             "fecha": f["fecha"], "T": T, "H": H, "W": W, "R": R, "dir": f.get("direccion"), "sur": sur,
@@ -308,10 +308,10 @@ def cascada(filas, inicial, estado=None):
             "clase_ifg": clase_ifg(ifg_calc(fwi, f["fecha"], sur, W)),
             "calentando": (d - inicio).days < CALENTAMIENTO,
             "origen": f.get("origen") or "",
-            "icona": Pi, "icona_seq": S, "clase_icona": ico.nivel(Pi),
+            **IC, "clase_icona": ico.nivel(IC["icona"]),
         })
     if estado is not None and prev is not None:      # último estado real, sin redondear, para la previsión
-        estado.update(fecha=prev, F=F, M=M, D=D, S=S, Pi=Pi, calentando=(prev - inicio).days < CALENTAMIENTO)
+        estado.update(fecha=prev, F=F, M=M, D=D, ICO=dict(EI), calentando=(prev - inicio).days < CALENTAMIENTO)
     return salida
 
 
@@ -677,7 +677,7 @@ def crear_previsor(alm, sensores, hora):
                 continue
             tabla = pv.descargar_horario(lat, lon, alt)
             F, M, D = est["F"], est["M"], est["D"]
-            S, Pi = est.get("S", 0), est.get("Pi", 0)
+            EI = dict(est.get("ICO") or ico.estado_inicial())
             filas, dia = [], est["fecha"] + timedelta(days=1)
             while dia <= hoy + timedelta(days=3):
                 j = (dia - hoy).days
@@ -714,7 +714,7 @@ def crear_previsor(alm, sensores, hora):
                 D = dc_step(T, P, D, DC_L[dia.month - 1])
                 isi, bui = isi_calc(F, W), bui_calc(M, D)
                 fwi = fwi_calc(isi, bui)
-                S, Pi = ico.paso(S, Pi, P, H, W, dia)
+                IC = ico.paso_completo(EI, P, H, W, DV, dia)
                 if j >= 0:
                     lo, hi = pv.rango(inc, j, fwi)
                     v = ref.get((nombre, dia.month))
@@ -728,7 +728,7 @@ def crear_previsor(alm, sensores, hora):
                         "ifg": round(ifg_calc(fwi, dia.isoformat(), sur, W), 2),
                         "clase_ifg": clase_ifg(ifg_calc(fwi, dia.isoformat(), sur, W)),
                         "pct": rango_percentil(v, fwi) if (v and len(v) >= 30 and not est["calentando"]) else None,
-                        "icona": Pi, "clase_icona": ico.nivel(Pi),
+                        **IC, "clase_icona": ico.nivel(IC["icona"]),
                         "calentando": est["calentando"], "lluvia_medida_h": medidas})
                 dia += timedelta(days=1)
             resultado[nombre] = filas

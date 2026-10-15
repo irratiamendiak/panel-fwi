@@ -8,8 +8,15 @@ el usuario (icona.xlsx). Cuatro tablas encadenadas:
   3. Letra clave final: primera letra + humedad relativa + velocidad del viento.
   4. Índice de peligro de hoy (0-16): letra final + sequía de hoy, con tablas de otoño-invierno y de
      primavera-verano (se toman los equinoccios: primavera-verano del 21 de marzo al 22 de septiembre).
+A ese índice base se suman las dos correcciones de la versión modificada de 1968 (manual, tablas 5 y 6):
+  5. Sequía prolongada: +1 a +10 según los días seguidos sin lluvia (menos de 1,3 mm); tras 1 día de
+     lluvia queda la mitad, tras 2 la cuarta parte y tras 3 desaparece.
+  6. Viento desfavorable: +1 a +15 según la velocidad. Adaptación para Gipuzkoa: solo con viento sur
+     (SE, S o SO, al menos 3 km/h) y humedad relativa por debajo del 50 % (viento sur seco, el "terral").
+El índice base (0-16) es el que alimenta las tablas del día siguiente; el índice del día es base + correcciones.
+Adaptación para Gipuzkoa: las tablas estacionales del manual se aplican intercambiadas a propósito
+(aquí el periodo de más peligro es el otoño-invierno), tal como están en icona.xlsx.
 Niveles: 0 Nulo · 1-4 Bajo · 5-8 Moderado · 9-12 Alto · 13 o más Extremo.
-Las tablas no incluyen la corrección por dirección del viento (vientos terrales) de la versión de 1968.
 """
 
 # 1) sequía: fila = sequía de ayer (0..25); columnas = lluvia <=1,3 | <=2,5 | <=3,6 | <=4,6 | <=5,6 | <=7,6 | <=9,6 | <=11,7 | <=13,5 | >=13,6 mm
@@ -179,3 +186,46 @@ def nivel(v):
         if v <= tope:
             return nombre
     return "Extremo"
+
+
+# ---- correcciones de la versión modificada de 1968 (manual, tablas 5 y 6)
+DIA_SECO_MM = 1.3
+T5 = [(15, 0), (21, 1), (28, 2), (36, 3), (45, 4), (55, 5), (66, 6), (78, 7), (91, 8), (105, 9)]   # (días hasta, suma); más: 10
+HR_TERRAL = 50          # viento sur "seco": humedad relativa por debajo de este valor (%)
+
+
+def corr_sequia(dias_secos):
+    for tope, c in T5:
+        if dias_secos <= tope:
+            return c
+    return 10
+
+
+def corr_viento(viento):
+    w = round(viento)
+    return 1 if w <= 6 else 3 if w <= 13 else 6 if w <= 20 else 9 if w <= 28 else 12 if w <= 40 else 15
+
+
+def viento_sur_seco(direccion, viento, hr):
+    return (direccion is not None and 112.5 <= direccion % 360 < 247.5 and viento is not None and viento >= 3
+            and hr is not None and hr < HR_TERRAL)
+
+
+def estado_inicial():
+    return {"S": 0, "P": 0, "secos": 0, "lluvias": 0, "c_prev": 0}
+
+
+def paso_completo(e, lluvia, hr, viento, direccion, dia):
+    """Un día del índice modificado. e: estado (se actualiza). Devuelve un dict con el índice del día
+    ('icona' = base + correcciones), la base, la sequía y las dos correcciones."""
+    e["S"], e["P"] = paso(e["S"], e["P"], lluvia, hr, viento, dia)
+    if (lluvia or 0) <= DIA_SECO_MM:
+        e["secos"] += 1; e["lluvias"] = 0
+        c5 = corr_sequia(e["secos"]); e["c_prev"] = c5
+    else:
+        e["lluvias"] += 1; e["secos"] = 0
+        c5 = e["c_prev"] // 2 if e["lluvias"] == 1 else (e["c_prev"] // 4 if e["lluvias"] == 2 else 0)
+        if e["lluvias"] >= 3:
+            e["c_prev"] = 0
+    c6 = corr_viento(viento) if viento_sur_seco(direccion, viento, hr) else 0
+    return {"icona": e["P"] + c5 + c6, "icona_base": e["P"], "icona_seq": e["S"], "icona_c5": c5, "icona_c6": c6}
