@@ -1043,51 +1043,51 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg,icona
 2026-10-15,Zizurkil,2026-10-16,1,3.1,1.6,6.0,Muy bajo,0,0.41,Muy bajo,8
 2026-10-15,Zizurkil,2026-10-17,2,0.0,0.0,3.6,Muy bajo,0,0.08,Muy bajo,0
 2026-10-15,Zizurkil,2026-10-18,3,0.1,0.0,4.0,Muy bajo,0,0.09,Muy bajo,1
-2026-10-16,Altzola,2026-10-16,0,2.0,1.0,3.9,Muy bajo,1,0.29,Muy bajo,7
+2026-10-16,Altzola,2026-10-16,0,3.9,2.9,5.7,Muy bajo,1,0.5,Muy bajo,8
 2026-10-16,Altzola,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
 2026-10-16,Altzola,2026-10-18,2,0.1,0.0,3.7,Muy bajo,0,0.09,Muy bajo,1
-2026-10-16,Altzola,2026-10-19,3,0.6,0.0,4.5,Muy bajo,0,0.14,Muy bajo,4
-2026-10-16,Arrasate,2026-10-16,0,6.4,2.8,11.4,Bajo,1,0.79,Bajo,6
-2026-10-16,Arrasate,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
-2026-10-16,Arrasate,2026-10-18,2,0.3,0.0,3.9,Muy bajo,0,0.11,Muy bajo,1
-2026-10-16,Arrasate,2026-10-19,3,0.8,0.0,4.7,Muy bajo,0,0.16,Muy bajo,3
-2026-10-16,Berastegi,2026-10-16,0,4.4,3.3,6.2,Muy bajo,1,0.55,Bajo,7
+2026-10-16,Altzola,2026-10-19,3,0.5,0.0,4.4,Muy bajo,0,0.13,Muy bajo,4
+2026-10-16,Arrasate,2026-10-16,0,8.0,4.4,13.0,Bajo,1,0.98,Bajo,6
+2026-10-16,Arrasate,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.08,Muy bajo,0
+2026-10-16,Arrasate,2026-10-18,2,0.2,0.0,3.9,Muy bajo,0,0.11,Muy bajo,1
+2026-10-16,Arrasate,2026-10-19,3,0.9,0.0,4.8,Muy bajo,0,0.17,Muy bajo,3
+2026-10-16,Berastegi,2026-10-16,0,4.1,3.1,5.9,Muy bajo,1,0.52,Bajo,7
 2026-10-16,Berastegi,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
-2026-10-16,Berastegi,2026-10-18,2,0.4,0.0,4.0,Muy bajo,0,0.12,Muy bajo,1
-2026-10-16,Berastegi,2026-10-19,3,0.8,0.0,4.7,Muy bajo,0,0.17,Muy bajo,4
-2026-10-16,Bidania,2026-10-16,0,2.8,1.7,4.6,Muy bajo,1,0.37,Muy bajo,7
+2026-10-16,Berastegi,2026-10-18,2,0.3,0.0,3.9,Muy bajo,0,0.11,Muy bajo,3
+2026-10-16,Berastegi,2026-10-19,3,0.7,0.0,4.6,Muy bajo,0,0.16,Muy bajo,6
+2026-10-16,Bidania,2026-10-16,0,4.0,2.9,5.8,Muy bajo,1,0.51,Bajo,7
 2026-10-16,Bidania,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.08,Muy bajo,0
 2026-10-16,Bidania,2026-10-18,2,0.0,0.0,3.7,Muy bajo,0,0.09,Muy bajo,1
 2026-10-16,Bidania,2026-10-19,3,0.3,0.0,4.2,Muy bajo,0,0.11,Muy bajo,3
-2026-10-16,Gipuzkoa,2026-10-16,0,4.5,2.6,7.5,Muy bajo,1,0.6,Bajo,7
-2026-10-16,Gipuzkoa,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.1,Muy bajo,0
-2026-10-16,Gipuzkoa,2026-10-18,2,0.4,0.0,4.1,Muy bajo,0,0.1,Muy bajo,1
-2026-10-16,Gipuzkoa,2026-10-19,3,1.2,0.4,5.1,Muy bajo,0,0.2,Muy bajo,4
-2026-10-16,Miramon,2026-10-16,0,4.2,3.2,6.1,Muy bajo,1,0.54,Bajo,6
-2026-10-16,Miramon,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
-2026-10-16,Miramon,2026-10-18,2,0.2,0.0,3.8,Muy bajo,0,0.1,Muy bajo,0
-2026-10-16,Miramon,2026-10-19,3,0.8,0.0,4.7,Muy bajo,0,0.16,Muy bajo,4
-2026-10-16,Mutriku,2026-10-16,0,3.0,2.0,4.8,Muy bajo,1,0.39,Muy bajo,5
-2026-10-16,Mutriku,2026-10-17,1,0.1,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
+2026-10-16,Gipuzkoa,2026-10-16,0,5.4,3.0,9.0,Bajo,1,0.7,Bajo,8
+2026-10-16,Gipuzkoa,2026-10-17,1,0.1,0.0,3.1,Muy bajo,0,0.1,Muy bajo,0
+2026-10-16,Gipuzkoa,2026-10-18,2,0.3,0.0,4.0,Muy bajo,0,0.1,Muy bajo,2
+2026-10-16,Gipuzkoa,2026-10-19,3,1.0,0.2,4.9,Muy bajo,0,0.2,Muy bajo,5
+2026-10-16,Miramon,2026-10-16,0,6.9,3.4,12.0,Bajo,1,0.85,Bajo,8
+2026-10-16,Miramon,2026-10-17,1,0.1,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
+2026-10-16,Miramon,2026-10-18,2,0.5,0.0,4.1,Muy bajo,0,0.13,Muy bajo,1
+2026-10-16,Miramon,2026-10-19,3,1.0,0.0,4.9,Muy bajo,0,0.18,Muy bajo,3
+2026-10-16,Mutriku,2026-10-16,0,6.2,2.6,11.2,Bajo,1,0.76,Bajo,8
+2026-10-16,Mutriku,2026-10-17,1,0.2,0.0,3.2,Muy bajo,0,0.1,Muy bajo,1
 2026-10-16,Mutriku,2026-10-18,2,0.1,0.0,3.7,Muy bajo,0,0.09,Muy bajo,1
-2026-10-16,Mutriku,2026-10-19,3,0.7,0.0,4.6,Muy bajo,0,0.15,Muy bajo,4
-2026-10-16,Ordizia,2026-10-16,0,6.4,2.8,11.4,Bajo,1,0.79,Bajo,7
-2026-10-16,Ordizia,2026-10-17,1,0.1,0.0,3.1,Muy bajo,0,0.09,Muy bajo,1
-2026-10-16,Ordizia,2026-10-18,2,1.5,0.3,5.1,Muy bajo,0,0.24,Muy bajo,2
-2026-10-16,Ordizia,2026-10-19,3,3.1,1.8,7.0,Muy bajo,0,0.41,Muy bajo,6
-2026-10-16,Pasaia,2026-10-16,0,5.0,4.0,6.9,Muy bajo,1,0.63,Bajo,9
-2026-10-16,Pasaia,2026-10-17,1,0.1,0.0,3.1,Muy bajo,0,0.1,Muy bajo,0
-2026-10-16,Pasaia,2026-10-18,2,0.8,0.0,4.4,Muy bajo,0,0.16,Muy bajo,1
-2026-10-16,Pasaia,2026-10-19,3,2.6,1.2,6.5,Muy bajo,0,0.35,Muy bajo,5
-2026-10-16,Zarautz,2026-10-16,0,2.3,1.3,4.2,Muy bajo,1,0.32,Muy bajo,7
-2026-10-16,Zarautz,2026-10-17,1,0.2,0.0,3.2,Muy bajo,0,0.1,Muy bajo,1
-2026-10-16,Zarautz,2026-10-18,2,0.0,0.0,3.6,Muy bajo,0,0.09,Muy bajo,1
+2026-10-16,Mutriku,2026-10-19,3,0.6,0.0,4.5,Muy bajo,0,0.15,Muy bajo,4
+2026-10-16,Ordizia,2026-10-16,0,5.8,2.3,10.9,Bajo,1,0.72,Bajo,7
+2026-10-16,Ordizia,2026-10-17,1,0.1,0.0,3.1,Muy bajo,0,0.09,Muy bajo,0
+2026-10-16,Ordizia,2026-10-18,2,0.7,0.0,4.3,Muy bajo,0,0.15,Muy bajo,3
+2026-10-16,Ordizia,2026-10-19,3,1.8,0.5,5.7,Muy bajo,0,0.27,Muy bajo,6
+2026-10-16,Pasaia,2026-10-16,0,6.6,3.0,11.6,Bajo,1,0.81,Bajo,10
+2026-10-16,Pasaia,2026-10-17,1,0.3,0.0,3.3,Muy bajo,0,0.12,Muy bajo,2
+2026-10-16,Pasaia,2026-10-18,2,1.2,0.0,4.8,Muy bajo,0,0.2,Muy bajo,4
+2026-10-16,Pasaia,2026-10-19,3,2.9,1.6,6.8,Muy bajo,0,0.39,Muy bajo,8
+2026-10-16,Zarautz,2026-10-16,0,5.0,4.0,6.9,Muy bajo,1,0.63,Bajo,8
+2026-10-16,Zarautz,2026-10-17,1,0.2,0.0,3.2,Muy bajo,0,0.11,Muy bajo,1
+2026-10-16,Zarautz,2026-10-18,2,0.1,0.0,3.7,Muy bajo,0,0.09,Muy bajo,1
 2026-10-16,Zarautz,2026-10-19,3,0.5,0.0,4.4,Muy bajo,0,0.14,Muy bajo,5
-2026-10-16,Zegama,2026-10-16,0,4.9,3.8,6.7,Muy bajo,1,0.61,Bajo,8
+2026-10-16,Zegama,2026-10-16,0,3.1,2.1,4.9,Muy bajo,1,0.41,Muy bajo,8
 2026-10-16,Zegama,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.08,Muy bajo,0
-2026-10-16,Zegama,2026-10-18,2,0.4,0.0,4.1,Muy bajo,0,0.13,Muy bajo,3
-2026-10-16,Zegama,2026-10-19,3,0.8,0.0,4.7,Muy bajo,0,0.17,Muy bajo,5
-2026-10-16,Zizurkil,2026-10-16,0,5.4,1.9,10.5,Bajo,1,0.68,Bajo,8
-2026-10-16,Zizurkil,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
-2026-10-16,Zizurkil,2026-10-18,2,0.2,0.0,3.8,Muy bajo,0,0.1,Muy bajo,1
-2026-10-16,Zizurkil,2026-10-19,3,0.7,0.0,4.6,Muy bajo,0,0.15,Muy bajo,4
+2026-10-16,Zegama,2026-10-18,2,0.2,0.0,3.8,Muy bajo,0,0.11,Muy bajo,3
+2026-10-16,Zegama,2026-10-19,3,0.7,0.0,4.6,Muy bajo,0,0.15,Muy bajo,5
+2026-10-16,Zizurkil,2026-10-16,0,5.8,2.2,10.8,Bajo,1,0.72,Bajo,8
+2026-10-16,Zizurkil,2026-10-17,1,0.0,0.0,3.0,Muy bajo,0,0.08,Muy bajo,0
+2026-10-16,Zizurkil,2026-10-18,2,0.2,0.0,3.9,Muy bajo,0,0.11,Muy bajo,1
+2026-10-16,Zizurkil,2026-10-19,3,0.7,0.0,4.6,Muy bajo,0,0.15,Muy bajo,3
