@@ -1216,9 +1216,9 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg,icona
 2026-10-19,Mutriku,2026-10-21,2,0.1,0.0,3.8,Muy bajo,0,0.1,Muy bajo,0
 2026-10-19,Mutriku,2026-10-22,3,0.4,0.0,4.3,Muy bajo,0,0.2,Muy bajo,4
 2026-10-19,Ordizia,2026-10-19,0,0.4,0.0,2.3,Muy bajo,1,0.2,Muy bajo,3
-2026-10-19,Ordizia,2026-10-20,1,0.1,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
-2026-10-19,Ordizia,2026-10-21,2,0.5,0.0,4.1,Muy bajo,0,0.13,Muy bajo,1
-2026-10-19,Ordizia,2026-10-22,3,1.9,0.6,5.8,Muy bajo,0,0.45,Muy bajo,7
+2026-10-19,Ordizia,2026-10-20,1,0.0,0.0,3.0,Muy bajo,0,0.09,Muy bajo,0
+2026-10-19,Ordizia,2026-10-21,2,0.4,0.0,4.0,Muy bajo,0,0.12,Muy bajo,1
+2026-10-19,Ordizia,2026-10-22,3,1.8,0.5,5.7,Muy bajo,0,0.44,Muy bajo,7
 2026-10-19,Pasaia,2026-10-19,0,6.8,3.2,11.8,Bajo,1,0.84,Bajo,12
 2026-10-19,Pasaia,2026-10-20,1,0.7,0.0,3.7,Muy bajo,0,0.15,Muy bajo,5
 2026-10-19,Pasaia,2026-10-21,2,0.0,0.0,3.6,Muy bajo,0,0.09,Muy bajo,1
