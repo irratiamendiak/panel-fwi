@@ -29,7 +29,9 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar dependencias
-        run: pip install pyjwt cryptography requests
+        run: |
+          pip install pyjwt cryptography requests reportlab numpy pillow
+          fc-list | grep -qi dejavu || sudo apt-get install -y -qq fonts-dejavu-core
 
       - name: Calcular el FWI y guardar los datos
         # Si al subir los datos resulta que otra ejecución ya ha subido los suyos, NO se mezclan ficheros
