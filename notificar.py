@@ -4,7 +4,8 @@ Notificaciones del panel FWI / Basugix (euskera y castellano).
 
   * Correo: informe del día y previsión a 3 días, una vez al día, al cerrarse el dato
     (hora del dato + 60 min: 15:00 en verano, 14:00 en invierno).
-  * Telegram: avisos de riesgo alto (Basugix >= 30, FWI >= 21,3 o ICONA >= 9), subidas bruscas,
+  * Telegram: solo subidas a nivel alto (entra en Alto, sube a Muy alto o Extremo, según el más alto de
+    FWI, Basugix e ICONA), fin del episodio al bajar de Moderado, preavisos por previsión,
     viento sur con riesgo alto, y avisos técnicos (estaciones sin datos, fallo del proceso).
 
 Lee docs/data/fwi.json (lo escribe actualizar_fwi.py) y guarda en datos/notificaciones.json lo ya
@@ -24,6 +25,7 @@ Uso:
 """
 import argparse, html, json, math, os, smtplib, ssl, sys, urllib.parse, urllib.request
 from datetime import date, datetime, timedelta
+from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -97,7 +99,7 @@ def celda_ico(v, extra=""):
     if v is None:
         return "<td>—</td>"
     i = COL_ICO[nivel_ico(v)]
-    txt = str(int(v)) if float(v).is_integer() else fnum(v)
+    txt = str(int(round(v)))
     return (f'<td style="padding:4px 6px;text-align:center"><span style="display:inline-block;min-width:34px;padding:2px 8px;'
             f'border-radius:999px;background:{COL[i]};color:{FG[i]};font-weight:700">{txt}</span>{extra}</td>')
 
@@ -163,20 +165,28 @@ def enviar_telegram(texto, chat=None, prueba=False):
         r.read()
 
 
-def enviar_correo(asunto, cuerpo_html, prueba=False):
+def enviar_correo(asunto, cuerpo_html, prueba=False, adjuntos=None):
+    """adjuntos: [(nombre_fichero, bytes)] (p. ej. el informe PDF)."""
     # Gmail por defecto: basta con SMTP_USER, SMTP_PASS (contraseña de aplicación) y EMAIL_TO
     host = os.environ.get("SMTP_HOST") or "smtp.gmail.com"
     usu, pw, dest = (os.environ.get(k) for k in ("SMTP_USER", "SMTP_PASS", "EMAIL_TO"))
     pw = (pw or "").replace(" ", "")
     if prueba or not (host and usu and pw and dest):
         Path("prueba_correo.html").write_text(cuerpo_html, encoding="utf-8")
-        print(("[prueba] " if prueba else "[correo sin configurar] ") + f"asunto: {asunto} -> prueba_correo.html")
+        for nom, datos in adjuntos or []:
+            Path("prueba_" + nom).write_bytes(datos)
+        print(("[prueba] " if prueba else "[correo sin configurar] ") + f"asunto: {asunto} -> prueba_correo.html"
+              + "".join(f", prueba_{n}" for n, _ in adjuntos or []))
         return
-    m = MIMEMultipart("alternative")
+    m = MIMEMultipart("mixed")
     m["Subject"], m["From"] = asunto, os.environ.get("EMAIL_FROM") or f"Basugix <{usu}>"
     lista = [x.strip() for x in dest.split(",") if x.strip()]
     m["To"] = m["From"]            # destinatarios en copia oculta, para no mostrar las direcciones
     m.attach(MIMEText(cuerpo_html, "html", "utf-8"))
+    for nom, datos in adjuntos or []:
+        parte = MIMEApplication(datos, _subtype="pdf" if nom.lower().endswith(".pdf") else "octet-stream")
+        parte.add_header("Content-Disposition", "attachment", filename=nom)
+        m.attach(parte)
     try:
         with smtplib.SMTP_SSL(host, int(os.environ.get("SMTP_PORT") or 465), context=ssl.create_default_context(), timeout=60) as s:
             s.login(usu, pw)
@@ -263,11 +273,51 @@ def bloque_correo(d, l, hoy):
             h.append(fila + "</tr>")
         h.append("</table>")
     h.append(f'<p style="font:12px system-ui;color:#555;margin:10px 0 2px">{T["leyenda"][l]}</p>'
-             f'<p style="font:12px system-ui;color:#555;margin:2px 0"><a href="{WEB}{"?lang=es" if l == "es" else ""}">{T["web"][l]}</a> · {T["pie"][l]}</p>')
+             f'<p style="font:12px system-ui;color:#555;margin:2px 0">{T["pie"][l]}</p>')
     return "\n".join(h)
 
 
+MESES_EU = ["urtarrilaren", "otsailaren", "martxoaren", "apirilaren", "maiatzaren", "ekainaren", "uztailaren", "abuztuaren",
+            "irailaren", "urriaren", "azaroaren", "abenduaren"]
+
+
+def informe_pdf_bytes(d):
+    """El informe PDF diario (informe_pdf.py) en memoria."""
+    import tempfile, informe_pdf
+    with tempfile.TemporaryDirectory() as tmp:
+        ruta = Path(tmp) / "informe.pdf"
+        informe_pdf.generar(d, ruta)
+        return ruta.read_bytes()
+
+
 def correo_diario(d, hoy, prueba):
+    """Correo diario tras el cierre del dato: el informe PDF adjunto, con un texto breve en euskera.
+    Si el PDF no se puede generar, se envía el correo de tablas de siempre."""
+    g = next((e for e in d["estaciones"] if e.get("resumen")), None)
+    u = g["dias"][-1] if g and g.get("dias") else None
+    valores = ""
+    if u and u["fecha"] == hoy:
+        b = bgx(ifg_de(u))
+        valores = (f"FWI {fnum(u['fwi'])}" + (f" · Basugix {fnum(b)}" if b is not None else "")
+                   + (f" · ICONA {int(round(u['icona']))}" if u.get("icona") is not None else ""))
+    f = date.fromisoformat(hoy)
+    fecha_eu = f"{f.year}ko {MESES_EU[f.month - 1]} {f.day}a"
+    try:
+        pdf = informe_pdf_bytes(d)
+    except Exception as e:
+        print("No se ha podido generar el informe PDF; se envía el correo de tablas:", type(e).__name__, e)
+        pdf = None
+    if pdf:
+        cuerpo = ('<div style="max-width:640px;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#14231c;font-size:15px;line-height:1.5">'
+                  f'<p style="font-size:18px;font-weight:700;margin:0 0 6px">Baso sute arriskua Gipuzkoan · {fecha_eu}</p>'
+                  + (f'<p style="margin:0 0 10px">GIPUZKOA: <b>{valores}</b></p>' if valores else "")
+                  + '<p style="margin:0 0 10px">Eranskinean, eguneko txostena (PDF, bi orri): FWI, Basugix eta ICONA indizeen mapak '
+                  '(gaurko datua eta 3 eguneko iragarpena), DC eta ISI estazioz estazio, eta eguraldia (eguzki-eguerdiko neurketa eta '
+                  '3 eguneko iragarpena), metodologiarekin.</p>'
+                  '<p style="margin:0;color:#56636b;font-size:13px">Datuak: Euskalmet, Open-Meteo</p></div>')
+        enviar_correo(f"Baso sute arriskua Gipuzkoan · {fecha_eu}" + (f" · {valores}" if valores else ""), cuerpo, prueba,
+                      adjuntos=[(f"Basugix_{hoy}.pdf", pdf)])
+        return
     cuerpo = ('<div style="max-width:760px;margin:0 auto;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#14231c">'
               + bloque_correo(d, "eu", hoy) + '<hr style="margin:22px 0;border:0;border-top:2px solid #1f5f46">'
               + bloque_correo(d, "es", hoy) + "</div>")
@@ -277,7 +327,7 @@ def correo_diario(d, hoy, prueba):
     if u and u["fecha"] == hoy:
         b = bgx(ifg_de(u))
         extra = (f" · GIPUZKOA FWI {fnum(u['fwi'])}" + (f" / Basugix {fnum(b)}" if b is not None else "")
-                 + (f" / ICONA {fnum(u['icona'])}" if u.get("icona") is not None else ""))
+                 + (f" / ICONA {int(round(u['icona']))}" if u.get("icona") is not None else ""))
     enviar_correo(f"Sute arriskua / Riesgo de incendio · {hoy}{extra}", cuerpo, prueba)
 
 
@@ -288,6 +338,20 @@ def valor_dia(e, f):
         return u, False
     p = next((x for x in e.get("prevision", []) if x["fecha"] == f), None)
     return p, True
+
+
+ICO_A_COMUN = [0, 1, 2, 3, 5]   # niveles del ICONA (nulo, bajo, moderado, alto, extremo) en la escala común de 6
+
+
+def nivel_comun(u):
+    """Nivel de la estación (0 Muy bajo ... 5 Extremo): el más alto de FWI, Basugix e ICONA."""
+    n = [idx_fwi_de(u)]
+    b = bgx(ifg_de(u))
+    if b is not None:
+        n.append(idx_bgx(b))
+    if u.get("icona") is not None:
+        n.append(ICO_A_COMUN[nivel_ico(u["icona"])])
+    return max(n)
 
 
 def alto(u):
@@ -304,65 +368,72 @@ def txt_valor(u, l):
         s += f" · Basugix {fnum(b)} ({NOM[l][idx_bgx(b)]})"
     if u.get("icona") is not None:
         ic = u["icona"]
-        s += f" · ICONA {int(ic) if float(ic).is_integer() else fnum(ic)} ({NOM_ICO[l][nivel_ico(ic)]})"
+        s += f" · ICONA {int(round(ic))} ({NOM_ICO[l][nivel_ico(ic)]})"
     if hay_sur(u):
         s += " · 💨"
     return s
 
 
 def avisos(d, hoy, est, prueba):
-    activos = est.setdefault("activos", {})       # estación -> fecha en que empezó el riesgo alto
+    """Telegram, solo para subidas de nivel alto y para el final del episodio:
+      * una estación entra en nivel Alto (o directamente en Muy alto o Extremo);
+      * una estación ya en nivel alto sube a Muy alto o a Extremo;
+      * una estación en episodio baja por debajo de Moderado (fin del episodio);
+      * preaviso: la previsión da nivel Alto o más en una estación que hoy no lo tiene.
+    El nivel es el más alto de los tres índices (FWI, Basugix e ICONA). Entre Moderado y Alto no se avisa."""
+    niveles = est.get("niveles")
+    if niveles is None:                           # paso desde la versión anterior (estaciones en riesgo alto)
+        niveles = {n: 3 for n in est.get("activos", {})}
+    est["niveles"] = niveles                      # estación -> último nivel (solo con episodio abierto)
+    est.pop("activos", None)
     prev_av = est.setdefault("preavisos", {})     # "estación|fecha" ya preavisados
-    empieza, termina, subidas, preav = [], [], [], []
-    ayer = (date.fromisoformat(hoy) - timedelta(days=1)).isoformat()
+    empieza, suben, termina, preav = [], [], [], []
     for e in d["estaciones"]:
         n = "GIPUZKOA" if e.get("resumen") else e["nombre"]
         u, calc = valor_dia(e, hoy)
         if not u:
             continue
-        if alto(u) and n not in activos:
-            activos[n] = hoy
-            empieza.append((n, u))
-        elif not alto(u) and n in activos:
-            del activos[n]
-            termina.append((n, u))
-        y, _ = valor_dia(e, ayer)
-        if y and ifg_de(y) is not None and ifg_de(u) is not None:
-            s = idx_bgx(bgx(ifg_de(u))) - idx_bgx(bgx(ifg_de(y)))
-            if s >= SALTO_NIVELES:
-                subidas.append((n, y, u))
-        if not alto(u):                               # preaviso: riesgo alto previsto en los próximos días
+        v = nivel_comun(u)
+        antes = niveles.get(n)
+        if v >= 3 and antes is None:
+            empieza.append((n, u, v)); niveles[n] = v
+        elif antes is not None and v >= 3 and v > antes:
+            suben.append((n, u, antes, v)); niveles[n] = v
+        elif antes is not None and v <= 1:
+            termina.append((n, u, v)); del niveles[n]
+        elif antes is not None:
+            niveles[n] = v                            # baja sin salir del episodio: se anota sin avisar
+        if v < 3:                                     # preaviso: nivel alto previsto en los próximos días
             for p in e.get("prevision", []):
                 if p["fecha"] > hoy and alto(p) and f"{n}|{p['fecha']}" not in prev_av:
                     prev_av[f"{n}|{p['fecha']}"] = hoy
                     preav.append((n, p))
-    # limpiar preavisos viejos
     for k in [k for k in prev_av if k.split("|")[1] < hoy]:
         del prev_av[k]
-    if not (empieza or termina or subidas or preav):
+    if not (empieza or suben or termina or preav):
         return
     partes = []
     for l, cab in (("eu", "🔥 <b>Baso sute arriskua — Gipuzkoa</b>"), ("es", "🔥 <b>Riesgo de incendio forestal — Gipuzkoa</b>")):
         t = [cab, ffecha(hoy, l)]
         if empieza:
-            t.append(("\n⚠️ <b>Arrisku handia hasi da:</b>" if l == "eu" else "\n⚠️ <b>Comienza riesgo alto:</b>"))
-            t += [f"• {n}: {txt_valor(u, l)}" for n, u in empieza]
-        if subidas:
-            t.append(("\n📈 <b>Igoera bizkorra (atzotik):</b>" if l == "eu" else "\n📈 <b>Subida brusca (desde ayer):</b>"))
-            t += [f"• {n}: Basugix {fnum(bgx(ifg_de(y)))} → {fnum(bgx(ifg_de(u)))}" for n, y, u in subidas]
+            t.append("\n⚠️ <b>Arrisku handia hasi da:</b>" if l == "eu" else "\n⚠️ <b>Comienza riesgo alto:</b>")
+            t += [f"• {n}: <b>{NOM[l][v]}</b> — {txt_valor(u, l)}" for n, u, v in empieza]
+        if suben:
+            t.append("\n📈 <b>Arriskua igo da:</b>" if l == "eu" else "\n📈 <b>Sube el riesgo:</b>")
+            t += [f"• {n}: {NOM[l][a]} → <b>{NOM[l][v]}</b> — {txt_valor(u, l)}" for n, u, a, v in suben]
         if preav:
-            t.append(("\n🔮 <b>Aurreabisua (iragarpena):</b>" if l == "eu" else "\n🔮 <b>Preaviso (previsión):</b>"))
+            t.append("\n🔮 <b>Aurreabisua (iragarpena):</b>" if l == "eu" else "\n🔮 <b>Preaviso (previsión):</b>")
             por_est = {}
             for n, p in preav:
                 por_est.setdefault(n, []).append(p)
             for n, ps in por_est.items():
-                peor = max(ps, key=lambda p: bgx(ifg_de(p)) or 0)
+                peor = max(ps, key=nivel_comun)
                 dias = ", ".join(ffecha(p["fecha"], l, False) for p in ps)
-                t.append(f"• {n} ({dias}) — {'gehienez' if l == 'eu' else 'máximo'}: {txt_valor(peor, l)}")
+                t.append(f"• {n} ({dias}) — {'gehienez' if l == 'eu' else 'máximo'}: <b>{NOM[l][nivel_comun(peor)]}</b> — {txt_valor(peor, l)}")
         if termina:
-            t.append(("\n✅ <b>Arrisku handia amaitu da:</b>" if l == "eu" else "\n✅ <b>Termina el riesgo alto:</b>"))
-            t += [f"• {n}: {txt_valor(u, l)}" for n, u in termina]
-        t.append(f'\n<a href="{WEB}{"?lang=es" if l == "es" else ""}">{"Webgunea" if l == "eu" else "Web"}</a>')
+            t.append("\n✅ <b>Arriskua ertainetik behera jaitsi da (amaiera):</b>" if l == "eu"
+                     else "\n✅ <b>El riesgo baja de moderado (fin del episodio):</b>")
+            t += [f"• {n}: {NOM[l][v]} — {txt_valor(u, l)}" for n, u, v in termina]
         partes.append("\n".join(t))
     enviar_telegram("\n\n— — —\n\n".join(partes), prueba=prueba)
 
@@ -399,8 +470,16 @@ def main():
             ok = False; print("Telegram: ERROR", e)
         try:
             if os.environ.get("SMTP_USER"):
+                adj = []
+                try:
+                    datos = json.loads(DATOS.read_text(encoding="utf-8"))
+                    adj = [(f"Basugix_proba_{datetime.now(ZONA).date().isoformat()}.pdf", informe_pdf_bytes(datos))]
+                except Exception as e:
+                    print("Informe PDF: ERROR", type(e).__name__, e)
                 enviar_correo("Basugix: proba / prueba", "<p>✅ <b>Basugix</b>: posta elektronikoa ondo dago (GitHub-etik bidalia).<br>"
-                              "✅ <b>Basugix</b>: el correo funciona (enviado desde GitHub).</p>")
+                              "✅ <b>Basugix</b>: el correo funciona (enviado desde GitHub).</p>"
+                              + ("<p>Eranskinean, azken datuekin egindako txostena (PDF).</p>" if adj else
+                                 "<p>⚠️ Ezin izan da txosten PDFa sortu (ikus GitHub-eko erregistroa).</p>"), adjuntos=adj)
                 print("Correo: enviado")
             else:
                 print("Correo: sin configurar")
