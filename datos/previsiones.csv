@@ -1364,9 +1364,9 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg,icona
 2026-10-22,Ordizia,2026-10-24,2,6.1,0.4,13.0,Bajo,0,1.23,Moderado,8
 2026-10-22,Ordizia,2026-10-25,3,6.7,0.3,12.4,Bajo,0,0.82,Bajo,8
 2026-10-22,Pasaia,2026-10-22,0,0.5,0.0,2.3,Muy bajo,1,0.21,Muy bajo,3
-2026-10-22,Pasaia,2026-10-23,1,2.4,1.0,5.4,Muy bajo,0,0.33,Muy bajo,6
+2026-10-22,Pasaia,2026-10-23,1,2.5,1.1,5.5,Muy bajo,0,0.34,Muy bajo,6
 2026-10-22,Pasaia,2026-10-24,2,0.1,0.0,3.7,Muy bajo,0,0.09,Muy bajo,1
-2026-10-22,Pasaia,2026-10-25,3,2.1,0.7,6.0,Muy bajo,0,0.3,Muy bajo,5
+2026-10-22,Pasaia,2026-10-25,3,2.1,0.7,5.9,Muy bajo,0,0.29,Muy bajo,5
 2026-10-22,Zarautz,2026-10-22,0,1.8,0.8,3.6,Muy bajo,1,0.43,Muy bajo,8
 2026-10-22,Zarautz,2026-10-23,1,8.2,3.4,13.8,Bajo,0,1.01,Moderado,7
 2026-10-22,Zarautz,2026-10-24,2,0.4,0.0,4.0,Muy bajo,0,0.12,Muy bajo,3
