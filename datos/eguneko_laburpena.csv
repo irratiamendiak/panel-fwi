@@ -256,3 +256,4 @@ fecha,estacion,T_media,T_max,T_min,HR_media,viento_media_kmh,direccion_media,llu
 2026-10-22,Zarautz,14.7,21.3,10.3,59.0,15.6,152,0.1,144,144,
 2026-10-22,Zegama,11.8,17.3,6.3,63.0,12.5,172,0.0,144,144,
 2026-10-22,Zizurkil,12.8,19.3,7.8,71.0,8.9,175,0.0,144,144,
+2026-10-23,Mutriku,16.2,20.7,12.8,60.0,13.8,242,4.4,,,Open-Meteo
