@@ -2280,6 +2280,8 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   function redDibujar(){
     const cv = $('#redCv'), geo = METEO.geo, d = RED.datos, campo = RED.vari;
     if (!geo || !d) return;
+    // Sin ninguna lectura en el periodo: se muestra 0 mm (no se deja el mapa vacío)
+    const sinDatos = !d.estaciones.some(e => e[campo] != null), val = e => e[campo] != null ? e[campo] : (sinDatos ? 0 : null);
     const rings = geo.contorno.features.flatMap(f => m72Anillos(f.geometry));
     let x0 = 99, x1 = -99, y0 = 99, y1 = -99;
     rings.flat().forEach(([x, y]) => { x0 = Math.min(x0,x); x1 = Math.max(x1,x); y0 = Math.min(y0,y); y1 = Math.max(y1,y); });
@@ -2287,14 +2289,14 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     const esc = Math.min((W - 2*pad) / ((x1 - x0) * kx), (H - 2*pad) / (y1 - y0));
     const P = ([x, y]) => [pad + (x - x0) * kx * esc, pad + (y1 - y) * esc], inv = (px, py) => [x0 + (px - pad) / (kx * esc), y1 - (py - pad) / esc];
     const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, W, H);
-    const validas = d.estaciones.filter(e => e[campo] != null && !e[campo + '_sospechoso']);
+    const validas = d.estaciones.filter(e => val(e) != null && !e[campo + '_sospechoso']);
     const ramp = RED_RAMP[campo === 'ultima' ? 'ultima' : 'hoy'], tt = TRAMOS[campo === 'ultima' ? 'ultima' : 'hoy'];
     if (validas.length >= 3){
       // interpolación por distancia inversa (peso 1/d⁴) entre los pluviómetros válidos
       const img = ctx.createImageData(W, H), st = 1;
       for (let py = 0; py < H; py += st) for (let px = 0; px < W; px += st){
         const [x, y] = inv(px, py); let sw = 0, sv = 0, ex = null;
-        for (const e of validas){ const dx = (x - e.lon) * kx, dy = y - e.lat, dd = dx*dx + dy*dy; if (dd < 1e-10){ ex = e[campo]; break; } const w = 1 / (dd * dd); sw += w; sv += w * e[campo]; }
+        for (const e of validas){ const dx = (x - e.lon) * kx, dy = y - e.lat, dd = dx*dx + dy*dy; if (dd < 1e-10){ ex = val(e); break; } const w = 1 / (dd * dd); sw += w; sv += w * val(e); }
         const col = rampaRGB(ramp, tramoMedio(tt, ex != null ? ex : sv / sw));
         for (let a = 0; a < st && py+a < H; a++) for (let b = 0; b < st && px+b < W; b++){ const i = ((py+a) * W + (px+b)) * 4; img.data[i] = col[0]; img.data[i+1] = col[1]; img.data[i+2] = col[2]; img.data[i+3] = 240; }
       }
@@ -2308,7 +2310,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     // pluviómetros con su valor (gris y con "?" si el control de calidad lo descarta)
     ctx.font = 'bold ' + (11 * kz) + 'px system-ui, sans-serif'; ctx.textAlign = 'center';
     d.estaciones.forEach(e => {
-      const v = e[campo], malo = e[campo + '_sospechoso'], [a, b] = P([e.lon, e.lat]);
+      const v = val(e), malo = e[campo + '_sospechoso'], [a, b] = P([e.lon, e.lat]);
       ctx.beginPath(); ctx.arc(a, b, 3 * kz, 0, 7);
       if (malo || v == null){ ctx.strokeStyle = '#8a969c'; ctx.lineWidth = 1.5 * kz; ctx.stroke(); } else { ctx.fillStyle = '#14231c'; ctx.fill(); }
       const t = v == null ? '—' : fmt(v) + (malo ? ' ?' : '');
@@ -2327,10 +2329,10 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       : Tm(`<b>${hasta}</b> arteko azken 60 minutuak`, `Últimos 60 minutos hasta las <b>${hasta}</b>`);
     redDibujar();
     const r = RED_RAMP[RED.vari === 'ultima' ? 'ultima' : 'hoy'], max = r[r.length-1][0];
-    const n = d.estaciones.filter(e => e[RED.vari] != null && !e[RED.vari + '_sospechoso']).length, malos = d.estaciones.filter(e => e[RED.vari + '_sospechoso']).map(e => e.nombre);
+    const sinDatos = !d.estaciones.some(e => e[RED.vari] != null), n = d.estaciones.filter(e => (sinDatos || e[RED.vari] != null) && !e[RED.vari + '_sospechoso']).length, malos = d.estaciones.filter(e => e[RED.vari + '_sospechoso']).map(e => e.nombre);
     $('#redEsc').innerHTML = leyendaTramos(r, TRAMOS[RED.vari === 'ultima' ? 'ultima' : 'hoy'], 'mm') + `<div class="esc-extra">● ${Tm('euri-neurgailua (mm)','pluviómetro (mm)')}</div>`;
-    $('#redNota').innerHTML = Tm(`Euskalmeten ${n} euri-neurgailu, 10 minuturo irakurketak. Estazioen arteko balioak interpolatuak dira. ${malos.length ? 'Kalitate-kontrola: ' + malos.join(', ') + ' baztertuak (inguruan euria egin du eta haiek ia ezer ez; "?" ikurrarekin). ' : ''}Prozesua exekutatzen den bakoitzean eguneratzen da; azkena: ${fmtOrdua(act)}.`,
-      `${n} pluviómetros de Euskalmet, lecturas cada 10 minutos. Valores entre estaciones interpolados. ${malos.length ? 'Control de calidad: ' + malos.join(', ') + ' descartados (ha llovido alrededor y en ellos casi nada; marcados con "?"). ' : ''}Se actualiza en cada ejecución del proceso; la última: ${fmtOrdua(act)}.`);
+    $('#redNota').innerHTML = Tm(`Euskalmeten ${n} euri-neurgailu, 10 minuturo irakurketak. Estazioen arteko balioak interpolatuak dira. ${sinDatos ? 'Aldi honetan ez dago irakurketarik: 0 mm erakusten da. ' : ''}${malos.length ? 'Kalitate-kontrola: ' + malos.join(', ') + ' baztertuak (inguruan euria egin du eta haiek ia ezer ez; "?" ikurrarekin). ' : ''}Prozesua exekutatzen den bakoitzean eguneratzen da; azkena: ${fmtOrdua(act)}.`,
+      `${n} pluviómetros de Euskalmet, lecturas cada 10 minutos. Valores entre estaciones interpolados. ${sinDatos ? 'Sin lecturas en este periodo: se muestra 0 mm. ' : ''}${malos.length ? 'Control de calidad: ' + malos.join(', ') + ' descartados (ha llovido alrededor y en ellos casi nada; marcados con "?"). ' : ''}Se actualiza en cada ejecución del proceso; la última: ${fmtOrdua(act)}.`);
   }
   function redIniciar(){
     $('#redSec').addEventListener('click', ev => { const b = ev.target.closest('[data-rv]'); if (b){ RED.vari = b.dataset.rv; redRender(); } });
