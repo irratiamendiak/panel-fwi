@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
 """
-Notificaciones del panel FWI / Basugix (euskera y castellano).
+Notificaciones del panel FWI / Basugix (solo en euskera).
 
-  * Correo: informe del día y previsión a 3 días, una vez al día, al cerrarse el dato
+  * Correo: informe del día (PDF adjunto), una vez al día, al cerrarse el dato
     (hora del dato + 60 min: 15:00 en verano, 14:00 en invierno).
-  * Telegram: solo subidas a nivel alto (entra en Alto, sube a Muy alto o Extremo, según el más alto de
-    FWI, Basugix e ICONA), fin del episodio al bajar de Moderado, preavisos por previsión,
-    viento sur con riesgo alto, y avisos técnicos (estaciones sin datos, fallo del proceso).
+  * Telegram: el mismo informe PDF completo, una vez al día, en el chat de avisos (TELEGRAM_CHAT);
+    y avisos técnicos en TELEGRAM_CHAT_TEC (estaciones sin datos, fallo del proceso, PDF no generado).
 
 Lee docs/data/fwi.json (lo escribe actualizar_fwi.py) y guarda en datos/notificaciones.json lo ya
-enviado, para no repetir: el correo, una vez al día; los avisos, solo cuando empieza o termina la
-situación (no cada día que se mantiene).
+enviado, para no repetir: el correo y el Telegram, una vez al día cada uno.
 
 Configuración (secretos de GitHub, como variables de entorno); si faltan, ese canal se omite:
   SMTP_USER, SMTP_PASS (contraseña de aplicación), EMAIL_TO (varios, separados por comas);
   opcionales: SMTP_HOST (por defecto smtp.gmail.com), SMTP_PORT (465), EMAIL_FROM
-  TELEGRAM_TOKEN, TELEGRAM_CHAT (grupo o canal de avisos), TELEGRAM_CHAT_TEC (avisos técnicos; si
+  TELEGRAM_TOKEN, TELEGRAM_CHAT (grupo o canal del boletín), TELEGRAM_CHAT_TEC (avisos técnicos; si
   falta, se usa TELEGRAM_CHAT)
 
 Uso:
   python notificar.py                  # lo normal, tras actualizar_fwi.py
-  python notificar.py --prueba         # no envía nada: escribe prueba_correo.html y muestra los mensajes
+  python notificar.py --prueba         # no envía nada: escribe prueba_correo.html / prueba_*.pdf y muestra los mensajes
   python notificar.py --fallo URL      # aviso técnico de que el proceso ha fallado
 """
 import argparse, html, json, math, os, smtplib, ssl, sys, urllib.parse, urllib.request
@@ -165,6 +163,27 @@ def enviar_telegram(texto, chat=None, prueba=False):
         r.read()
 
 
+def enviar_telegram_documento(nombre, datos, caption, chat=None, prueba=False):
+    """Envía un PDF (bytes) al chat de Telegram, con un pie de texto (HTML, máx. 1024 caracteres)."""
+    import uuid
+    tok, chat = os.environ.get("TELEGRAM_TOKEN"), chat or os.environ.get("TELEGRAM_CHAT")
+    if prueba or not tok or not chat:
+        if prueba:
+            Path("prueba_telegram_" + nombre).write_bytes(datos)
+        print(("[prueba] " if prueba else "[Telegram sin configurar] ") + f"documento: {nombre} ({len(datos)} bytes)\n{caption}\n")
+        return
+    borde = "----fwi" + uuid.uuid4().hex
+    cuerpo = b""
+    for k, v in (("chat_id", chat), ("caption", caption[:1024]), ("parse_mode", "HTML")):
+        cuerpo += f'--{borde}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode("utf-8")
+    cuerpo += (f'--{borde}\r\nContent-Disposition: form-data; name="document"; filename="{nombre}"\r\n'
+               f'Content-Type: application/pdf\r\n\r\n').encode("utf-8") + datos + f"\r\n--{borde}--\r\n".encode()
+    req = urllib.request.Request(f"https://api.telegram.org/bot{tok}/sendDocument", cuerpo,
+                                 {"Content-Type": f"multipart/form-data; boundary={borde}"})
+    with urllib.request.urlopen(req, timeout=120) as r:
+        r.read()
+
+
 def enviar_correo(asunto, cuerpo_html, prueba=False, adjuntos=None):
     """adjuntos: [(nombre_fichero, bytes)] (p. ej. el informe PDF)."""
     # Gmail por defecto: basta con SMTP_USER, SMTP_PASS (contraseña de aplicación) y EMAIL_TO
@@ -290,9 +309,8 @@ def informe_pdf_bytes(d):
         return ruta.read_bytes()
 
 
-def correo_diario(d, hoy, prueba):
-    """Correo diario tras el cierre del dato: el informe PDF adjunto, con un texto breve en euskera.
-    Si el PDF no se puede generar, se envía el correo de tablas de siempre."""
+def preparar_boletin(d, hoy):
+    """Datos del boletín del día: el PDF (o None si no se puede generar), los valores de GIPUZKOA y la fecha en euskera."""
     g = next((e for e in d["estaciones"] if e.get("resumen")), None)
     u = g["dias"][-1] if g and g.get("dias") else None
     valores = ""
@@ -301,12 +319,18 @@ def correo_diario(d, hoy, prueba):
         valores = (f"FWI {fnum(u['fwi'])}" + (f" · Basugix {fnum(b)}" if b is not None else "")
                    + (f" · ICONA {int(round(u['icona']))}" if u.get("icona") is not None else ""))
     f = date.fromisoformat(hoy)
-    fecha_eu = f"{f.year}ko {MESES_EU[f.month - 1]} {f.day}a"
     try:
         pdf = informe_pdf_bytes(d)
     except Exception as e:
-        print("No se ha podido generar el informe PDF; se envía el correo de tablas:", type(e).__name__, e)
+        print("No se ha podido generar el informe PDF:", type(e).__name__, e)
         pdf = None
+    return {"pdf": pdf, "valores": valores, "fecha_eu": f"{f.year}ko {MESES_EU[f.month - 1]} {f.day}a", "u": u}
+
+
+def correo_diario(d, hoy, prueba, bol):
+    """Correo diario tras el cierre del dato: el informe PDF adjunto, con un texto breve en euskera.
+    Si el PDF no se puede generar, se envía el correo de tablas (también en euskera)."""
+    valores, fecha_eu, pdf = bol["valores"], bol["fecha_eu"], bol["pdf"]
     if pdf:
         cuerpo = ('<div style="max-width:640px;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#14231c;font-size:15px;line-height:1.5">'
                   f'<p style="font-size:18px;font-weight:700;margin:0 0 6px">Baso sute arriskua Gipuzkoan · {fecha_eu}</p>'
@@ -319,127 +343,27 @@ def correo_diario(d, hoy, prueba):
                       adjuntos=[(f"Basugix_{hoy}.pdf", pdf)])
         return
     cuerpo = ('<div style="max-width:760px;margin:0 auto;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#14231c">'
-              + bloque_correo(d, "eu", hoy) + '<hr style="margin:22px 0;border:0;border-top:2px solid #1f5f46">'
-              + bloque_correo(d, "es", hoy) + "</div>")
-    g = next((e for e in d["estaciones"] if e.get("resumen")), None)
-    u = g["dias"][-1] if g and g.get("dias") else None
-    extra = ""
-    if u and u["fecha"] == hoy:
-        b = bgx(ifg_de(u))
-        extra = (f" · GIPUZKOA FWI {fnum(u['fwi'])}" + (f" / Basugix {fnum(b)}" if b is not None else "")
-                 + (f" / ICONA {int(round(u['icona']))}" if u.get("icona") is not None else ""))
-    enviar_correo(f"Sute arriskua / Riesgo de incendio · {hoy}{extra}", cuerpo, prueba)
+              + bloque_correo(d, "eu", hoy) + "</div>")
+    enviar_correo(f"Baso sute arriskua · {hoy}" + (f" · GIPUZKOA {valores}" if valores else ""), cuerpo, prueba)
 
 
-# ---------------------------------------------------------------- Telegram: avisos
-def valor_dia(e, f):
-    u = next((x for x in e.get("dias", []) if x["fecha"] == f), None)
-    if u:
-        return u, False
-    p = next((x for x in e.get("prevision", []) if x["fecha"] == f), None)
-    return p, True
+def telegram_boletin(hoy, prueba, bol, est):
+    """Telegram: el mismo informe PDF completo que va por correo, con un pie breve en euskera.
+    Devuelve True si se ha enviado; si no hay PDF, avisa (una vez al día) en el chat técnico."""
+    if not bol["pdf"]:
+        if est.get("tec_pdf") != hoy:
+            est["tec_pdf"] = hoy
+            aviso_tecnico("Ezin izan da gaurko txosten PDFa sortu. Ikusi GitHub-eko erregistroa.", prueba)
+        return False
+    pie = (f"🔥 <b>Baso sute arriskua Gipuzkoan</b>\n{bol['fecha_eu']}"
+           + (f"\nGIPUZKOA: <b>{bol['valores']}</b>" if bol["valores"] else ""))
+    enviar_telegram_documento(f"Basugix_{hoy}.pdf", bol["pdf"], pie, prueba=prueba)
+    return True
 
 
-ICO_A_COMUN = [0, 1, 2, 3, 5]   # niveles del ICONA (nulo, bajo, moderado, alto, extremo) en la escala común de 6
-
-
-def nivel_comun(u):
-    """Nivel de la estación (0 Muy bajo ... 5 Extremo): el más alto de FWI, Basugix e ICONA."""
-    n = [idx_fwi_de(u)]
-    b = bgx(ifg_de(u))
-    if b is not None:
-        n.append(idx_bgx(b))
-    if u.get("icona") is not None:
-        n.append(ICO_A_COMUN[nivel_ico(u["icona"])])
-    return max(n)
-
-
-def alto(u):
-    b = bgx(ifg_de(u))
-    ic = u.get("icona")
-    return ((b is not None and round(b, 1) >= UMBRAL_BGX) or idx_fwi_de(u) >= 3      # FWI "Handia" o más
-            or (ic is not None and round(ic) >= UMBRAL_ICO))                       # ICONA "Alto" o más
-
-
-def txt_valor(u, l):
-    b = bgx(ifg_de(u))
-    s = f"FWI {fnum(u['fwi'])} ({NOM[l][idx_fwi_de(u)]})"
-    if b is not None:
-        s += f" · Basugix {fnum(b)} ({NOM[l][idx_bgx(b)]})"
-    if u.get("icona") is not None:
-        ic = u["icona"]
-        s += f" · ICONA {int(round(ic))} ({NOM_ICO[l][nivel_ico(ic)]})"
-    if hay_sur(u):
-        s += " · 💨"
-    return s
-
-
-def avisos(d, hoy, est, prueba):
-    """Telegram, solo para subidas de nivel alto y para el final del episodio:
-      * una estación entra en nivel Alto (o directamente en Muy alto o Extremo);
-      * una estación ya en nivel alto sube a Muy alto o a Extremo;
-      * una estación en episodio baja por debajo de Moderado (fin del episodio);
-      * preaviso: la previsión da nivel Alto o más en una estación que hoy no lo tiene.
-    El nivel es el más alto de los tres índices (FWI, Basugix e ICONA). Entre Moderado y Alto no se avisa."""
-    niveles = est.get("niveles")
-    if niveles is None:                           # paso desde la versión anterior (estaciones en riesgo alto)
-        niveles = {n: 3 for n in est.get("activos", {})}
-    est["niveles"] = niveles                      # estación -> último nivel (solo con episodio abierto)
-    est.pop("activos", None)
-    prev_av = est.setdefault("preavisos", {})     # "estación|fecha" ya preavisados
-    empieza, suben, termina, preav = [], [], [], []
-    for e in d["estaciones"]:
-        n = "GIPUZKOA" if e.get("resumen") else e["nombre"]
-        u, calc = valor_dia(e, hoy)
-        if not u:
-            continue
-        v = nivel_comun(u)
-        antes = niveles.get(n)
-        if v >= 3 and antes is None:
-            empieza.append((n, u, v)); niveles[n] = v
-        elif antes is not None and v >= 3 and v > antes:
-            suben.append((n, u, antes, v)); niveles[n] = v
-        elif antes is not None and v <= 1:
-            termina.append((n, u, v)); del niveles[n]
-        elif antes is not None:
-            niveles[n] = v                            # baja sin salir del episodio: se anota sin avisar
-        if v < 3:                                     # preaviso: nivel alto previsto en los próximos días
-            for p in e.get("prevision", []):
-                if p["fecha"] > hoy and alto(p) and f"{n}|{p['fecha']}" not in prev_av:
-                    prev_av[f"{n}|{p['fecha']}"] = hoy
-                    preav.append((n, p))
-    for k in [k for k in prev_av if k.split("|")[1] < hoy]:
-        del prev_av[k]
-    if not (empieza or suben or termina or preav):
-        return
-    partes = []
-    for l, cab in (("eu", "🔥 <b>Baso sute arriskua — Gipuzkoa</b>"), ("es", "🔥 <b>Riesgo de incendio forestal — Gipuzkoa</b>")):
-        t = [cab, ffecha(hoy, l)]
-        if empieza:
-            t.append("\n⚠️ <b>Arrisku handia hasi da:</b>" if l == "eu" else "\n⚠️ <b>Comienza riesgo alto:</b>")
-            t += [f"• {n}: <b>{NOM[l][v]}</b> — {txt_valor(u, l)}" for n, u, v in empieza]
-        if suben:
-            t.append("\n📈 <b>Arriskua igo da:</b>" if l == "eu" else "\n📈 <b>Sube el riesgo:</b>")
-            t += [f"• {n}: {NOM[l][a]} → <b>{NOM[l][v]}</b> — {txt_valor(u, l)}" for n, u, a, v in suben]
-        if preav:
-            t.append("\n🔮 <b>Aurreabisua (iragarpena):</b>" if l == "eu" else "\n🔮 <b>Preaviso (previsión):</b>")
-            por_est = {}
-            for n, p in preav:
-                por_est.setdefault(n, []).append(p)
-            for n, ps in por_est.items():
-                peor = max(ps, key=nivel_comun)
-                dias = ", ".join(ffecha(p["fecha"], l, False) for p in ps)
-                t.append(f"• {n} ({dias}) — {'gehienez' if l == 'eu' else 'máximo'}: <b>{NOM[l][nivel_comun(peor)]}</b> — {txt_valor(peor, l)}")
-        if termina:
-            t.append("\n✅ <b>Arriskua ertainetik behera jaitsi da (amaiera):</b>" if l == "eu"
-                     else "\n✅ <b>El riesgo baja de moderado (fin del episodio):</b>")
-            t += [f"• {n}: {NOM[l][v]} — {txt_valor(u, l)}" for n, u, v in termina]
-        partes.append("\n".join(t))
-    enviar_telegram("\n\n— — —\n\n".join(partes), prueba=prueba)
-
-
-def aviso_tecnico(texto_eu, texto_es, prueba):
-    enviar_telegram(f"🛠️ {texto_eu}\n\n🛠️ {texto_es}", os.environ.get("TELEGRAM_CHAT_TEC"), prueba)
+# ---------------------------------------------------------------- Telegram: avisos técnicos
+def aviso_tecnico(texto, prueba):
+    enviar_telegram(f"🛠️ {texto}", os.environ.get("TELEGRAM_CHAT_TEC"), prueba)
 
 
 def estaciones_sin_datos(d, hoy, est, prueba):
@@ -448,8 +372,7 @@ def estaciones_sin_datos(d, hoy, est, prueba):
            and (not e.get("dias") or e["dias"][-1]["fecha"] < lim)]
     if sin and est.get("tec_sin_datos") != hoy:
         est["tec_sin_datos"] = hoy
-        aviso_tecnico("Egun bat baino gehiago daturik gabe: " + ", ".join(sin),
-                      "Más de un día sin datos: " + ", ".join(sin), prueba)
+        aviso_tecnico("Egun bat baino gehiago daturik gabe: " + ", ".join(sin), prueba)
 
 
 # ---------------------------------------------------------------- principal
@@ -462,22 +385,22 @@ def main():
     a = p.parse_args()
     if a.prueba_envio:
         ok = True
+        adj = []
         try:
-            enviar_telegram("✅ <b>Basugix</b>: Telegram abisuak ondo daude (GitHub-etik bidalia).\n"
-                            "✅ <b>Basugix</b>: los avisos por Telegram funcionan (enviado desde GitHub).")
-            print("Telegram: bidalia / enviado" if os.environ.get("TELEGRAM_TOKEN") else "Telegram: sin configurar")
+            datos = json.loads(DATOS.read_text(encoding="utf-8"))
+            adj = [(f"Basugix_proba_{datetime.now(ZONA).date().isoformat()}.pdf", informe_pdf_bytes(datos))]
+        except Exception as e:
+            print("Informe PDF: ERROR", type(e).__name__, e)
+        try:
+            enviar_telegram("✅ <b>Basugix</b>: Telegram abisuak ondo daude (GitHub-etik bidalia).")
+            if adj:
+                enviar_telegram_documento(adj[0][0], adj[0][1], "✅ <b>Basugix</b>: proba-txostena (PDF).")
+            print("Telegram: bidalia" if os.environ.get("TELEGRAM_TOKEN") else "Telegram: sin configurar")
         except Exception as e:
             ok = False; print("Telegram: ERROR", e)
         try:
             if os.environ.get("SMTP_USER"):
-                adj = []
-                try:
-                    datos = json.loads(DATOS.read_text(encoding="utf-8"))
-                    adj = [(f"Basugix_proba_{datetime.now(ZONA).date().isoformat()}.pdf", informe_pdf_bytes(datos))]
-                except Exception as e:
-                    print("Informe PDF: ERROR", type(e).__name__, e)
-                enviar_correo("Basugix: proba / prueba", "<p>✅ <b>Basugix</b>: posta elektronikoa ondo dago (GitHub-etik bidalia).<br>"
-                              "✅ <b>Basugix</b>: el correo funciona (enviado desde GitHub).</p>"
+                enviar_correo("Basugix: proba", "<p>✅ <b>Basugix</b>: posta elektronikoa ondo dago (GitHub-etik bidalia).</p>"
                               + ("<p>Eranskinean, azken datuekin egindako txostena (PDF).</p>" if adj else
                                  "<p>⚠️ Ezin izan da txosten PDFa sortu (ikus GitHub-eko erregistroa).</p>"), adjuntos=adj)
                 print("Correo: enviado")
@@ -487,8 +410,7 @@ def main():
             ok = False; print("Correo: ERROR", e)
         return 0 if ok else 1
     if a.fallo:
-        aviso_tecnico(f"Eguneratze-prozesuak huts egin du. Ikusi: {a.fallo}",
-                      f"El proceso de actualización ha fallado. Ver: {a.fallo}", a.prueba)
+        aviso_tecnico(f"Eguneratze-prozesuak huts egin du. Ikusi: {a.fallo}", a.prueba)
         return 0
     d = json.loads(DATOS.read_text(encoding="utf-8"))
     ahora = datetime.now(ZONA)
@@ -498,21 +420,30 @@ def main():
     if ahora < cierre and not a.forzar:
         print("Aún no se ha cerrado el dato del día: no se notifica nada.")
         return 0
-    if est.get("correo") != hoy or a.forzar:
-        try:
-            correo_diario(d, hoy, a.prueba)
-            if not a.prueba:
-                est["correo"] = hoy
-        except Exception as e:
-            print("No se ha podido enviar el correo:", e)
+    nuevo_correo = est.get("correo") != hoy or a.forzar
+    nuevo_tg = est.get("telegram") != hoy or a.forzar
+    if nuevo_correo or nuevo_tg:
+        bol = preparar_boletin(d, hoy)             # el PDF se genera una sola vez para los dos canales
+        if nuevo_correo:
+            try:
+                correo_diario(d, hoy, a.prueba, bol)
+                if not a.prueba:
+                    est["correo"] = hoy
+            except Exception as e:
+                print("No se ha podido enviar el correo:", e)
+        if nuevo_tg:
+            try:
+                if telegram_boletin(hoy, a.prueba, bol, est) and not a.prueba:
+                    est["telegram"] = hoy
+            except Exception as e:
+                print("No se ha podido enviar el boletín por Telegram:", e)
     if est.get("avisos") != hoy or a.forzar:
         try:
-            avisos(d, hoy, est, a.prueba)
             estaciones_sin_datos(d, hoy, est, a.prueba)
             if not a.prueba:
                 est["avisos"] = hoy
         except Exception as e:
-            print("No se han podido enviar los avisos:", e)
+            print("No se han podido enviar los avisos técnicos:", e)
     if not a.prueba:
         guardar_estado(est)
     return 0
