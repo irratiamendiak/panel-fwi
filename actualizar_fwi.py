@@ -160,7 +160,14 @@ CLASES = [("Muy bajo", 5.2), ("Bajo", 11.2), ("Moderado", 21.3),
 
 
 # ---------------------------------------------------------------- fórmulas FWI
+def limitar_hr(h):
+    """La humedad relativa física está entre 0 y 100 %: algunos sensores marcan algo más de 100."""
+    return min(100.0, max(0.0, h))
+
+
 def ffmc_step(T, H, W, r, F0):
+    H = limitar_hr(H)
+    W = max(0.0, W)
     mo = 147.2 * (101 - F0) / (59.5 + F0)
     if r > 0.5:
         rf = r - 0.5
@@ -186,6 +193,7 @@ def ffmc_step(T, H, W, r, F0):
 
 
 def dmc_step(T, H, r, Do, Le):
+    H = limitar_hr(H)
     if T < -1.1:
         T = -1.1
     rk = 1.894 * (T + 1.1) * (100 - H) * Le * 0.0001
@@ -290,7 +298,7 @@ def cascada(filas, inicial, estado=None):
             EI = ico.estado_inicial()
         hueco = prev is not None and (d - prev).days != 1
         prev = d
-        T, H, W, R = f["temperatura"], f["humedad"], f["viento"], f["lluvia"]
+        T, H, W, R = f["temperatura"], limitar_hr(f["humedad"]), f["viento"], f["lluvia"]
         F = ffmc_step(T, H, W, R, F)
         M = dmc_step(T, H, R, M, DMC_L[d.month - 1])
         D = dc_step(T, R, D, DC_L[d.month - 1])
@@ -448,7 +456,7 @@ def leer_historial():
                     datos[n][r["fecha"]] = {
                         "fecha": r["fecha"],
                         "temperatura": float(r["temperatura"]),
-                        "humedad": float(r["humedad"]),
+                        "humedad": limitar_hr(float(r["humedad"])),
                         "viento": float(r["viento"]),
                         "lluvia": float(r["lluvia"]),
                         "direccion": float(dir_txt) if dir_txt else None,
@@ -486,7 +494,7 @@ def obtener_dia(cli, alm, sensores, cod, dia, dia_fin, hora):
         aviso = f" (rellenado: {origen})"
     else:
         aviso = "" if n >= ew.LECTURAS_POR_DIA else f" (lluvia: {n}/{ew.LECTURAS_POR_DIA} lecturas)"
-    fila = {"fecha": dia.isoformat(), "temperatura": round(t, 1), "humedad": round(h, 1),
+    fila = {"fecha": dia.isoformat(), "temperatura": round(t, 1), "humedad": round(limitar_hr(h), 1),
             "viento": round(w * 3.6, 1), "lluvia": ll, "direccion": round(dv, 0) if dv is not None else None,
             "origen": origen}
     return fila, aviso
@@ -578,7 +586,7 @@ def descargar_mutriku(datos, dia_fin, hora, dias_atras=3):
         if not e:
             continue
         T, H, W, DV, P, _ = e
-        existentes[dia.isoformat()] = {"fecha": dia.isoformat(), "temperatura": round(T, 1), "humedad": round(H, 1),
+        existentes[dia.isoformat()] = {"fecha": dia.isoformat(), "temperatura": round(T, 1), "humedad": round(limitar_hr(H), 1),
                                        "viento": round(W, 1), "lluvia": round(P, 1),
                                        "direccion": round(DV) if DV is not None else None}
         nuevas += 1
@@ -686,6 +694,7 @@ def crear_previsor(alm, sensores, hora):
                     break
                 T, H, W, DV, P, horas = e
                 T, H, W = pv.corregir(corr.get(f"{nombre}|{min(3, max(0, j))}", IDENTIDAD), T, H, W)
+                H = limitar_hr(H)
                 medidas = 0
                 cod_est = ew.ESTACIONES.get(nombre)
                 if nombre in LLUVIA_DE and ew.ESTACIONES.get(LLUVIA_DE[nombre]):   # Pasaia: lluvia real de Miramon
