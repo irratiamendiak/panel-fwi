@@ -65507,6 +65507,7 @@ fecha,estacion,temperatura,humedad,viento,lluvia,direccion,origen
 2026-11-09,Bidania,16.2,66.7,39.8,0.0,161.0,
 2026-11-09,Berastegi,17.8,65.0,26.7,0.0,154.0,
 2026-11-09,Zegama,16.5,75.7,28.6,0.0,152.0,
+2026-11-09,Ordizia,19.8,58,16.9,0.0,179,lluvia:Bidania; temperatura:Open-Meteo; humedad:Open-Meteo; viento:Open-Meteo
 2026-11-09,Zizurkil,21.9,52.3,32.1,0.0,126.0,
 2026-11-09,Pasaia,22.0,47.9,6.5,0.08,94.0,
 2026-11-09,Zarautz,23.0,50.0,34.6,0.2,168.0,
