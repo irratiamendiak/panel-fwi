@@ -2244,11 +2244,11 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg,icona
 2026-11-09,Zizurkil,2026-11-11,2,2.4,1.2,6.0,Muy bajo,0,0.53,Bajo,4
 2026-11-09,Zizurkil,2026-11-12,3,0.5,0.0,4.4,Muy bajo,0,0.13,Muy bajo,1
 2026-11-10,Altzola,2026-11-10,0,6.6,3.1,11.7,Bajo,1,1.32,Moderado,8
-2026-11-10,Altzola,2026-11-11,1,3.9,2.5,6.9,Muy bajo,0,0.8,Bajo,7
-2026-11-10,Altzola,2026-11-12,2,1.0,0.0,4.6,Muy bajo,0,0.29,Muy bajo,5
+2026-11-10,Altzola,2026-11-11,1,5.2,3.7,8.1,Muy bajo,0,1.04,Moderado,7
+2026-11-10,Altzola,2026-11-12,2,1.3,0.0,4.9,Muy bajo,0,0.34,Muy bajo,5
 2026-11-10,Altzola,2026-11-13,3,0.0,0.0,3.9,Muy bajo,0,0.08,Muy bajo,0
 2026-11-10,Arrasate,2026-11-10,0,10.2,6.6,15.2,Bajo,1,2.03,Alto,10
-2026-11-10,Arrasate,2026-11-11,1,6.8,2.0,12.4,Bajo,0,1.36,Moderado,9
+2026-11-10,Arrasate,2026-11-11,1,7.3,2.4,12.8,Bajo,0,1.45,Moderado,9
 2026-11-10,Arrasate,2026-11-12,2,3.2,1.9,6.8,Muy bajo,0,0.67,Bajo,7
 2026-11-10,Arrasate,2026-11-13,3,0.2,0.0,4.0,Muy bajo,0,0.1,Muy bajo,4
 2026-11-10,Berastegi,2026-11-10,0,9.3,5.8,14.4,Bajo,1,1.86,Moderado,9
@@ -2256,12 +2256,12 @@ emitida,estacion,fecha,adelanto,fwi,min,max,clase,calculado,ifg,clase_ifg,icona
 2026-11-10,Berastegi,2026-11-12,2,0.8,0.0,4.4,Muy bajo,0,0.26,Muy bajo,4
 2026-11-10,Berastegi,2026-11-13,3,0.0,0.0,3.9,Muy bajo,0,0.08,Muy bajo,0
 2026-11-10,Bidania,2026-11-10,0,2.1,1.1,4.0,Muy bajo,1,0.49,Muy bajo,7
-2026-11-10,Bidania,2026-11-11,1,1.6,0.1,4.5,Muy bajo,0,0.39,Muy bajo,8
+2026-11-10,Bidania,2026-11-11,1,1.6,0.2,4.6,Muy bajo,0,0.4,Muy bajo,8
 2026-11-10,Bidania,2026-11-12,2,0.1,0.0,3.8,Muy bajo,0,0.1,Muy bajo,1
 2026-11-10,Bidania,2026-11-13,3,0.0,0.0,3.9,Muy bajo,0,0.09,Muy bajo,0
 2026-11-10,Gipuzkoa,2026-11-10,0,10.1,6.6,15.1,Bajo,1,2.0,Alto,10
-2026-11-10,Gipuzkoa,2026-11-11,1,6.8,2.6,12.1,Bajo,0,1.4,Moderado,9
-2026-11-10,Gipuzkoa,2026-11-12,2,1.2,0.4,4.9,Muy bajo,0,0.3,Muy bajo,4
+2026-11-10,Gipuzkoa,2026-11-11,1,7.0,2.8,12.3,Bajo,0,1.4,Moderado,9
+2026-11-10,Gipuzkoa,2026-11-12,2,1.3,0.4,4.9,Muy bajo,0,0.3,Muy bajo,4
 2026-11-10,Gipuzkoa,2026-11-13,3,0.1,0.0,4.0,Muy bajo,0,0.1,Muy bajo,1
 2026-11-10,Miramon,2026-11-10,0,14.3,9.6,20.9,Moderado,1,2.88,Alto,19
 2026-11-10,Miramon,2026-11-11,1,12.4,5.6,20.3,Moderado,0,2.5,Alto,12
