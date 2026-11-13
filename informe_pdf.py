@@ -196,41 +196,64 @@ class Mapa:
                 except OSError:
                     continue
             return ImageFont.load_default()
-        fuente = ft("DejaVuSans-Bold.ttf", max(3.0, letra * 0.72))
-
-        # Cada estación se representa en su coordenada geográfica real:
-        # sin recolocar nombres, sin cajas y sin líneas guía.
+        # El mapa del viento usa símbolos direccionales anclados a la coordenada real.
+        # Los demás mapas conservan exactamente la rotulación de la versión anterior.
+        if flechas:
+            for f in self.zonas["features"]:
+                pr = f["properties"]
+                if pr.get("lat") is None:
+                    continue
+                nombre_est = pr["estacion"]
+                if nombre_est not in flechas or flechas[nombre_est][0] is None:
+                    continue
+                x, y = P_(pr["lon"], pr["lat"])
+                g, roja = flechas[nombre_est]
+                # La dirección meteorológica indica de dónde viene; invertir 180°
+                # para que la punta señale hacia dónde se desplaza el aire.
+                a = math.radians((g + 180) % 360)
+                ux, uy = math.sin(a), -math.cos(a)
+                largo = 8.0 * k
+                ex, ey = x + ux * largo, y + uy * largo
+                color_f = (190, 35, 35) if roja else (24, 43, 54)
+                grosor = max(2, int(1.15 * k))
+                dr.line((x - ux * 1.8*k, y - uy * 1.8*k, ex, ey), fill=(255,255,255), width=grosor + max(1,int(.7*k)))
+                dr.line((x - ux * 1.8*k, y - uy * 1.8*k, ex, ey), fill=color_f, width=grosor)
+                ala = 3.1 * k
+                px, py = -uy, ux
+                bx, by = ex - ux * ala, ey - uy * ala
+                dr.polygon([(ex,ey),(bx+px*ala*.72,by+py*ala*.72),(bx-px*ala*.72,by-py*ala*.72)],
+                           fill=color_f, outline=(255,255,255))
+                # El centro del círculo identifica la estación y queda sobre lon/lat.
+                rr = 2.0*k
+                dr.ellipse((x-rr,y-rr,x+rr,y+rr), fill=(255,255,255), outline=color_f, width=max(1,int(.8*k)))
+        else:
+            fuente = ft("DejaVuSans-Bold.ttf", letra)
+        fuente_n = ft("DejaVuSans.ttf", letra * 0.78)
         for f in self.zonas["features"]:
             pr = f["properties"]
             if pr.get("lat") is None:
                 continue
-            nombre_est = pr["estacion"]
             x, y = P_(pr["lon"], pr["lat"])
+            dxl, dyl = DESPLAZA.get(pr["estacion"], (0, 0))     # etiquetas que se pisan con la vecina
+            if flechas and pr["estacion"] in flechas and flechas[pr["estacion"]][0] is not None:
+                g, roja = flechas[pr["estacion"]]
+                a = math.radians(g + 180); ux, uy = math.sin(a), -math.cos(a); s_ = 6.5 * k
+                pts = [(0, s_), (s_ * .45, -s_ * .5), (0, -s_ * .15), (-s_ * .45, -s_ * .5)]
+                rot = [(x + py * ux + px * uy, y + py * uy - px * ux) for px, py in pts]
+                dr.polygon(rot, fill=(217, 56, 43) if roja else (20, 35, 28), outline=(255, 255, 255))
+                y += 19 * k  # reserva espacio bajo la flecha para que la caja blanca no la tape
+            if etiquetas and pr["estacion"] in etiquetas:
+                x += dxl * k; y -= dyl * k
+                t = etiquetas[pr["estacion"]]
+                bb = dr.textbbox((0, 0), t, font=fuente); tw, th = bb[2] - bb[0], bb[3] - bb[1]
+                nm = pr["estacion"] if nombres else ""
+                bn = dr.textbbox((0, 0), nm, font=fuente_n) if nm else (0, 0, 0, 0); nw, nh = bn[2] - bn[0], bn[3] - bn[1]
+                caja_w = max(tw, nw) + 3 * k; alto_n = (nh + 1.2 * k) if nm else 0
+                dr.rounded_rectangle([x - caja_w / 2, y - th - alto_n - 2.4 * k, x + caja_w / 2, y + 1.2 * k], radius=1.8 * k, fill=(255, 255, 255, 225))
+                if nm:
+                    dr.text((x - nw / 2, y - th - alto_n - 1.6 * k - bn[1]), nm, font=fuente_n, fill=(70, 84, 90))
+                dr.text((x - tw / 2, y - th - 1.6 * k - bb[1]), t, font=fuente, fill=(20, 35, 28))
 
-            if flechas and nombre_est in flechas and flechas[nombre_est][0] is not None:
-                g, roja = flechas[nombre_est]
-                ang = math.radians((g + 180) % 360)
-                largo = 7.0 * k
-                dx, dy = math.sin(ang), -math.cos(ang)
-                ex, ey = x + dx * largo, y + dy * largo
-                color_f = (217, 56, 43) if roja else (20, 35, 28)
-                dr.line((x, y, ex, ey), fill=(255, 255, 255), width=max(2, int(1.8 * k)))
-                dr.line((x, y, ex, ey), fill=color_f, width=max(1, int(0.9 * k)))
-                ala = 2.8 * k
-                bx, by = ex - dx * ala, ey - dy * ala
-                px, py = -dy, dx
-                dr.polygon([(ex, ey), (bx + px * ala * 0.62, by + py * ala * 0.62),
-                            (bx - px * ala * 0.62, by - py * ala * 0.62)],
-                           fill=color_f, outline=(255, 255, 255))
-
-            # Punto de referencia: su centro coincide exactamente con lon/lat.
-            dr.ellipse((x - 1.35*k, y - 1.35*k, x + 1.35*k, y + 1.35*k),
-                       fill=(255, 255, 255), outline=(20, 35, 28), width=max(1, int(0.7*k)))
-
-            if etiquetas and nombre_est in etiquetas:
-                texto = f"{nombre_est} · {etiquetas[nombre_est]}" if nombres else etiquetas[nombre_est]
-                dr.text((x, y + 2.0*k), texto, font=fuente, fill=(20, 35, 28),
-                        anchor="ma", stroke_width=max(1, int(0.8*k)), stroke_fill=(255, 255, 255))
         buf = io.BytesIO(); img.save(buf, "PNG"); buf.seek(0)
         return RLImage(buf, width=ancho, height=ancho * H / W)
 
