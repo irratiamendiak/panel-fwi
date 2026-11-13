@@ -81,6 +81,15 @@ jobs:
             python notificar.py
           fi
 
+      - name: Publicar PDF para descargar y revisar
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF-Basugix-${{ github.run_id }}
+          path: Basugix_*.pdf
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Guardar el registro de notificaciones
         # el registro evita repetir avisos; si otra ejecución ha guardado algo entretanto, se toma su versión
         # del repositorio y se le pone encima este registro (que es el más reciente).
