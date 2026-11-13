@@ -2313,29 +2313,37 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       const v = val(e), malo = e[campo + '_sospechoso'], [a, b] = P([e.lon, e.lat]);
       ctx.beginPath(); ctx.arc(a, b, 3 * kz, 0, 7);
       if (malo || v == null){ ctx.strokeStyle = '#8a969c'; ctx.lineWidth = 1.5 * kz; ctx.stroke(); } else { ctx.fillStyle = '#14231c'; ctx.fill(); }
-      const t = v == null ? '—' : fmt(v) + (malo ? ' ?' : '');
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3 * kz; ctx.strokeText(t, a, b - 6 * kz); ctx.fillStyle = malo || v == null ? '#8a969c' : '#14231c'; ctx.fillText(t, a, b - 6 * kz);
+      // Eskas: eguneroko metatua falta bada, azken 60 minutuetako neurketa agertu (*) markarekin.
+      const eskasAzkena = e.cod === 'C0F1' && campo === 'hoy' && v == null && e.ultima != null;
+      const t = eskasAzkena ? fmt(e.ultima) + '*' : (v == null ? '—' : fmt(v) + (malo ? ' ?' : ''));
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3 * kz; ctx.strokeText(t, a, b - 6 * kz); ctx.fillStyle = malo || (v == null && !eskasAzkena) ? '#8a969c' : '#14231c'; ctx.fillText(t, a, b - 6 * kz);
     });
-    // Estazio-izenak balioaren azpian; kokapen hurbiletan etiketen gainjartzea saihestu.
+    // Estazio-izenak: datu-etiketen eremuak erreserbatu, izenek mm balioak estal ez ditzaten.
     ctx.font = (9 * kz) + 'px system-ui, sans-serif'; ctx.textAlign = 'center';
+    const okupatuak = d.estaciones.map(e => {
+      const [a, b] = P([e.lon, e.lat]);
+      const t = e.cod === 'C0F1' && campo === 'hoy' && e.hoy == null && e.ultima != null ? fmt(e.ultima) + '*' : (val(e) == null ? '—' : fmt(val(e)) + (e[campo + '_sospechoso'] ? ' ?' : ''));
+      const w = ctx.measureText(t).width;
+      return {x:a-w/2-4*kz,y:b-13*kz,w:w+8*kz,h:11*kz,px:a,py:b};
+    });
     const etiketak = [];
-    d.estaciones.forEach(e => {
+    d.estaciones.forEach((e, i) => {
       const [a, b] = P([e.lon, e.lat]), izena = e.nombre || e.cod || '';
       if (!izena) return;
-      const w = ctx.measureText(izena).width, h = 10 * kz;
-      const aukerak = [[0, 13], [-12, 13], [12, 13], [-24, 13], [24, 13], [0, 23], [0, 3], [-36, 13], [36, 13]];
+      const w = ctx.measureText(izena).width, h = 10*kz;
+      const aukerak = [[0,18],[-18,0],[18,0],[-30,0],[30,0],[0,28],[-42,8],[42,8],[0,-18],[-54,0],[54,0]];
       let hautatua = null;
       for (const [dx, dy] of aukerak) {
-        const x = a + dx * kz, y = b + dy * kz;
-        const r = {x: x - w/2 - 2*kz, y: y - h/2, w: w + 4*kz, h};
-        if (r.x < 2*kz || r.x + r.w > W - 2*kz || r.y < 2*kz || r.y + r.h > H - 2*kz) continue;
-        if (!etiketak.some(q => r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y)) { hautatua = {x, y, r}; break; }
+        const x=a+dx*kz, y=b+dy*kz, r={x:x-w/2-2*kz,y:y-h/2,w:w+4*kz,h};
+        if (r.x<2*kz || r.x+r.w>W-2*kz || r.y<2*kz || r.y+r.h>H-2*kz) continue;
+        const talkaDatuarekin = okupatuak.some((q,j) => j!==i && r.x<q.x+q.w && r.x+r.w>q.x && r.y<q.y+q.h && r.y+r.h>q.y);
+        const talkaPuntuarekin = okupatuak.some((q,j) => j!==i && Math.hypot(x-q.px,y-q.py)<7*kz);
+        if (!talkaDatuarekin && !talkaPuntuarekin && !etiketak.some(q => r.x<q.x+q.w && r.x+r.w>q.x && r.y<q.y+q.h && r.y+r.h>q.y)) { hautatua={x,y,r}; break; }
       }
       if (!hautatua) return;
       etiketak.push(hautatua.r);
-      ctx.strokeStyle = 'rgba(255,255,255,.96)'; ctx.lineWidth = 3 * kz;
-      ctx.strokeText(izena, hautatua.x, hautatua.y);
-      ctx.fillStyle = '#263238'; ctx.fillText(izena, hautatua.x, hautatua.y);
+      ctx.strokeStyle='rgba(255,255,255,.98)'; ctx.lineWidth=3.2*kz; ctx.strokeText(izena,hautatua.x,hautatua.y);
+      ctx.fillStyle='#263238'; ctx.fillText(izena,hautatua.x,hautatua.y);
     });
   }
   function redRender(){
@@ -2352,7 +2360,9 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     const r = RED_RAMP[RED.vari === 'ultima' ? 'ultima' : 'hoy'], max = r[r.length-1][0];
     const sinDatos = !d.estaciones.some(e => e[RED.vari] != null), n = d.estaciones.filter(e => (sinDatos || e[RED.vari] != null) && !e[RED.vari + '_sospechoso']).length, malos = d.estaciones.filter(e => e[RED.vari + '_sospechoso']).map(e => e.nombre);
     $('#redEsc').innerHTML = leyendaTramos(r, TRAMOS[RED.vari === 'ultima' ? 'ultima' : 'hoy'], 'mm') + `<div class="esc-extra">● ${Tm('euri-neurgailua (mm)','pluviómetro (mm)')}</div>`;
-    $('#redNota').innerHTML = Tm(`Euskalmeten ${n} euri-neurgailu, 10 minuturo irakurketak. Estazioen arteko balioak interpolatuak dira. ${sinDatos ? 'Aldi honetan ez dago irakurketarik: 0 mm erakusten da. ' : ''}${malos.length ? 'Kalitate-kontrola: ' + malos.join(', ') + ' baztertuak (inguruan euria egin du eta haiek ia ezer ez; "?" ikurrarekin). ' : ''}Prozesua exekutatzen den bakoitzean eguneratzen da; azkena: ${fmtOrdua(act)}.`,
+    const eskasFallback = campo === 'hoy' && d.estaciones.some(e => e.cod === 'C0F1' && e.hoy == null && e.ultima != null);
+    $('#redNota').innerHTML = Tm(`Euskalmeten ${n} euri-neurgailu, 10 minuturo irakurketak. Estazioen arteko balioak interpolatuak dira. ${sinDatos ? 'Aldi honetan ez dago irakurketarik: 0 mm erakusten da. ' : ''}${malos.length ? 'Kalitate-kontrola: ' + malos.join(', ') + ' baztertuak (inguruan euria egin du eta haiek ia ezer ez; "?" ikurrarekin). ' : ''}${eskasFallback ? 'Eskas-en * ikurrak azken 60 minutuetako datua adierazten du; eguneko metatua ez dago eskuragarri. ' : ''}Prozesua exekutatzen den bakoitzean eguneratzen da; azkena: ${fmtOrdua(act)}.`,
+
       `${n} pluviómetros de Euskalmet, lecturas cada 10 minutos. Valores entre estaciones interpolados. ${sinDatos ? 'Sin lecturas en este periodo: se muestra 0 mm. ' : ''}${malos.length ? 'Control de calidad: ' + malos.join(', ') + ' descartados (ha llovido alrededor y en ellos casi nada; marcados con "?"). ' : ''}Se actualiza en cada ejecución del proceso; la última: ${fmtOrdua(act)}.`);
   }
   function redIniciar(){
