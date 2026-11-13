@@ -379,7 +379,8 @@ def estaciones_sin_datos(d, hoy, est, prueba):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--prueba", action="store_true", help="No envía nada; muestra y guarda lo que enviaría")
-    p.add_argument("--forzar", action="store_true", help="Envía aunque ya se haya enviado hoy o no sea la hora")
+    p.add_argument("--forzar", action="store_true", help="Envía correo y Telegram aunque ya se hayan enviado hoy o no sea la hora")
+    p.add_argument("--forzar-telegram", action="store_true", help="Reenvía solo el PDF por Telegram, aunque ya se haya enviado hoy o no sea la hora")
     p.add_argument("--fallo", metavar="URL", help="Aviso técnico: el proceso ha fallado")
     p.add_argument("--prueba-envio", action="store_true", help="Envía un correo y un Telegram de prueba (configuración)")
     a = p.parse_args()
@@ -417,11 +418,11 @@ def main():
     hoy = ahora.date().isoformat()
     cierre = ahora.replace(hour=int(d.get("hora_dato", 14)), minute=0, second=0, microsecond=0) + timedelta(minutes=MARGEN_CIERRE)
     est = cargar_estado()
-    if ahora < cierre and not a.forzar:
+    if ahora < cierre and not (a.forzar or a.forzar_telegram):
         print("Aún no se ha cerrado el dato del día: no se notifica nada.")
         return 0
     nuevo_correo = est.get("correo") != hoy or a.forzar
-    nuevo_tg = est.get("telegram") != hoy or a.forzar
+    nuevo_tg = est.get("telegram") != hoy or a.forzar or a.forzar_telegram
     if nuevo_correo or nuevo_tg:
         bol = preparar_boletin(d, hoy)             # el PDF se genera una sola vez para los dos canales
         if nuevo_correo:
