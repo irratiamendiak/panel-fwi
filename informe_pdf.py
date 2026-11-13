@@ -24,7 +24,7 @@ from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Table, Tab
 import io
 import numpy as np
 from PIL import Image as PILImage, ImageDraw, ImageFont, ImageFilter
-from reportlab.graphics.shapes import Drawing, Polygon, Rect, String, Circle, Group
+from reportlab.graphics.shapes import Drawing, Polygon, Rect, String, Circle, Group, Line
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
@@ -196,78 +196,41 @@ class Mapa:
                 except OSError:
                     continue
             return ImageFont.load_default()
-        fuente = ft("DejaVuSans-Bold.ttf", letra)
-        fuente_n = ft("DejaVuSans.ttf", letra * 0.78)
+        fuente = ft("DejaVuSans-Bold.ttf", max(3.0, letra * 0.72))
 
-        # Primero se dibujan todas las flechas exactamente sobre la coordenada de la estación.
-        estaciones_mapa = []
+        # Cada estación se representa en su coordenada geográfica real:
+        # sin recolocar nombres, sin cajas y sin líneas guía.
         for f in self.zonas["features"]:
             pr = f["properties"]
             if pr.get("lat") is None:
                 continue
             nombre_est = pr["estacion"]
             x, y = P_(pr["lon"], pr["lat"])
+
             if flechas and nombre_est in flechas and flechas[nombre_est][0] is not None:
                 g, roja = flechas[nombre_est]
-                a = math.radians(g + 180)
-                ux, uy = math.sin(a), -math.cos(a)
-                s_ = 6.5 * k
-                pts = [(0, s_), (s_ * .45, -s_ * .5), (0, -s_ * .15), (-s_ * .45, -s_ * .5)]
-                rot = [(x + py * ux + px * uy, y + py * uy - px * ux) for px, py in pts]
-                dr.polygon(rot, fill=(217, 56, 43) if roja else (20, 35, 28), outline=(255, 255, 255))
+                ang = math.radians((g + 180) % 360)
+                largo = 7.0 * k
+                dx, dy = math.sin(ang), -math.cos(ang)
+                ex, ey = x + dx * largo, y + dy * largo
+                color_f = (217, 56, 43) if roja else (20, 35, 28)
+                dr.line((x, y, ex, ey), fill=(255, 255, 255), width=max(2, int(1.8 * k)))
+                dr.line((x, y, ex, ey), fill=color_f, width=max(1, int(0.9 * k)))
+                ala = 2.8 * k
+                bx, by = ex - dx * ala, ey - dy * ala
+                px, py = -dy, dx
+                dr.polygon([(ex, ey), (bx + px * ala * 0.62, by + py * ala * 0.62),
+                            (bx - px * ala * 0.62, by - py * ala * 0.62)],
+                           fill=color_f, outline=(255, 255, 255))
+
+            # Punto de referencia: su centro coincide exactamente con lon/lat.
+            dr.ellipse((x - 1.35*k, y - 1.35*k, x + 1.35*k, y + 1.35*k),
+                       fill=(255, 255, 255), outline=(20, 35, 28), width=max(1, int(0.7*k)))
+
             if etiquetas and nombre_est in etiquetas:
-                estaciones_mapa.append((nombre_est, x, y, etiquetas[nombre_est]))
-
-        # Las etiquetas se colocan alrededor de su estación buscando huecos libres.
-        # Así no dependen de desplazamientos manuales fijos que fallan al cambiar el tamaño
-        # del texto, la escala del mapa o el número de estaciones con dato.
-        ocupadas = []
-        for nombre_est, sx, sy, t in estaciones_mapa:
-            bb = dr.textbbox((0, 0), t, font=fuente)
-            tw, th = bb[2] - bb[0], bb[3] - bb[1]
-            nm = nombre_est if nombres else ""
-            bn = dr.textbbox((0, 0), nm, font=fuente_n) if nm else (0, 0, 0, 0)
-            nw, nh = bn[2] - bn[0], bn[3] - bn[1]
-            caja_w = max(tw, nw) + 5 * k
-            alto_n = (nh + 1.5 * k) if nm else 0
-            caja_h = th + alto_n + 4 * k
-
-            # Centros candidatos: primero cerca de la estación y después en posiciones más alejadas.
-            candidatos = []
-            for radio in (12, 19, 27, 36):
-                for ang in (-90, -45, 0, 45, 90, 135, 180, 225):
-                    rad = math.radians(ang)
-                    candidatos.append((sx + math.cos(rad) * radio * k,
-                                       sy + math.sin(rad) * radio * k))
-            mejor = None
-            mejor_coste = float("inf")
-            for cx, cy in candidatos:
-                x0, y0 = cx - caja_w / 2, cy - caja_h / 2
-                x1, y1 = cx + caja_w / 2, cy + caja_h / 2
-                fuera = max(0, -x0) + max(0, -y0) + max(0, x1 - W) + max(0, y1 - H)
-                solape = 0
-                for ox0, oy0, ox1, oy1 in ocupadas:
-                    iw = max(0, min(x1, ox1) - max(x0, ox0))
-                    ih = max(0, min(y1, oy1) - max(y0, oy0))
-                    solape += iw * ih
-                distancia = math.hypot(cx - sx, cy - sy)
-                coste = solape * 1000 + fuera * 10000 + distancia
-                if coste < mejor_coste:
-                    mejor_coste, mejor = coste, (cx, cy, x0, y0, x1, y1)
-                if coste == 0:
-                    break
-            cx, cy, x0, y0, x1, y1 = mejor
-            ocupadas.append((x0, y0, x1, y1))
-
-            # Línea guía discreta cuando la etiqueta se separa del punto de la estación.
-            if math.hypot(cx - sx, cy - sy) > 10 * k:
-                dr.line((sx, sy, cx, cy), fill=(75, 88, 91, 190), width=max(1, int(k * 0.45)))
-
-            dr.rounded_rectangle([x0, y0, x1, y1], radius=2 * k, fill=(255, 255, 255, 238),
-                                 outline=(90, 105, 108, 170), width=max(1, int(k * 0.35)))
-            if nm:
-                dr.text((cx - nw / 2, y0 + 1.2 * k - bn[1]), nm, font=fuente_n, fill=(70, 84, 90))
-            dr.text((cx - tw / 2, y0 + alto_n + 1.5 * k - bb[1]), t, font=fuente, fill=(20, 35, 28))
+                texto = f"{nombre_est} · {etiquetas[nombre_est]}" if nombres else etiquetas[nombre_est]
+                dr.text((x, y + 2.0*k), texto, font=fuente, fill=(20, 35, 28),
+                        anchor="ma", stroke_width=max(1, int(0.8*k)), stroke_fill=(255, 255, 255))
         buf = io.BytesIO(); img.save(buf, "PNG"); buf.seek(0)
         return RLImage(buf, width=ancho, height=ancho * H / W)
 
