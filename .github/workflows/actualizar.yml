@@ -74,7 +74,12 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
           TELEGRAM_CHAT_TEC: ${{ secrets.TELEGRAM_CHAT_TEC }}
-        run: python notificar.py
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            python notificar.py --forzar-telegram
+          else
+            python notificar.py
+          fi
 
       - name: Guardar el registro de notificaciones
         # el registro evita repetir avisos; si otra ejecución ha guardado algo entretanto, se toma su versión
