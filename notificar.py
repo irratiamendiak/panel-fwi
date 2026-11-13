@@ -321,6 +321,9 @@ def preparar_boletin(d, hoy):
     f = date.fromisoformat(hoy)
     try:
         pdf = informe_pdf_bytes(d)
+        # Guardar una copia para poder descargar y revisar el PDF desde los artefactos de GitHub Actions.
+        Path(f"Basugix_{hoy}.pdf").write_bytes(pdf)
+        print(f"PDF generado para revisión: Basugix_{hoy}.pdf ({len(pdf)} bytes)")
     except Exception as e:
         print("No se ha podido generar el informe PDF:", type(e).__name__, e)
         pdf = None
