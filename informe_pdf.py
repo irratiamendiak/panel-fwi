@@ -99,7 +99,7 @@ RAMPAS = {
 TRAMOS = {"T": [0, 4, 8, 12, 16, 20, 24, 28, 32], "H": [20, 30, 40, 50, 60, 70, 80, 90, 100],
           "W": [0, 5, 10, 15, 20, 25, 30, 35, 45, 55], "R": [0, 0.2, 0.5, 1, 2, 3, 5, 8, 12, 15, 20, 25]}
 METEO = {"T": ("Tenperatura<br/><font size='5'>(eguzki-eguerdian)</font>", "°C"), "H": ("Hezetasuna<br/><font size='5'>(eguzki-eguerdian)</font>", "%"),
-         "W": ("Haizea<br/><font size='5'>(eguzki-eguerdian)</font>", "km/h"), "R": ("Euria<br/><font size='5'>(aurreko 24 orduak)</font>", "mm")}
+         "W": ("Haizea<br/><font size='5'>(abiadura: ordu horretako neurketa; ez eguneko batezbestekoa edo bolada maximoa)</font>", "km/h"), "R": ("Euria<br/><font size='5'>(aurreko 24 orduak)</font>", "mm")}
 
 
 def rampa(r, v):
@@ -210,7 +210,7 @@ class Mapa:
                 pts = [(0, s_), (s_ * .45, -s_ * .5), (0, -s_ * .15), (-s_ * .45, -s_ * .5)]
                 rot = [(x + py * ux + px * uy, y + py * uy - px * ux) for px, py in pts]
                 dr.polygon(rot, fill=(217, 56, 43) if roja else (20, 35, 28), outline=(255, 255, 255))
-                y += 9 * k
+                y += 19 * k  # reserva espacio bajo la flecha para que la caja blanca no la tape
             if etiquetas and pr["estacion"] in etiquetas:
                 x += dxl * k; y -= dyl * k
                 t = etiquetas[pr["estacion"]]
@@ -420,7 +420,7 @@ METODO_INDIZEAK = [
 ]
 METODO_EGURALDIA = [
     "<b>Neurketak.</b> Euskalmeten estazioak, eguzki-eguerdian (13:00 neguan, 14:00 udan). Tenperatura, hezetasun erlatiboa eta haizea "
-    "(abiadura eta norabidea) ordu horretakoak dira; euria, berriz, aurreko 24 orduetan metatutakoa (aurreko eguneko eguzki-eguerditik "
+    "(abiadura eta norabidea) eguzki-eguerdiko orduko neurketak dira (ez eguneko batezbestekoa edo haize-bolada maximoa); euria, berriz, aurreko 24 orduetan metatutakoa (aurreko eguneko eguzki-eguerditik "
     "egun horretakora arte). Mutriku: Open-Meteo eredua; Altzola: haizea eredutik; Zarautz: euria Inurritzatik.",
     "<b>Iragarpena.</b> Open-Meteo eredua (CC BY 4.0): tenperatura, hezetasuna eta haizea egun bakoitzeko eguzki-eguerdirako, eta euria "
     "aurreko 24 orduetarako, neurketen irizpide berarekin.",
