@@ -2316,6 +2316,27 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       const t = v == null ? '—' : fmt(v) + (malo ? ' ?' : '');
       ctx.strokeStyle = '#fff'; ctx.lineWidth = 3 * kz; ctx.strokeText(t, a, b - 6 * kz); ctx.fillStyle = malo || v == null ? '#8a969c' : '#14231c'; ctx.fillText(t, a, b - 6 * kz);
     });
+    // Estazio-izenak balioaren azpian; kokapen hurbiletan etiketen gainjartzea saihestu.
+    ctx.font = (9 * kz) + 'px system-ui, sans-serif'; ctx.textAlign = 'center';
+    const etiketak = [];
+    d.estaciones.forEach(e => {
+      const [a, b] = P([e.lon, e.lat]), izena = e.nombre || e.cod || '';
+      if (!izena) return;
+      const w = ctx.measureText(izena).width, h = 10 * kz;
+      const aukerak = [[0, 13], [-12, 13], [12, 13], [-24, 13], [24, 13], [0, 23], [0, 3], [-36, 13], [36, 13]];
+      let hautatua = null;
+      for (const [dx, dy] of aukerak) {
+        const x = a + dx * kz, y = b + dy * kz;
+        const r = {x: x - w/2 - 2*kz, y: y - h/2, w: w + 4*kz, h};
+        if (r.x < 2*kz || r.x + r.w > W - 2*kz || r.y < 2*kz || r.y + r.h > H - 2*kz) continue;
+        if (!etiketak.some(q => r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y)) { hautatua = {x, y, r}; break; }
+      }
+      if (!hautatua) return;
+      etiketak.push(hautatua.r);
+      ctx.strokeStyle = 'rgba(255,255,255,.96)'; ctx.lineWidth = 3 * kz;
+      ctx.strokeText(izena, hautatua.x, hautatua.y);
+      ctx.fillStyle = '#263238'; ctx.fillText(izena, hautatua.x, hautatua.y);
+    });
   }
   function redRender(){
     const d = RED.datos;
