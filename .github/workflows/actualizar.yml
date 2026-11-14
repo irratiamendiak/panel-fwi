@@ -6,8 +6,7 @@ on:
     # (13:00 en invierno, 14:00 en verano). Se espera a que Euskalmet lo publique hasta 60 minutos después;
     # a esa hora (15:00 en verano, 14:00 en invierno) el día se cierra siempre con el dato de las 12:00 UTC.
     - cron: "0 6 * * *"      # previsión de primera hora (08:00 en verano, 07:00 en invierno)
-    - cron: "10,40 12 * * *"      # dato del día, cada 30 min: 14:10 y 14:40 en verano / 13:10 y 13:40 en invierno
-    - cron: "10,40 13 * * *"      # cierre del día (15:10) y respaldo (15:40); en invierno, 14:10 y 14:40
+    - cron: "10 13 * * *"        # único envío diario: 15:10 en verano / 14:10 en invierno
   workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
 
 permissions:
@@ -61,7 +60,8 @@ jobs:
           exit 1
 
       - name: Notificaciones (correo y Telegram)
-        # informe diario por correo y avisos por Telegram; solo actúa tras el cierre del dato y una vez al día.
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.event.schedule == '10 13 * * *')
+        # Solo en el horario diario fijado (o al lanzar manualmente); nunca en las ejecuciones de actualización de la mañana.
         # Si falla, no impide nada más.
         continue-on-error: true
         env:
@@ -110,7 +110,7 @@ jobs:
           exit 1
 
       - name: Aviso técnico si algo ha fallado
-        if: failure()
+        if: failure() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.event.schedule == '10 13 * * *'))
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
