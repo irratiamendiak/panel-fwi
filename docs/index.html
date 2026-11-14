@@ -1468,7 +1468,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       if (document.fonts && document.fonts.ready) await document.fonts.ready;
       const opciones = {
         margin: [12, 12, 12, 12],
-        filename: (nombre || 'informe').replace(/\\.pdf$/i, '') + '.pdf',
+        filename: (nombre || 'informe').replace(/\.pdf$/i, '') + '.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
