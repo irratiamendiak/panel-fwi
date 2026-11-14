@@ -1350,7 +1350,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   // informes: título, subtítulo y clase de un valor según la pestaña
   const clV = v => v == null ? null : (MODO === 'ifg' ? claseBgx(v) : (MODO === 'icona' ? claseIco(v) : claseDeFwi(v)));
   const TIT = () => MODO === 'ifg' ? 'Basugix: baso sute arriskua' : (MODO === 'icona' ? 'GBSI (Gipuzkoako Baso Sute Indizea)' : 'Suteen arrisku meteorologikoa');
-  const SUB = () => MODO === 'ifg' ? 'Basugix, Gipuzkoako baso sute arrisku indizea (20 = egun ertaina)' : (MODO === 'icona' ? 'Indize sintetikoa de peligro meteorológico de incendios (0–16)' : 'FWI (Fire Weather Index)');
+  const SUB = () => MODO === 'ifg' ? 'Basugix, Gipuzkoako baso sute arrisku indizea (20 = egun ertaina)' : (MODO === 'icona' ? (ES ? 'Índice sintético de peligro meteorológico de incendios (0–16)' : 'Suteen arrisku meteorologikoaren indize sintetikoa (0–16)') : 'FWI (Fire Weather Index)');
   const colExtra = d => MODO === 'ifg' ? fmtIfg(ifgDe(d)) : (MODO === 'icona' ? (d.icona_seq != null ? d.icona_seq : '—') : (d.pct != null ? d.pct : '—'));
   const cabExtra = () => MODO === 'ifg' ? '× egun ert.' : (MODO === 'icona' ? 'Lehortea' : 'Pertz.');
   const fmtLargo = s => { const d = fecha(s); return ES ? d.getDate()+' de '+MES_ES[d.getMonth()]+' de '+d.getFullYear() : d.getFullYear()+'ko '+HIL_GEN[d.getMonth()]+' '+d.getDate()+'a'; };
@@ -1485,7 +1485,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     });
     return `<div class="inf">
       <div class="inf-cab">
-        <div><h1>${TIT()} — Gipuzkoa</h1>
+        <div><h1>${TIT()}</h1>
           <p class="sub">${SUB()} · <b>${fmtFechaLuzea(fecha(f))}</b>${esPrev ? ' · <b>IRAGARPENA</b>' : ''}</p></div>
         ${dg ? `<div class="inf-gip" style="background:${colorDe(claseM(dg)).c};color:${colorDe(claseM(dg)).fg}">GIPUZKOA<div class="v">${fmtM(valM(dg))}</div>${claseEu(claseM(dg))}${MODO === 'ifg' ? '<br>'+fmtIfg(ifgDe(dg))+' egun ertainarekiko' : (MODO === 'icona' ? '' : (dg.pct != null ? '<br>'+dg.pct+'. pertzentila' : ''))}${SUTEAK && suteakEgun(f).length ? '<br>🔥 '+suteakEgun(f).length+' sute' : ''}</div>` : ''}
       </div>
@@ -1556,7 +1556,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     const graf = sg ? graficoSerie(sg.serie, desde, hasta) : null;
     return `<div class="inf">
       <div class="inf-cab">
-        <div><h1>${TIT()} — Gipuzkoa</h1>
+        <div><h1>${TIT()}</h1>
           <p class="sub">Aldiko txostena · <b>${fmtLargo(desde)} – ${fmtLargo(hasta)}</b> (${fechas.length} egun)</p></div>
         ${sg ? `<div class="inf-gip" style="background:${colorDe(clV(sg.media)).c};color:${colorDe(clV(sg.media)).fg}">GIPUZKOA<div class="v">${fmtM(sg.media)}</div>batez bestekoa<br>max. ${fmtM(valM(sg.max))} · ${sg.altos} egun ≥ Handia${SUTEAK ? '<br>🔥 '+sutAld.length+' sute (EGIF)' : ''}</div>` : ''}
       </div>
