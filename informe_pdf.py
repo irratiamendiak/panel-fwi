@@ -198,46 +198,76 @@ class Mapa:
             return ImageFont.load_default()
         fuente = ft("DejaVuSans-Bold.ttf", letra)
         fuente_n = ft("DejaVuSans.ttf", letra * 0.78)
+
+        # Primero se dibujan todas las flechas exactamente sobre la coordenada de la estación.
+        estaciones_mapa = []
         for f in self.zonas["features"]:
             pr = f["properties"]
             if pr.get("lat") is None:
                 continue
+            nombre_est = pr["estacion"]
             x, y = P_(pr["lon"], pr["lat"])
-            # En el mapa del viento, la flecha se coloca ligeramente por encima de la
-            # coordenada real y la etiqueta queda centrada en la estación. Así el nombre
-            # no hereda el desplazamiento de la flecha ni los ajustes de otros mapas.
-            es_viento = bool(flechas and pr["estacion"] in flechas and flechas[pr["estacion"]][0] is not None)
-            dxl, dyl = (0, 0) if es_viento else DESPLAZA.get(pr["estacion"], (0, 0))
-            if es_viento:
-                g, roja = flechas[pr["estacion"]]
-                a = math.radians(g + 180); ux, uy = math.sin(a), -math.cos(a); s_ = 6.5 * k
+            if flechas and nombre_est in flechas and flechas[nombre_est][0] is not None:
+                g, roja = flechas[nombre_est]
+                a = math.radians(g + 180)
+                ux, uy = math.sin(a), -math.cos(a)
+                s_ = 6.5 * k
                 pts = [(0, s_), (s_ * .45, -s_ * .5), (0, -s_ * .15), (-s_ * .45, -s_ * .5)]
-                # La flecha queda arriba; el nombre y el valor permanecen en la coordenada.
-                fy = y - 18 * k
-                rot = [(x + py * ux + px * uy, fy + py * uy - px * ux) for px, py in pts]
+                rot = [(x + py * ux + px * uy, y + py * uy - px * ux) for px, py in pts]
                 dr.polygon(rot, fill=(217, 56, 43) if roja else (20, 35, 28), outline=(255, 255, 255))
-            if etiquetas and pr["estacion"] in etiquetas:
-                x += dxl * k; y -= dyl * k
-                t = etiquetas[pr["estacion"]]
-                bb = dr.textbbox((0, 0), t, font=fuente); tw, th = bb[2] - bb[0], bb[3] - bb[1]
-                nm = pr["estacion"] if nombres else ""
-                bn = dr.textbbox((0, 0), nm, font=fuente_n) if nm else (0, 0, 0, 0); nw, nh = bn[2] - bn[0], bn[3] - bn[1]
-                caja_w = max(tw, nw) + 3 * k; alto_n = (nh + 1.2 * k) if nm else 0
-                if es_viento:
-                    # Sin recuadro: el texto se coloca debajo de la estación y lleva
-                    # un fino contorno blanco para seguir siendo legible sobre el mapa.
-                    y += 22 * k
-                    trazo = max(1, int(0.65 * k))
-                    if nm:
-                        dr.text((x - nw / 2, y - th - alto_n - 1.6 * k - bn[1]), nm,
-                                font=fuente_n, fill=(70, 84, 90), stroke_width=trazo, stroke_fill=(255, 255, 255))
-                    dr.text((x - tw / 2, y - th - 1.6 * k - bb[1]), t,
-                            font=fuente, fill=(20, 35, 28), stroke_width=trazo, stroke_fill=(255, 255, 255))
-                else:
-                    dr.rounded_rectangle([x - caja_w / 2, y - th - alto_n - 2.4 * k, x + caja_w / 2, y + 1.2 * k], radius=1.8 * k, fill=(255, 255, 255, 225))
-                    if nm:
-                        dr.text((x - nw / 2, y - th - alto_n - 1.6 * k - bn[1]), nm, font=fuente_n, fill=(70, 84, 90))
-                    dr.text((x - tw / 2, y - th - 1.6 * k - bb[1]), t, font=fuente, fill=(20, 35, 28))
+            if etiquetas and nombre_est in etiquetas:
+                estaciones_mapa.append((nombre_est, x, y, etiquetas[nombre_est]))
+
+        # Las etiquetas se colocan alrededor de su estación buscando huecos libres.
+        # Así no dependen de desplazamientos manuales fijos que fallan al cambiar el tamaño
+        # del texto, la escala del mapa o el número de estaciones con dato.
+        ocupadas = []
+        for nombre_est, sx, sy, t in estaciones_mapa:
+            bb = dr.textbbox((0, 0), t, font=fuente)
+            tw, th = bb[2] - bb[0], bb[3] - bb[1]
+            nm = nombre_est if nombres else ""
+            bn = dr.textbbox((0, 0), nm, font=fuente_n) if nm else (0, 0, 0, 0)
+            nw, nh = bn[2] - bn[0], bn[3] - bn[1]
+            caja_w = max(tw, nw) + 5 * k
+            alto_n = (nh + 1.5 * k) if nm else 0
+            caja_h = th + alto_n + 4 * k
+
+            # Centros candidatos: primero cerca de la estación y después en posiciones más alejadas.
+            candidatos = []
+            for radio in (12, 19, 27, 36):
+                for ang in (-90, -45, 0, 45, 90, 135, 180, 225):
+                    rad = math.radians(ang)
+                    candidatos.append((sx + math.cos(rad) * radio * k,
+                                       sy + math.sin(rad) * radio * k))
+            mejor = None
+            mejor_coste = float("inf")
+            for cx, cy in candidatos:
+                x0, y0 = cx - caja_w / 2, cy - caja_h / 2
+                x1, y1 = cx + caja_w / 2, cy + caja_h / 2
+                fuera = max(0, -x0) + max(0, -y0) + max(0, x1 - W) + max(0, y1 - H)
+                solape = 0
+                for ox0, oy0, ox1, oy1 in ocupadas:
+                    iw = max(0, min(x1, ox1) - max(x0, ox0))
+                    ih = max(0, min(y1, oy1) - max(y0, oy0))
+                    solape += iw * ih
+                distancia = math.hypot(cx - sx, cy - sy)
+                coste = solape * 1000 + fuera * 10000 + distancia
+                if coste < mejor_coste:
+                    mejor_coste, mejor = coste, (cx, cy, x0, y0, x1, y1)
+                if coste == 0:
+                    break
+            cx, cy, x0, y0, x1, y1 = mejor
+            ocupadas.append((x0, y0, x1, y1))
+
+            # Línea guía discreta cuando la etiqueta se separa del punto de la estación.
+            if math.hypot(cx - sx, cy - sy) > 10 * k:
+                dr.line((sx, sy, cx, cy), fill=(75, 88, 91, 190), width=max(1, int(k * 0.45)))
+
+            dr.rounded_rectangle([x0, y0, x1, y1], radius=2 * k, fill=(255, 255, 255, 238),
+                                 outline=(90, 105, 108, 170), width=max(1, int(k * 0.35)))
+            if nm:
+                dr.text((cx - nw / 2, y0 + 1.2 * k - bn[1]), nm, font=fuente_n, fill=(70, 84, 90))
+            dr.text((cx - tw / 2, y0 + alto_n + 1.5 * k - bb[1]), t, font=fuente, fill=(20, 35, 28))
         buf = io.BytesIO(); img.save(buf, "PNG"); buf.seek(0)
         return RLImage(buf, width=ancho, height=ancho * H / W)
 
