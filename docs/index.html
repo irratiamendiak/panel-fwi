@@ -1664,7 +1664,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       ${leyendaInf(sutEst.length)}
       ${graf ? `<h2>${nombreVis(e)}: ${graf.etiqueta}</h2><div class="graf">${graf.svg}</div>` : ''}
       ${x ? '<h2>Egunak mailaka</h2>'+porClase : '<p>Aldi horretan ez dago daturik.</p>'}
-      ${!e.resumen && x ? '<h2>'+ (ES ? 'Otras variables del periodo' : 'Aldiko beste aldagai batzuk') +'</h2><table><thead><tr><th>'+ (ES ? 'Variable' : 'Aldagaia') +'</th><th>'+ (ES ? 'Días' : 'Egunak') +'</th></tr></thead><tbody><tr><td class="izena">'+ (ES ? 'Días sin lluvia (menos de 1 mm)' : 'Euririk gabeko egunak (1 mm baino gutxiago)') +'</td><td><b>'+diasSecos+'</b></td></tr><tr><td class="izena">'+ (ES ? 'Días de viento sur' : 'Hego haizeko egunak') +'</td><td><b>'+diasSur+'</b></td></tr></tbody></table>' : ''}
+      ${!e.resumen ? '<h2>'+ (ES ? 'Otras variables del periodo' : 'Aldiko beste aldagai batzuk') +'</h2><table><thead><tr><th>'+ (ES ? 'Variable' : 'Aldagaia') +'</th><th>'+ (ES ? 'Días' : 'Egunak') +'</th></tr></thead><tbody><tr><td class="izena">'+ (ES ? 'Días sin lluvia (menos de 1 mm)' : 'Euririk gabeko egunak (1 mm baino gutxiago)') +'</td><td><b>'+diasSecos+'</b></td></tr><tr><td class="izena">'+ (ES ? 'Días de viento sur' : 'Hego haizeko egunak') +'</td><td><b>'+diasSur+'</b></td></tr></tbody></table>' : ''}
       ${porMes}${top}
       ${tablaSuteak(sutEst, '🔥 Aldiko suteak eragin-eremuan (EGIF)', desde)}
       ${notas.length ? `<p class="pie"><b>Oharrak:</b> ${notas.join(' · ')}</p>` : ''}
