@@ -196,38 +196,7 @@ class Mapa:
                 except OSError:
                     continue
             return ImageFont.load_default()
-        # La fuente se usa tanto en los mapas normales como en el mapa del viento.
         fuente = ft("DejaVuSans-Bold.ttf", letra)
-        # El mapa del viento usa símbolos direccionales anclados a la coordenada real.
-        # Los demás mapas conservan exactamente la rotulación de la versión anterior.
-        if flechas:
-            for f in self.zonas["features"]:
-                pr = f["properties"]
-                if pr.get("lat") is None:
-                    continue
-                nombre_est = pr["estacion"]
-                if nombre_est not in flechas or flechas[nombre_est][0] is None:
-                    continue
-                x, y = P_(pr["lon"], pr["lat"])
-                g, roja = flechas[nombre_est]
-                # La dirección meteorológica indica de dónde viene; invertir 180°
-                # para que la punta señale hacia dónde se desplaza el aire.
-                a = math.radians((g + 180) % 360)
-                ux, uy = math.sin(a), -math.cos(a)
-                largo = 8.0 * k
-                ex, ey = x + ux * largo, y + uy * largo
-                color_f = (190, 35, 35) if roja else (24, 43, 54)
-                grosor = max(2, int(1.15 * k))
-                dr.line((x - ux * 1.8*k, y - uy * 1.8*k, ex, ey), fill=(255,255,255), width=grosor + max(1,int(.7*k)))
-                dr.line((x - ux * 1.8*k, y - uy * 1.8*k, ex, ey), fill=color_f, width=grosor)
-                ala = 3.1 * k
-                px, py = -uy, ux
-                bx, by = ex - ux * ala, ey - uy * ala
-                dr.polygon([(ex,ey),(bx+px*ala*.72,by+py*ala*.72),(bx-px*ala*.72,by-py*ala*.72)],
-                           fill=color_f, outline=(255,255,255))
-                # El centro del círculo identifica la estación y queda sobre lon/lat.
-                rr = 2.0*k
-                dr.ellipse((x-rr,y-rr,x+rr,y+rr), fill=(255,255,255), outline=color_f, width=max(1,int(.8*k)))
         fuente_n = ft("DejaVuSans.ttf", letra * 0.78)
         for f in self.zonas["features"]:
             pr = f["properties"]
@@ -253,7 +222,6 @@ class Mapa:
                 if nm:
                     dr.text((x - nw / 2, y - th - alto_n - 1.6 * k - bn[1]), nm, font=fuente_n, fill=(70, 84, 90))
                 dr.text((x - tw / 2, y - th - 1.6 * k - bb[1]), t, font=fuente, fill=(20, 35, 28))
-
         buf = io.BytesIO(); img.save(buf, "PNG"); buf.seek(0)
         return RLImage(buf, width=ancho, height=ancho * H / W)
 
