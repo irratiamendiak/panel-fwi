@@ -1593,6 +1593,12 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     if (d){
       tabla += fila('Tenperatura', fmt(d.T)+' °C') + fila('Hezetasun erlatiboa', '% '+fmt(d.H,0)) +
         fila('Haizea', fmt(d.W)+' km/h'+(d.dir != null ? ' ('+sector8(d.dir)+')' : '')) + fila('Euria (24 h)', fmt(d.R)+' mm');
+      if (!e.resumen){
+        const seco = diasSinLluvia(e, f, d), sur = diasVientoSur(e, f, d);
+        const sufijo = ES ? ' días consecutivos' : ' egun jarraian';
+        tabla += fila(ES ? 'Días sin lluvia' : 'Euririk gabeko egunak', seco ? seco.n + sufijo : '—');
+        tabla += fila(ES ? 'Días de viento sur' : 'Hego haizeko egunak', sur ? sur.n + sufijo : '—');
+      }
       if (MODO !== 'ifg'){
         [['FFMC','ffmc'],['DMC','dmc'],['DC','dc'],['ISI','isi'],['BUI','bui']].forEach(([t,k]) => { if (d[k] != null) tabla += fila(t, fmt(d[k])); });
         tabla += fila('<b>FWI</b>', '<b>'+fmt(d.fwi)+'</b> '+pill(d.clase || claseDeFwi(d.fwi))) + fila('Hilabeteko pertzentila', d.pct != null ? d.pct+'.' : '—');
