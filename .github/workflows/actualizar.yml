@@ -3,11 +3,20 @@ name: Actualizar FWI
 on:
   schedule:
     # Todas las horas son UTC. El dato del FWI es el del mediodía solar, que son siempre las 12:00 UTC
-    # (13:00 en invierno, 14:00 en verano). Se espera a que Euskalmet lo publique hasta 60 minutos después;
-    # a esa hora (15:00 en verano, 14:00 en invierno) el día se cierra siempre con el dato de las 12:00 UTC.
-    - cron: "0 6 * * *"      # previsión de primera hora (08:00 en verano, 07:00 en invierno)
-    - cron: "0 13 * * *"       # envío diario: 14:00 en invierno y 15:00 en verano (hora peninsular)
+    # (13:00 en invierno, 14:00 en verano). El día se cierra una hora después (14:00 en invierno,
+    # 15:00 en verano). GitHub retrasa o se salta a veces los crons, y más a las horas en punto, así que
+    # hay varios lanzamientos de envío: notificar.py solo envía si el dato está cerrado y si hoy no se
+    # ha enviado ya, de modo que los de respaldo no duplican nada.
+    - cron: "17 6 * * *"     # previsión de primera hora (08:17 en verano, 07:17 en invierno)
+    - cron: "7 13 * * *"     # envío diario: 14:07 en invierno, 15:07 en verano (hora peninsular)
+    - cron: "37 13 * * *"    # respaldo
+    - cron: "7 14 * * *"     # respaldo
   workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
+    inputs:
+      notificar:
+        description: "Enviar también correo y Telegram (aunque ya se hayan enviado hoy)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write      # para guardar los datos nuevos en el repositorio
@@ -60,10 +69,10 @@ jobs:
           exit 1
 
       - name: Notificaciones (correo y Telegram)
-        if: github.event_name == 'schedule' && github.event.schedule == '0 13 * * *'
-        # 13:00 UTC equivale a las 14:00 en invierno y a las 15:00 en verano en la península.
-        # Si falla, no impide nada más.
-        continue-on-error: true
+        # En las ejecuciones programadas, notificar.py decide solo: no envía antes del cierre del dato
+        # ni repite lo ya enviado hoy. En las manuales solo se envía si se marca la casilla (--forzar).
+        # Sin continue-on-error: si falla, se ejecuta el aviso técnico del final.
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.notificar)
         env:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
@@ -74,7 +83,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
           TELEGRAM_CHAT_TEC: ${{ secrets.TELEGRAM_CHAT_TEC }}
-        run: python notificar.py
+        run: python notificar.py ${{ github.event_name == 'workflow_dispatch' && '--forzar' || '' }}
 
       - name: Publicar PDF para descargar y revisar
         if: always()
@@ -105,7 +114,7 @@ jobs:
           exit 1
 
       - name: Aviso técnico si algo ha fallado
-        if: failure() && github.event_name == 'schedule' && github.event.schedule == '0 13 * * *'
+        if: failure() && github.event_name == 'schedule'
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
