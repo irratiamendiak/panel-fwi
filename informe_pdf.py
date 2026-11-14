@@ -196,6 +196,8 @@ class Mapa:
                 except OSError:
                     continue
             return ImageFont.load_default()
+        # La fuente se usa tanto en los mapas normales como en el mapa del viento.
+        fuente = ft("DejaVuSans-Bold.ttf", letra)
         # El mapa del viento usa símbolos direccionales anclados a la coordenada real.
         # Los demás mapas conservan exactamente la rotulación de la versión anterior.
         if flechas:
@@ -226,8 +228,6 @@ class Mapa:
                 # El centro del círculo identifica la estación y queda sobre lon/lat.
                 rr = 2.0*k
                 dr.ellipse((x-rr,y-rr,x+rr,y+rr), fill=(255,255,255), outline=color_f, width=max(1,int(.8*k)))
-        else:
-            fuente = ft("DejaVuSans-Bold.ttf", letra)
         fuente_n = ft("DejaVuSans.ttf", letra * 0.78)
         for f in self.zonas["features"]:
             pr = f["properties"]
