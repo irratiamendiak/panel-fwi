@@ -223,10 +223,21 @@ class Mapa:
                 nm = pr["estacion"] if nombres else ""
                 bn = dr.textbbox((0, 0), nm, font=fuente_n) if nm else (0, 0, 0, 0); nw, nh = bn[2] - bn[0], bn[3] - bn[1]
                 caja_w = max(tw, nw) + 3 * k; alto_n = (nh + 1.2 * k) if nm else 0
-                dr.rounded_rectangle([x - caja_w / 2, y - th - alto_n - 2.4 * k, x + caja_w / 2, y + 1.2 * k], radius=1.8 * k, fill=(255, 255, 255, 225))
-                if nm:
-                    dr.text((x - nw / 2, y - th - alto_n - 1.6 * k - bn[1]), nm, font=fuente_n, fill=(70, 84, 90))
-                dr.text((x - tw / 2, y - th - 1.6 * k - bb[1]), t, font=fuente, fill=(20, 35, 28))
+                if es_viento:
+                    # Sin recuadro: el texto se coloca debajo de la estación y lleva
+                    # un fino contorno blanco para seguir siendo legible sobre el mapa.
+                    y += 22 * k
+                    trazo = max(1, int(0.65 * k))
+                    if nm:
+                        dr.text((x - nw / 2, y - th - alto_n - 1.6 * k - bn[1]), nm,
+                                font=fuente_n, fill=(70, 84, 90), stroke_width=trazo, stroke_fill=(255, 255, 255))
+                    dr.text((x - tw / 2, y - th - 1.6 * k - bb[1]), t,
+                            font=fuente, fill=(20, 35, 28), stroke_width=trazo, stroke_fill=(255, 255, 255))
+                else:
+                    dr.rounded_rectangle([x - caja_w / 2, y - th - alto_n - 2.4 * k, x + caja_w / 2, y + 1.2 * k], radius=1.8 * k, fill=(255, 255, 255, 225))
+                    if nm:
+                        dr.text((x - nw / 2, y - th - alto_n - 1.6 * k - bn[1]), nm, font=fuente_n, fill=(70, 84, 90))
+                    dr.text((x - tw / 2, y - th - 1.6 * k - bb[1]), t, font=fuente, fill=(20, 35, 28))
         buf = io.BytesIO(); img.save(buf, "PNG"); buf.seek(0)
         return RLImage(buf, width=ancho, height=ancho * H / W)
 
