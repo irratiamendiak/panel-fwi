@@ -1474,9 +1474,13 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
         if (e.modelo) notas.push('eredua (Open-Meteo)');
         if (r && d.cobertura != null && d.cobertura < 100) notas.push('lurraldearen % '+d.cobertura);
       }
+      const seco = !r && d ? diasSinLluvia(e, f, d) : null;
+      const sur = !r && d ? diasVientoSur(e, f, d) : null;
+      const sufijoDias = ES ? ' días' : ' egun';
       filas += `<tr><td class="izena">${r ? '<b>'+nombreVis(e)+'</b>' : e.nombre}</td><td><b>${d ? fmtM(valM(d)) : '—'}</b></td><td>${d ? pill(claseM(d)) : '—'}</td>`+
         `<td>${!d ? '—' : colExtra(d)}</td><td>${r||!d ? '' : fmt(d.T)}</td><td>${r||!d ? '' : fmt(d.H,0)}</td>`+
         `<td>${r||!d ? '' : fmt(d.W)+(d.dir!=null?' '+sector8(d.dir):'')}</td><td>${r||!d ? '' : fmt(d.R)}</td>`+
+        `<td>${seco ? (seco.hutsunea ? '≥ ' : '')+seco.n+sufijoDias : (r||!d ? '' : '—')}</td><td>${sur ? (sur.hutsunea ? '≥ ' : '')+sur.n+sufijoDias : (r||!d ? '' : '—')}</td>`+
         `<td>${d && !ALT() ? fmt(d.isi) : ''}</td><td>${r||!d||ALT() ? '' : fmt(d.dc)}</td><td class="izena">${notas.join(', ')}</td></tr>`;
     });
     return `<div class="inf">
@@ -1487,7 +1491,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       </div>
       <div class="inf-mapa">${svgMapa(geo, puntosDe(geo, n => porNombre[n] ? valM(porNombre[n]) : null), null, SUTEAK ? suteakEgun(f) : [])}</div>
       ${leyendaInf(SUTEAK && suteakEgun(f).length)}
-      <table><thead><tr><th>Estazioa</th><th>${NOMI()}</th><th>Maila</th><th>${cabExtra()}</th><th>T °C</th><th>HR %</th><th>Haizea km/h</th><th>Euria 24 h mm</th><th>${ALT() ? '' : 'ISI'}</th><th>${ALT() ? '' : 'DC'}</th><th>Oharrak</th></tr></thead><tbody>${filas}</tbody></table>
+      <table><thead><tr><th>Estazioa</th><th>${NOMI()}</th><th>Maila</th><th>${cabExtra()}</th><th>T °C</th><th>HR %</th><th>Haizea km/h</th><th>Euria 24 h mm</th><th>${ES ? 'Días sin lluvia' : 'Euririk gabe'}</th><th>${ES ? 'Días de viento sur' : 'Hego haizea'}</th><th>${ALT() ? '' : 'ISI'}</th><th>${ALT() ? '' : 'DC'}</th><th>Oharrak</th></tr></thead><tbody>${filas}</tbody></table>
       ${tablaSuteak(suteakEgun(f), '🔥 Egun horretako suteak (EGIF)', f)}
       ${pieInf('Mapa: gainazal jarraitua (estazioen balioen interpolazioa, alderantzizko distantziaren arabera).')}
     </div>`;
