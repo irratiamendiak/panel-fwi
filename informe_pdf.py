@@ -213,7 +213,7 @@ class Mapa:
                 a = math.radians(g + 180); ux, uy = math.sin(a), -math.cos(a); s_ = 6.5 * k
                 pts = [(0, s_), (s_ * .45, -s_ * .5), (0, -s_ * .15), (-s_ * .45, -s_ * .5)]
                 # La flecha queda arriba; el nombre y el valor permanecen en la coordenada.
-                fy = y - 10 * k
+                fy = y - 18 * k
                 rot = [(x + py * ux + px * uy, fy + py * uy - px * ux) for px, py in pts]
                 dr.polygon(rot, fill=(217, 56, 43) if roja else (20, 35, 28), outline=(255, 255, 255))
             if etiquetas and pr["estacion"] in etiquetas:
