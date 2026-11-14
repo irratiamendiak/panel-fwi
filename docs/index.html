@@ -1439,22 +1439,19 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     const ahora = new Date();
     return `<p class="pie">${extra} GIPUZKOA: estazioen FWIen batez besteko haztatua, eragin-eremuen azaleraren arabera. Pertzentila: hilabete bereko egun historikoekin alderatuta (2010etik). Eguzki-eguerdiko datuak (13:00 neguan, 14:00 udan). Datuak: Euskalmet / Open Data Euskadi; Mutriku eta iragarpenak: Open-Meteo.com (CC BY 4.0). Tresna orientagarria: ez ditu ordezkatzen abisu ofizialak.<br>Sortua: ${fmtFechaLuzea(ahora)}, ${fmtOrdua(ahora)}</p>`;
   }
-  let html2pdfCarga = null;
   function imprimir(html, nombre){
-    $('#informe').innerHTML = html;
-    const titulo = document.title;
-    const limpiar = () => {
-      document.body.classList.remove('imprimiendo');
-      document.title = titulo;
-      window.removeEventListener('afterprint', limpiar);
-    };
-    window.addEventListener('afterprint', limpiar);
-    document.body.classList.add('imprimiendo');
-    document.title = nombre;
-    setTimeout(() => {
-      window.print();
-      setTimeout(limpiar, 1000);
-    }, 50);
+    const ventana = window.open('about:blank', '_blank');
+    if (!ventana){
+      alert(ES ? 'Permite las ventanas emergentes para abrir el informe en otra pestaña.' : 'Baimendu leiho gainerakorrak txostena beste fitxa batean irekitzeko.');
+      return;
+    }
+    const recursos = Array.from(document.head.querySelectorAll('link[rel="stylesheet"], style'))
+      .map(n => n.outerHTML).join('');
+    ventana.document.open();
+    ventana.document.write('<!DOCTYPE html><html lang="'+(ES ? 'es' : 'eu')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+recursos+'<title>'+String(nombre).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))+'</title></head><body class="imprimiendo"><div id="informe" style="display:block">'+html+'</div></body></html>');
+    ventana.document.close();
+    ventana.addEventListener('load', () => setTimeout(() => { ventana.focus(); ventana.print(); }, 250), {once:true});
+    setTimeout(() => { if (!ventana.closed && ventana.document.readyState === 'complete') { ventana.focus(); ventana.print(); } }, 800);
   }
 
   // --- egun bakarreko txostena
@@ -1624,6 +1621,9 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     const st = {}; DATA.estaciones.forEach(x => { st[x.nombre] = estadisticas(x, fechas); });
     const x = st[e.nombre];
     const sutEst = suteakAldia(desde, hasta).filter(z => z.e === e.nombre);
+    const observados = e.resumen ? [] : fechas.map(f => diaEst(e, f)).filter(d => d && !d.prev && d.R != null);
+    const diasSur = observados.filter(d => esSurSector(d)).length;
+    const diasSecos = observados.filter(d => d.R < EURI_MIN).length;
     const col = x ? colorDe(clV(x.media)) : {c:'#c9d0cc', fg:'#111'};
     let porClase = '', porMes = '', top = '';
     if (x){
@@ -1656,6 +1656,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       ${leyendaInf(sutEst.length)}
       ${graf ? `<h2>${nombreVis(e)}: ${graf.etiqueta}</h2><div class="graf">${graf.svg}</div>` : ''}
       ${x ? '<h2>Egunak mailaka</h2>'+porClase : '<p>Aldi horretan ez dago daturik.</p>'}
+      ${!e.resumen && x ? '<h2>'+ (ES ? 'Otras variables del periodo' : 'Aldiko beste aldagai batzuk') +'</h2><table><thead><tr><th>'+ (ES ? 'Variable' : 'Aldagaia') +'</th><th>'+ (ES ? 'Días' : 'Egunak') +'</th></tr></thead><tbody><tr><td class="izena">'+ (ES ? 'Días sin lluvia (menos de 1 mm)' : 'Euririk gabeko egunak (1 mm baino gutxiago)') +'</td><td><b>'+diasSecos+'</b></td></tr><tr><td class="izena">'+ (ES ? 'Días de viento sur' : 'Hego haizeko egunak') +'</td><td><b>'+diasSur+'</b></td></tr></tbody></table>' : ''}
       ${porMes}${top}
       ${tablaSuteak(sutEst, '🔥 Aldiko suteak eragin-eremuan (EGIF)', desde)}
       ${notas.length ? `<p class="pie"><b>Oharrak:</b> ${notas.join(' · ')}</p>` : ''}
