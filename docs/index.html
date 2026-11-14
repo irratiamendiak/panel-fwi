@@ -1450,8 +1450,10 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     ventana.document.open();
     ventana.document.write('<!DOCTYPE html><html lang="'+(ES ? 'es' : 'eu')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+recursos+'<title>'+String(nombre).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))+'</title></head><body class="imprimiendo"><div id="informe" style="display:block">'+html+'</div></body></html>');
     ventana.document.close();
-    ventana.addEventListener('load', () => setTimeout(() => { ventana.focus(); ventana.print(); }, 250), {once:true});
-    setTimeout(() => { if (!ventana.closed && ventana.document.readyState === 'complete') { ventana.focus(); ventana.print(); } }, 800);
+    let impreso = false;
+    const lanzarImpresion = () => { if (impreso || ventana.closed) return; impreso = true; ventana.focus(); ventana.print(); };
+    ventana.addEventListener('load', () => setTimeout(lanzarImpresion, 250), {once:true});
+    setTimeout(lanzarImpresion, 800);
   }
 
   // --- egun bakarreko txostena
