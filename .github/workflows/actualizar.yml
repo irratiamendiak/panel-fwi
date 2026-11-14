@@ -60,7 +60,7 @@ jobs:
           exit 1
 
       - name: Notificaciones (correo y Telegram)
-        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.event.schedule == '10 13 * * *')
+        if: github.event_name == 'schedule' && github.event.schedule == '10 13 * * *'
         # Solo en el horario diario fijado (o al lanzar manualmente); nunca en las ejecuciones de actualización de la mañana.
         # Si falla, no impide nada más.
         continue-on-error: true
@@ -74,12 +74,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
           TELEGRAM_CHAT_TEC: ${{ secrets.TELEGRAM_CHAT_TEC }}
-        run: |
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            python notificar.py --forzar-telegram
-          else
-            python notificar.py
-          fi
+        run: python notificar.py
 
       - name: Publicar PDF para descargar y revisar
         if: always()
