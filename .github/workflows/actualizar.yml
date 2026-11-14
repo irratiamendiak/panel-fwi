@@ -6,7 +6,8 @@ on:
     # (13:00 en invierno, 14:00 en verano). Se espera a que Euskalmet lo publique hasta 60 minutos después;
     # a esa hora (15:00 en verano, 14:00 en invierno) el día se cierra siempre con el dato de las 12:00 UTC.
     - cron: "0 6 * * *"      # previsión de primera hora (08:00 en verano, 07:00 en invierno)
-    - cron: "10 13 * * *"        # único envío diario: 15:10 en verano / 14:10 en invierno
+    - cron: "0 12 * * *"       # candidato a envío diario: 14:00 en verano (hora peninsular)
+    - cron: "0 13 * * *"       # candidato a envío diario: 14:00 en invierno (hora peninsular)
   workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
 
 permissions:
@@ -60,8 +61,8 @@ jobs:
           exit 1
 
       - name: Notificaciones (correo y Telegram)
-        if: github.event_name == 'schedule' && github.event.schedule == '10 13 * * *'
-        # Solo en el horario diario fijado (o al lanzar manualmente); nunca en las ejecuciones de actualización de la mañana.
+        if: github.event_name == 'schedule' && (github.event.schedule == '0 12 * * *' || github.event.schedule == '0 13 * * *')
+        # Los dos cron cubren el cambio horario; el control TZ de abajo permite un único envío a las 14:00 de Madrid.
         # Si falla, no impide nada más.
         continue-on-error: true
         env:
@@ -74,7 +75,12 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
           TELEGRAM_CHAT_TEC: ${{ secrets.TELEGRAM_CHAT_TEC }}
-        run: python notificar.py
+        run: |
+          if [ "$(TZ=Europe/Madrid date +%H)" = "14" ]; then
+            python notificar.py
+          else
+            echo "No es la franja de las 14:00 en Europe/Madrid; no se envía notificación."
+          fi
 
       - name: Publicar PDF para descargar y revisar
         if: always()
@@ -105,9 +111,14 @@ jobs:
           exit 1
 
       - name: Aviso técnico si algo ha fallado
-        if: failure() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.event.schedule == '10 13 * * *'))
+        if: failure() && github.event_name == 'schedule' && (github.event.schedule == '0 12 * * *' || github.event.schedule == '0 13 * * *')
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
           TELEGRAM_CHAT_TEC: ${{ secrets.TELEGRAM_CHAT_TEC }}
-        run: python notificar.py --fallo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          if [ "$(TZ=Europe/Madrid date +%H)" = "14" ]; then
+            python notificar.py --fallo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          else
+            echo "Fuera de las 14:00 de Madrid; se omite el aviso técnico."
+          fi
