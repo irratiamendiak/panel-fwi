@@ -259,10 +259,6 @@ class Mapa:
             cx, cy, x0, y0, x1, y1 = mejor
             ocupadas.append((x0, y0, x1, y1))
 
-            # Línea guía discreta cuando la etiqueta se separa del punto de la estación.
-            if math.hypot(cx - sx, cy - sy) > 10 * k:
-                dr.line((sx, sy, cx, cy), fill=(75, 88, 91, 190), width=max(1, int(k * 0.45)))
-
             dr.rounded_rectangle([x0, y0, x1, y1], radius=2 * k, fill=(255, 255, 255, 238),
                                  outline=(90, 105, 108, 170), width=max(1, int(k * 0.35)))
             if nm:
