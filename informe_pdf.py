@@ -203,14 +203,19 @@ class Mapa:
             if pr.get("lat") is None:
                 continue
             x, y = P_(pr["lon"], pr["lat"])
-            dxl, dyl = DESPLAZA.get(pr["estacion"], (0, 0))     # etiquetas que se pisan con la vecina
-            if flechas and pr["estacion"] in flechas and flechas[pr["estacion"]][0] is not None:
+            # En el mapa del viento, la flecha se coloca ligeramente por encima de la
+            # coordenada real y la etiqueta queda centrada en la estación. Así el nombre
+            # no hereda el desplazamiento de la flecha ni los ajustes de otros mapas.
+            es_viento = bool(flechas and pr["estacion"] in flechas and flechas[pr["estacion"]][0] is not None)
+            dxl, dyl = (0, 0) if es_viento else DESPLAZA.get(pr["estacion"], (0, 0))
+            if es_viento:
                 g, roja = flechas[pr["estacion"]]
                 a = math.radians(g + 180); ux, uy = math.sin(a), -math.cos(a); s_ = 6.5 * k
                 pts = [(0, s_), (s_ * .45, -s_ * .5), (0, -s_ * .15), (-s_ * .45, -s_ * .5)]
-                rot = [(x + py * ux + px * uy, y + py * uy - px * ux) for px, py in pts]
+                # La flecha queda arriba; el nombre y el valor permanecen en la coordenada.
+                fy = y - 10 * k
+                rot = [(x + py * ux + px * uy, fy + py * uy - px * ux) for px, py in pts]
                 dr.polygon(rot, fill=(217, 56, 43) if roja else (20, 35, 28), outline=(255, 255, 255))
-                y += 19 * k  # reserva espacio bajo la flecha para que la caja blanca no la tape
             if etiquetas and pr["estacion"] in etiquetas:
                 x += dxl * k; y -= dyl * k
                 t = etiquetas[pr["estacion"]]
