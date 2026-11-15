@@ -490,82 +490,10 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   </details>
 
   <section id="metodo" data-lang="eu" aria-label="Nola kalkulatzen da indizea">
-    <h2>Nola kalkulatzen da indizea</h2>
-    <p class="nota met-intro">Webgune honek bi indize erakusten ditu: <b>FWIa</b>, nazioartean erabiltzen dena, eta <b>Basugix</b>, Gipuzkoarako egokitua (ikus beherago). <b>FWIa</b> (<i>Fire Weather Index</i>) Kanadako Baso Zerbitzuak garatutako sistema da, eta Europan EFFISek (Europako Suteen Informazio Sistema) erabiltzen du. Eguraldiak sute bat pizteko eta hedatzeko sortzen duen arriskua neurtzen du: zenbat eta handiagoa, orduan eta errazago piztu eta azkarrago hedatuko litzateke sute bat. Ez du kontuan hartzen su-iturririk dagoen ala ez, ez eta toki bakoitzeko landaredia zehatza ere. Tresna orientagarria da: <b>ez ditu ordezkatzen abisu ofizialak</b>.</p>
+    <h2>Metodologia</h2>
+    <p class="nota met-intro" data-modos="fwi"><b>FWIa</b> (<i>Fire Weather Index</i>) Kanadako Baso Zerbitzuak garatutako sistema da, eta Europan EFFISek (Europako Suteen Informazio Sistema) erabiltzen du. Eguraldiak sute bat pizteko eta hedatzeko sortzen duen arriskua neurtzen du: zenbat eta handiagoa, orduan eta errazago piztu eta azkarrago hedatuko litzateke sute bat. Ez du kontuan hartzen su-iturririk dagoen ala ez, ez eta toki bakoitzeko landaredia zehatza ere. Tresna orientagarria da: <b>ez ditu ordezkatzen abisu ofizialak</b>.</p>
 
-    <details class="met">
-      <summary>Datuak eta ordua: eguzki-eguerdia</summary>
-      <p>Egunero <b>eguzki-eguerdiko</b> datuak erabiltzen dira: <b>12:00 UTC</b>, hau da, ordu ofizialean <b>13:00 neguan eta 14:00 udan</b>. Estazio bakoitzeko ordu horretako tenperatura, hezetasun erlatiboa eta haizearen abiadura eta norabidea hartzen dira, eta aurreko <b>24 orduetako euri metatua</b>. Hori da FWI sistemaren irizpide estandarra, eta EFFISek erabiltzen duen bera.</p>
-      <p>Euskalmetek datuak argitaratzeko denbora behar duenez, datuak <b>14:10ean eta 14:40an</b> deskargatzen dira, eta <b>15:00etan eguna ixten da</b>, 15:10eko exekuzioan (udan; neguan ordubete lehenago). Eguna beti ixten da 14:00etako datuarekin: <b>ez da inoiz geroagoko irakurketarik erabiltzen</b>. Webguneak eguneko datua erakusten du Euskalmeten datu neurtua iritsi bezain laster (normalean 14:10ean edo 14:40an); ordura arte, aurreko egunekoa. Estazio batek oraindik daturik ez badu, orduan arte neurtutakoarekin kalkulatutako balioa agertzen da, "kalkulatua" markarekin, datu neurtua iritsi arte. Orria bakarrik eguneratzen da: minuturo datuak iristen diren orduetan, eta bost minuturo gainerakoan.</p>
-    </details>
-
-    <details class="met" id="metIcona">
-      <summary>GBSI (Gipuzkoako Baso Sute Indizea): metodologia</summary>
-      <p>GBSI (Gipuzkoako Baso Sute Indizea) <b>ICONAren 1968ko indize sintetikoaren egokitzapen batean</b> oinarritzen da; jatorrizko metodoa ICONAk argitaratutako <i>Manual de predicción del peligro de incendios forestales</i> (1982) lanean azaltzen da. Gipuzkoarako egokitutako indize honek egun bakoitzeko suteen arrisku meteorologikoa adierazten du, 0tik 16ra. Taula-sorta baten bidez kalkulatzen da, lau urratsetan, eta egun batetik bestera gogoratzen du:</p>
-      <ol>
-        <li><b>Lehorte-indizea</b> (0–25): atzokoa gehi 1 euririk gabeko egunetan (24 orduan 1,3 mm baino gutxiago); euriak jaitsi egiten du, eta 13,6 mm-tik gora 0ra itzultzen da.</li>
-        <li><b>Lehen giltza-letra</b> (a–t): atzoko arrisku-indizetik eta 24 orduko euritik.</li>
-        <li><b>Azken giltza-letra</b>: lehenengoa, hezetasun erlatiboaren (5 klase) eta haizearen abiaduraren (5 klase) arabera zuzenduta.</li>
-        <li><b>Gaurko arrisku-indizea</b> (0–16): azken letratik eta lehorte-indizetik, udazken-negurako eta udaberri-udarako taula banarekin (udaberria-uda: martxoaren 21etik irailaren 22ra).</li>
-      </ol>
-      <p>Oinarri-indize horri 1968ko bertsio aldatuaren bi zuzenketak gehitzen zaizkio (eskuliburuko 5. eta 6. taulak): <b>lehorte luzea</b>, +1etik +10era, euririk gabeko egun jarraien arabera (16 egunetik aurrera; euri-egun baten ondoren erdia geratzen da, biren ondoren laurdena, eta hiruren ondoren desagertu egiten da); eta <b>haize kaltegarria</b>, +1etik +15era, abiaduraren arabera. Gipuzkoan, haize kaltegarria <b>hego haize lehorra</b> da: hegoaldeko haizea (HE, H edo HM, gutxienez 3 km/h) % 50etik beherako hezetasunarekin. Hego haize guztiei aplikatuz gero, indizeak okerrago bereizten ditu sute-egunak, Gipuzkoan oso maiz jotzen baitu eguerdian. Zuzenketekin, indizeak 16 gaindi dezake; muturreko maila 13tik gorakoa da. Biharko kalkulurako oinarri-indizea erabiltzen da, metodoak dioen bezala.</p>
-      <p><b>Gipuzkoarako egokitzapena:</b> eskuliburuko urtaroko taulak trukatuta aplikatzen dira, nahita. Eskuliburuak udaberri-udarako taula larriena erabiltzen du eta udazkenekoa leunena, Espainiako zati handienean arrisku handiena udan baitago; Gipuzkoan, berriz, arrisku handieneko garaia udazken-negua da (otsailetik apirilera bitarteko gailurrarekin), eta, beraz, taula larriena udazken-neguan aplikatzen da eta leunena udaberri-udan.</p>
-      <div class="tabla-met"><table>
-        <thead><tr><th>Indizea</th><th>Maila</th><th>Esanahia</th></tr></thead>
-        <tbody>
-          <tr><td>0</td><td>Hutsa</td><td>Ia ez dago pizteko edo hedatzeko baldintzarik.</td></tr>
-          <tr><td>1–4</td><td>Baxua</td><td>Bero-iturri handiekin piztu daiteke; hedapena motela izaten da.</td></tr>
-          <tr><td>5–8</td><td>Ertaina</td><td>Ohiko pizte-iturriekin piztu daiteke, eta hedapena nabarmena da.</td></tr>
-          <tr><td>9–12</td><td>Handia</td><td>Erraz pizten da eta azkar heda daiteke; itzaltzea zailagoa da.</td></tr>
-          <tr><td>≥ 13</td><td>Muturrekoa</td><td>Txinparta txikiek ere piztu dezakete, eta hedapena oso azkarra edo bortitza izan daiteke.</td></tr>
-        </tbody>
-      </table></div>
-      <p>Sarrerako datuak FWIrenak dira: eguzki-eguerdiko hezetasun erlatiboa eta haizea, eta aurreko 24 orduetako euria. Hiru egun baino gehiagoko hutsune baten ondoren, indizea 0tik hasten da berriro. </p>
-      <p><b>Gipuzkoan</b> (EGIF 2010–2025): handia eta muturrekoa mailek egunen % 18 hartzen dute eta suteen % 62 biltzen dute; muturrekoan (egunen % 6,6) sute-maiztasuna egun ertainarena baino 5 aldiz handiagoa da. Sute-egunak bereizteko gaitasuna (AUC 0,821) Basugixenaren (0,827) antzekoa da.</p>
-    </details>
-
-    <details class="met">
-      <summary>🌦️ Eguraldia fitxa</summary>
-      <p><b>Eguzki-eguerdiko neurketak</b>: indizeak kalkulatzeko erabiltzen diren datuak (13:00 neguan, 14:00 udan): tenperatura, hezetasuna, haizea eta haren norabidea, eta aurreko 24 orduetako euria, euririk gabeko egunekin eta hego haizearekin.</p>
-      <p><b>Eguneko laburpena</b>: egun naturalaren itxiera (00:00-24:00), estazio bakoitzeko: batez besteko tenperatura (eta maximoa eta minimoa), batez besteko hezetasuna eta haizea, batez besteko norabidea (bektorialki kalkulatua, abiaduraren arabera haztatuta) eta egun osoko euria. 10 minuturo irakurketekin kalkulatzen da, hurrengo goizean, eta gorde egiten da; "Txostenak" leihoko CSV deskargan ere badago. Mutrikun ez dago estaziorik eta Altzolak ez du haize-neurgailurik: Mutrikuko laburpen osoa eta Altzolako haizea Open-Meteo ereduaren orduroko datuekin kalkulatzen dira, puntu horien koordenatuetan (🖥️ eredua).</p>
-      <p><b>Euri neurtua</b>: Euskalmeten 32 euri-neurgailuen datuak Gipuzkoan (gehi Eskas, mugan), 10 minuturo irakurketekin: azken 60 minutuak, gaur 00:00etatik azken irakurketara arte eta atzo osoa, estazioen artean interpolatutako mapa batean. Kalitate-kontrol bat dago: estazio batek ia ezer ez badu inguruan argi euria egin duenean, baztertu eta "?" ikurrarekin markatzen da. Prozesua exekutatzen den bakoitzean eguneratzen da.</p>
-      <p><b>Mapak: hurrengo 72 orduak</b>: euria (3 orduko metatua), hurrengo 72 orduetako euri metatua, hezetasuna, tenperatura, haizea (norabidearekin) eta boladak, Gipuzkoa osorako mapa jarraituetan, 3 orduro. Open-Meteo-ren iragarpena da, ~5 km-ko sareta batean.</p>
-      <p><b>Eguraldi-iragarpena</b>: GIPUZKOA osorako mapa (3 orduro) eta estazio bakoitzeko iragarpen zehatza, Open-Meteo-ren eskutik.</p>
-    </details>
-
-    <details class="met">
-      <summary>Euririk gabeko egunak eta hegoaldeko haizea</summary>
-      <p>Txartel bakoitzean, haizearen azpian, estazioak <b>jarraian euririk gabe</b> daramatzan egunak agertzen dira, ikusten ari den egunera arte (hura barne). Egun bat "euriduna" da eguzki-eguerdira arteko 24 orduetan <b>1 mm edo gehiago</b> egin badu; hortik behera, euriak ia ez du erregaia hezetzen. Aurreko egunetan datu-hutsunea badago, "≥" ikurra agertzen da: gutxienez egun horiek daramatza euririk gabe.</p>
-      <p>Horren azpian, <b>hegoaldeko haizearekin jarraian</b> daramatzan egunak: datuaren orduan haizea <b>hego-ekialdetik, hegoaldetik edo hego-mendebaldetik</b> (SE, S, SO) ibili den egunak, 3 km/h gutxienez (kalma-egunetan haize-orratzak edozein norabide adieraz dezake). Euririk gabeko egunekin batera, landaredia zenbat denbora daraman lehortzen adierazten du.</p>
-    </details>
-
-    <details class="met">
-      <summary>Eguneratze-ordutegia</summary>
-      <p>Panela bere kabuz eguneratzen da egun osoan zehar (udako ordua; neguan, ordubete lehenago):</p>
-      <div class="tabla-met"><table>
-        <thead><tr><th>Tartea</th><th>Maiztasuna</th><th>Zer egiten du</th></tr></thead>
-        <tbody>
-          <tr><td>07:20 – 13:20</td><td>Orduro</td><td>Gaurko estimazioa kalkulatzen du berriro, azken irakurketara arteko benetako euriarekin, indizeen 3 eguneko iragarpena berritzen du eta euri neurtuaren mapa eguneratzen du.</td></tr>
-          <tr><td>14:10 · 14:40 · 15:10 · 15:40</td><td>30 minuturo</td><td>Eguzki-eguerdiko datua (14:00) jaisten du Euskalmetek argitaratu ondoren; 15:10ekoak eguna ixten du (15:00etako itxieraren ondoren) eta posta eta Telegram abisuak bidaltzen ditu; 15:40koa babeskopia da.</td></tr>
-          <tr><td>16:20 – 23:20</td><td>Orduro</td><td>Biharko estimazioa kalkulatzen du berriro, gaurko 14:00etatik aurrera egindako benetako euriarekin, eta euri neurtuaren mapa eguneratzen du.</td></tr>
-          <tr><td>02:20 · 05:20</td><td>3 orduro</td><td>Gaurko estimazioa (eguna aldatu da). Gauerdiaren ondorengo lehenengoak aurreko egunaren laburpena ere kalkulatzen du.</td></tr>
-        </tbody>
-      </table></div>
-      <p><b>Estimazioa</b> ("kalkulatua"): euriarentzat, estazioak dagoeneko neurtutako ordu osoak hartzen dira (aurreko eguneko 14:00etatik) eta falta direnak iragarpenarekin osatzen dira; tenperatura, hezetasuna eta haizea beti estimatuak dira, Open-Meteo-ren iragarpenarekin. <b>Eguraldia</b> fitxako iragarpena eta mapak, berriz, nabigatzaileak eskatzen dizkio zuzenean Open-Meteo-ri, orduro, egunean zehar edozein unetan.</p>
-    </details>
-
-    <details class="met">
-      <summary>Datuak falta direnean</summary>
-      <ul>
-        <li><b>Euria.</b> 24 orduetako 144 irakurketetatik (10 minuturo bat) 6 edo gutxiago falta badira, estazioaren datua erabiltzen da. Gehiago falta badira, edo egun osoa, euria <b>gertuen dagoen estaziotik</b> hartzen da (datu osoak baditu; bestela, hurrengotik). Guztiek huts eginez gero (akats orokorra), Open-Meteo eredutik.</li>
-        <li><b>Tenperatura, hezetasuna eta haizea.</b> 14:00etako irakurketa zehatza falta bada, estazio beraren <b>13:10 eta 14:50 arteko</b> irakurketen artean arriskuari begira txarrena hartzen da: <b>hezetasun txikiena</b> eta <b>tenperatura eta haize handienak</b>. Tarte horretan ezer ez badago, Open-Meteo ereduaren balioa estazioaren koordenatuetan.</li>
-        <li><b>Estazioak datu bat ere ez badu</b> egun batean (matxura, edo estazioa oraindik martxan ez zegoelako), egun hori ez da asmatzen: hutsune gisa geratzen da.</li>
-        <li><b>Datu akastunak.</b> Fisikoki ezinezkoak diren irakurketak (sentsoreen errore-kodeak, % 0ko hezetasuna, 3.000 mm-ko euria...) baztertu egiten dira kalkulatu aurretik.</li>
-        <li>Beteriko datu guztiak historikoan <b>markatuta</b> geratzen dira, zein aldagai eta nondik hartu den adierazita.</li>
-      </ul>
-    </details>
-
-    <details class="met">
+    <details class="met" data-modos="fwi">
       <summary>FWI sistemaren osagaiak eta kaskada</summary>
       <ul>
         <li><b>FFMC</b>: gainazaleko erregai finaren (orbela, belar lehorra) hezetasuna. Egun gutxitan aldatzen da; pizteko erraztasuna adierazten du.</li>
@@ -578,7 +506,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p>FFMC, DMC eta DC egunez egun kalkulatzen dira, <b>aurreko egunaren baliotik</b> abiatuta (kaskada). Horregatik egun bateko datuek hurrengo egunetan ere eragina dute. Egun bat falta bada, azken balio eskuragarritik jarraitzen da (* markarekin xehetasunean). Hutsunea <b>bi aste baino luzeagoa</b> bada, kodeak berrabiarazten dira, eta hurrengo <b>45 egunak</b> "berotzen" (†) markatzen dira: balio orientagarriak dira, fidagarritasun txikikoak, eta ez dira sartzen klimatologian ez GIPUZKOAko batez bestekoan. Eguneko iraupen-faktoreak 46° N inguruko latitudeetarako daude kalibratuta, Euskadikoen antzekoak.</p>
     </details>
 
-    <details class="met" id="metFwi">
+    <details class="met" data-modos="fwi" id="metFwi">
       <summary>FWIaren arrisku-mailak eta pertzentila</summary>
       <p>Mailak EFFISen irizpidearen araberakoak dira:</p>
       <div class="classes">
@@ -592,7 +520,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p><b>Pertzentilak</b> eguneko FWIa estazio horretako <b>hilabete bereko</b> egun historiko guztiekin alderatzen du (2010etik). Adibidez, "90. pertzentila" esan nahi du hilabete horretako egunen % 90ek FWI txikiagoa izan zutela. Klima hezean kategoria orokorrak baino informazio gehiago ematen du: FWI berdina ohikoa izan daiteke abuztuan eta salbuespenezkoa martxoan.</p>
     </details>
 
-    <details class="met" id="metIfg">
+    <details class="met" data-modos="ifg" id="metIfg">
       <summary>Basugix: Gipuzkoako baso sute arrisku indizea</summary>
       <p>EFFISen mailak klima mediterraneorako pentsatuta daude. Gipuzkoan, ordea, 2010-2025eko suteen <b>bi herenak</b> FWI "oso baxua" edo "baxua" zuten egunetan gertatu ziren, eta maila altuak ia inoiz ez dira iristen. Arrazoia: gure suteak batez ere <b>negu amaieran eta udaberrian</b> gertatzen dira (martxoa da hilabeterik okerrena), belar, iratze eta ote lehorrarekin eta hego haizearekin, eta FWIak ez du hori ondo jasotzen.</p>
       <p><b>Basugix</b> Gipuzkoarako egokitutako indizea da. Sute bat izateko probabilitatea neurtzen du, <b>egun ertain batekin</b> alderatuta, eta puntuetan adierazten da:</p>
@@ -620,45 +548,32 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p>Basugix <b>"Basugix"</b> fitxan ikusten da, FWIaren aurkezpen berarekin (txartelak, mapa, iragarpena eta txostenak). GIPUZKOA txartelean, estazioen sute-probabilitateen batez besteko haztatutik kalkulatzen da. Behin-behineko proposamena da: datu gehiagorekin eta sute berriekin berrikusiko da.</p>
     </details>
 
-    <details class="met">
-      <summary>Estazioak eta horien berezitasunak</summary>
+    <details class="met" data-modos="icona" id="metIcona">
+      <summary>GBSI (Gipuzkoako Baso Sute Indizea): metodologia</summary>
+      <p>GBSI (Gipuzkoako Baso Sute Indizea) <b>ICONAren 1968ko indize sintetikoaren egokitzapen batean</b> oinarritzen da; jatorrizko metodoa ICONAk argitaratutako <i>Manual de predicción del peligro de incendios forestales</i> (1982) lanean azaltzen da. Gipuzkoarako egokitutako indize honek egun bakoitzeko suteen arrisku meteorologikoa adierazten du, 0tik 16ra. Taula-sorta baten bidez kalkulatzen da, lau urratsetan, eta egun batetik bestera gogoratzen du:</p>
+      <ol>
+        <li><b>Lehorte-indizea</b> (0–25): atzokoa gehi 1 euririk gabeko egunetan (24 orduan 1,3 mm baino gutxiago); euriak jaitsi egiten du, eta 13,6 mm-tik gora 0ra itzultzen da.</li>
+        <li><b>Lehen giltza-letra</b> (a–t): atzoko arrisku-indizetik eta 24 orduko euritik.</li>
+        <li><b>Azken giltza-letra</b>: lehenengoa, hezetasun erlatiboaren (5 klase) eta haizearen abiaduraren (5 klase) arabera zuzenduta.</li>
+        <li><b>Gaurko arrisku-indizea</b> (0–16): azken letratik eta lehorte-indizetik, udazken-negurako eta udaberri-udarako taula banarekin (udaberria-uda: martxoaren 21etik irailaren 22ra).</li>
+      </ol>
+      <p>Oinarri-indize horri 1968ko bertsio aldatuaren bi zuzenketak gehitzen zaizkio (eskuliburuko 5. eta 6. taulak): <b>lehorte luzea</b>, +1etik +10era, euririk gabeko egun jarraien arabera (16 egunetik aurrera; euri-egun baten ondoren erdia geratzen da, biren ondoren laurdena, eta hiruren ondoren desagertu egiten da); eta <b>haize kaltegarria</b>, +1etik +15era, abiaduraren arabera. Gipuzkoan, haize kaltegarria <b>hego haize lehorra</b> da: hegoaldeko haizea (HE, H edo HM, gutxienez 3 km/h) % 50etik beherako hezetasunarekin. Hego haize guztiei aplikatuz gero, indizeak okerrago bereizten ditu sute-egunak, Gipuzkoan oso maiz jotzen baitu eguerdian. Zuzenketekin, indizeak 16 gaindi dezake; muturreko maila 13tik gorakoa da. Biharko kalkulurako oinarri-indizea erabiltzen da, metodoak dioen bezala.</p>
+      <p><b>Gipuzkoarako egokitzapena:</b> eskuliburuko urtaroko taulak trukatuta aplikatzen dira, nahita. Eskuliburuak udaberri-udarako taula larriena erabiltzen du eta udazkenekoa leunena, Espainiako zati handienean arrisku handiena udan baitago; Gipuzkoan, berriz, arrisku handieneko garaia udazken-negua da (otsailetik apirilera bitarteko gailurrarekin), eta, beraz, taula larriena udazken-neguan aplikatzen da eta leunena udaberri-udan.</p>
       <div class="tabla-met"><table>
-        <thead><tr><th>Estazioa</th><th>Kodea</th><th>Altuera</th><th>Berezitasunak</th><th>Euria falta bada</th></tr></thead>
+        <thead><tr><th>Indizea</th><th>Maila</th><th>Esanahia</th></tr></thead>
         <tbody>
-          <tr><td>Altzola</td><td>C078</td><td>17 m</td><td>Ez du haize-neurgailurik: haizea (abiadura eta norabidea) Open-Meteo ereduarena da estazioaren koordenatuetan. Tenperatura, hezetasuna eta euria neurketa errealak dira.</td><td>Arrasate, Bidania</td></tr>
-          <tr><td>Arrasate</td><td>C023</td><td>318 m</td><td>Deba ibarraren goiko aldea.</td><td>Zegama, Altzola</td></tr>
-          <tr><td>Berastegi</td><td>C026</td><td>379 m</td><td>2021eko ekainetik 2022ko ekainera ez dago daturik argitaratuta.</td><td>Zizurkil, Bidania</td></tr>
-          <tr><td>Bidania</td><td>C058</td><td>592 m</td><td>Estazio altuena.</td><td>Zizurkil, Ordizia</td></tr>
-          <tr><td>Miramon</td><td>C017</td><td>113 m</td><td>Donostia.</td><td>Pasaia, Zizurkil</td></tr>
-          <tr><td>Mutriku</td><td>—</td><td>20 m</td><td>Ez dago estazio fisikorik: Open-Meteo ereduaren estimazioa da, kostaldeko hutsunea betetzeko (🖥️ eredua). Ez dago tokiko neurketarik zuzentzeko edo egiaztatzeko.</td><td>—</td></tr>
-          <tr><td>Ordizia</td><td>C043</td><td>243 m</td><td>Goierri. 2025eko otsailetik urrira ez dago daturik argitaratuta.</td><td>Bidania, Zegama</td></tr>
-          <tr><td>Pasaia</td><td>B096</td><td>0 m</td><td>Badia-ahoko itsas plataforma. Hezetasuna eta euria maiz falta dira, eta askotan beteta daude (euria, gehienetan, Miramonetik).</td><td>Miramon</td></tr>
-          <tr><td>Zarautz</td><td>C064</td><td>80 m</td><td>Bi estazio errealen konbinazioa: tenperatura, hezetasuna eta haizea Zarautzekoak, eta euria Inurritzakoa (C086), udalerri berean, Zarautzek ez baitu euri-neurgailurik. 2021eko abendutik 2024ko uztailera ez dago daturik argitaratuta.</td><td>Inurritzak huts eginez gero: Zizurkil, Bidania</td></tr>
-          <tr><td>Zegama</td><td>C028</td><td>520 m</td><td>Goierri, Aizkorriren magalean.</td><td>Ordizia, Arrasate</td></tr>
-          <tr><td>Zizurkil</td><td>C029</td><td>149 m</td><td>Oria ibarra, Tolosaldea.</td><td>Bidania, Berastegi</td></tr>
+          <tr><td>0</td><td>Hutsa</td><td>Ia ez dago pizteko edo hedatzeko baldintzarik.</td></tr>
+          <tr><td>1–4</td><td>Baxua</td><td>Bero-iturri handiekin piztu daiteke; hedapena motela izaten da.</td></tr>
+          <tr><td>5–8</td><td>Ertaina</td><td>Ohiko pizte-iturriekin piztu daiteke, eta hedapena nabarmena da.</td></tr>
+          <tr><td>9–12</td><td>Handia</td><td>Erraz pizten da eta azkar heda daiteke; itzaltzea zailagoa da.</td></tr>
+          <tr><td>≥ 13</td><td>Muturrekoa</td><td>Txinparta txikiek ere piztu dezakete, eta hedapena oso azkarra edo bortitza izan daiteke.</td></tr>
         </tbody>
       </table></div>
-      <p>Altuerak eta koordenatuak Euskalmeten estazio-fitxa ofizialetakoak dira.</p>
-      <p>Historikoa estazio bakoitza martxan jarri zenetik dago (gehienak 2010etik), Open Data Euskadiko 10 minuturo irakurketekin kalkulatua, eta egunero Euskalmeten APIarekin eguneratzen da.</p>
+      <p>Sarrerako datuak FWIrenak dira: eguzki-eguerdiko hezetasun erlatiboa eta haizea, eta aurreko 24 orduetako euria. Hiru egun baino gehiagoko hutsune baten ondoren, indizea 0tik hasten da berriro. </p>
+      <p><b>Gipuzkoan</b> (EGIF 2010–2025): handia eta muturrekoa mailek egunen % 18 hartzen dute eta suteen % 62 biltzen dute; muturrekoan (egunen % 6,6) sute-maiztasuna egun ertainarena baino 5 aldiz handiagoa da. Sute-egunak bereizteko gaitasuna (AUC 0,821) Basugixenaren (0,827) antzekoa da.</p>
     </details>
 
-    <details class="met">
-      <summary>Eragin-eremuak eta mapa</summary>
-      <p>Gipuzkoako puntu bakoitza bere <b>estazio hurbilenari</b> esleitzen zaio (Thiessen poligonoak): horiek dira estazio bakoitzaren <b>eragin-eremuak</b>. Mapak bi modutan erakusten du arriskua:</p>
-      <ul>
-        <li><b>Gainazal jarraitua</b>: estazioen FWIak interpolatzen ditu, puntu bakoitzean estazio hurbilenei pisu handiagoa emanez (alderantzizko distantzia). Trantsizio leunak ematen ditu.</li>
-        <li><b>Eragin-eremuak</b>: eremu bakoitzak bere estazioaren FWIa hartzen du osorik.</li>
-      </ul>
-      <p>Estazio gutxirekin eta erliebe hain aldakorrarekin, mapa <b>orientazio orokorra</b> da, ez mendi bakoitzean neurtutako balioa: ez ditu jasotzen orientazioaren, altueraren edo erregaiaren tokiko aldeak. Landarediaren eta arrisku egiturazkoaren geruzek interpretatzen laguntzen dute. Mapak, txartelek eta haien barrek beti egun bera eta balio berak erakusten dituzte.</p>
-    </details>
-
-    <details class="met">
-      <summary>GIPUZKOA: lurraldeko batez bestekoa</summary>
-      <p>Ez da estazio bat, laburpen bat baizik: estazioen <b>FWIen batez besteko haztatua</b>, bakoitzaren eragin-eremuaren <b>azaleraren</b> arabera. Indizeak soilik batez besteratzen dira: tenperatura, hezetasuna, euria edo haizea batez besteratzeak ez du zentzurik, kostaldea eta barnealdea nahasten dituelako. FWIa ez-lineala denez, zuzenagoa da estazio bakoitzaren arriskua batez besteratzea, eguraldi "ertain" batekin kalkulatzea baino.</p>
-      <p>Egun jakin batean daturik ez duten edo "berotzen" dauden estazioak kanpoan geratzen dira, eta txartelak lurraldearen zein ehunekorekin kalkulatu den adierazten du; % 30etik behera bada, ez da erakusten. Hiru eguneko iragarpena ere estazioen iragarpenen batez besteko haztatua da.</p>
-    </details>
-
-    <details class="met">
+    <details class="met" data-modos="fwi ifg">
       <summary>Hego haizearen abisua (💨)</summary>
       <p>FWIak haizearen <b>abiadura</b> hartzen du kontuan, baina ez <b>norabidea</b>. Gipuzkoan hego haizea (foehn motakoa) lehorra eta beroa da: landaredia oso azkar lehortzen du, eta sute askoren atzean dago, batez ere neguan eta udaberrian.</p>
       <p>Horregatik, abisu bat gehitzen da haizea <b>hego-ekialdetik, hegoaldetik edo hego-mendebaldetik</b> (120°–240°) datorrenean, <b>3 km/h edo gehiagoko</b> abiaduraz. Gipuzkoako 2010-2025eko <b>EGIF</b> sute-erregistroarekin kalibratu da (497 sute eta 63.837 estazio-egun). Proba egin ziren abiadura-atalase guztien artean, 3 km/h izan zen datuei hobekien egokitzen zitzaiena: garrantzitsuena norabidea da, eta atalase txiki horrek kalma-egunak bakarrik baztertzen ditu.</p>
@@ -666,97 +581,118 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p>FWI fitxan, abisuak <b>ez du FWIa aldatzen</b>: aparteko informazioa da, eta biderkatzailea gutxi gorabeherakoa da. Basugix fitxan, hego haizea indizean bertan dago sartuta.</p>
     </details>
 
-    <details class="met">
+    <details class="met" data-modos="fwi ifg">
       <summary>Hiru eguneko iragarpena</summary>
       <p>Benetako FWIaren modu berean kalkulatzen da, baina <b>Open-Meteoren</b> eguzki-eguerdiko iragarpen meteorologikoarekin, estazio bakoitzaren joera historikoarekin zuzendua, eta neurtutako azken eguneko kodeetatik abiatuta. Balioaren azpiko tarteak adierazten du 2025 eta 2026ko kasuen % 80 inguruan non erori zen benetako balioa. Probetan, akatsa egun batera FWIren 3 puntu ingurukoa izan zen, eta hiru egunera 4 ingurukoa; egun muturrekoenetan gutxietsi ohi du. Egun bakoitzeko iragarpena gordetzen da, gero neurtutakoarekin alderatu eta fidagarritasuna egiaztatzeko.</p>
+    </details>
+
+    <details class="met" data-modos="fwi ifg icona">
+      <summary>Datuak eta ordua: eguzki-eguerdia</summary>
+      <p>Egunero <b>eguzki-eguerdiko</b> datuak erabiltzen dira: <b>12:00 UTC</b>, hau da, ordu ofizialean <b>13:00 neguan eta 14:00 udan</b>. Estazio bakoitzeko ordu horretako tenperatura, hezetasun erlatiboa eta haizearen abiadura eta norabidea hartzen dira, eta aurreko <b>24 orduetako euri metatua</b>. Hori da FWI sistemaren irizpide estandarra, eta EFFISek erabiltzen duen bera.</p>
+      <p>Euskalmetek datuak argitaratzeko denbora behar duenez, datuak <b>14:10ean eta 14:40an</b> deskargatzen dira, eta <b>15:00etan eguna ixten da</b>, 15:10eko exekuzioan (udan; neguan ordubete lehenago). Eguna beti ixten da 14:00etako datuarekin: <b>ez da inoiz geroagoko irakurketarik erabiltzen</b>. Webguneak eguneko datua erakusten du Euskalmeten datu neurtua iritsi bezain laster (normalean 14:10ean edo 14:40an); ordura arte, aurreko egunekoa. Estazio batek oraindik daturik ez badu, orduan arte neurtutakoarekin kalkulatutako balioa agertzen da, "kalkulatua" markarekin, datu neurtua iritsi arte. Orria bakarrik eguneratzen da: minuturo datuak iristen diren orduetan, eta bost minuturo gainerakoan.</p>
+    </details>
+
+    <details class="met" data-modos="meteo">
+      <summary>🌦️ Eguraldia fitxa</summary>
+      <p><b>Eguzki-eguerdiko neurketak</b>: indizeak kalkulatzeko erabiltzen diren datuak (13:00 neguan, 14:00 udan): tenperatura, hezetasuna, haizea eta haren norabidea, eta aurreko 24 orduetako euria, euririk gabeko egunekin eta hego haizearekin.</p>
+      <p><b>Eguneko laburpena</b>: egun naturalaren itxiera (00:00-24:00), estazio bakoitzeko: batez besteko tenperatura (eta maximoa eta minimoa), batez besteko hezetasuna eta haizea, batez besteko norabidea (bektorialki kalkulatua, abiaduraren arabera haztatuta) eta egun osoko euria. 10 minuturo irakurketekin kalkulatzen da, hurrengo goizean, eta gorde egiten da; "Txostenak" leihoko CSV deskargan ere badago. Mutrikun ez dago estaziorik eta Altzolak ez du haize-neurgailurik: Mutrikuko laburpen osoa eta Altzolako haizea Open-Meteo ereduaren orduroko datuekin kalkulatzen dira, puntu horien koordenatuetan (🖥️ eredua).</p>
+      <p><b>Euri neurtua</b>: Euskalmeten 32 euri-neurgailuen datuak Gipuzkoan (gehi Eskas, mugan), 10 minuturo irakurketekin: azken 60 minutuak, gaur 00:00etatik azken irakurketara arte eta atzo osoa, estazioen artean interpolatutako mapa batean. Kalitate-kontrol bat dago: estazio batek ia ezer ez badu inguruan argi euria egin duenean, baztertu eta "?" ikurrarekin markatzen da. Prozesua exekutatzen den bakoitzean eguneratzen da.</p>
+      <p><b>Mapak: hurrengo 72 orduak</b>: euria (3 orduko metatua), hurrengo 72 orduetako euri metatua, hezetasuna, tenperatura, haizea (norabidearekin) eta boladak, Gipuzkoa osorako mapa jarraituetan, 3 orduro. Open-Meteo-ren iragarpena da, ~5 km-ko sareta batean.</p>
+      <p><b>Eguraldi-iragarpena</b>: GIPUZKOA osorako mapa (3 orduro) eta estazio bakoitzeko iragarpen zehatza, Open-Meteo-ren eskutik.</p>
+    </details>
+
+    <details class="met" data-modos="meteo">
+      <summary>Euririk gabeko egunak eta hegoaldeko haizea</summary>
+      <p>Txartel bakoitzean, haizearen azpian, estazioak <b>jarraian euririk gabe</b> daramatzan egunak agertzen dira, ikusten ari den egunera arte (hura barne). Egun bat "euriduna" da eguzki-eguerdira arteko 24 orduetan <b>1 mm edo gehiago</b> egin badu; hortik behera, euriak ia ez du erregaia hezetzen. Aurreko egunetan datu-hutsunea badago, "≥" ikurra agertzen da: gutxienez egun horiek daramatza euririk gabe.</p>
+      <p>Horren azpian, <b>hegoaldeko haizearekin jarraian</b> daramatzan egunak: datuaren orduan haizea <b>hego-ekialdetik, hegoaldetik edo hego-mendebaldetik</b> (SE, S, SO) ibili den egunak, 3 km/h gutxienez (kalma-egunetan haize-orratzak edozein norabide adieraz dezake). Euririk gabeko egunekin batera, landaredia zenbat denbora daraman lehortzen adierazten du.</p>
+    </details>
+
+    <details class="met" data-modos="meteo">
+      <summary>Eguraldi-iragarpena</summary>
       <p><b>Eguraldi-iragarpena.</b> Indizeen iragarpenaren azpian, estazio edo eragin-eremu bakoitzeko 7 eguneko eguraldi-iragarpena dago (tenperatura, euria, hezetasun minimoa eta haizea, hego haizea nabarmenduta) eta hurrengo 72 orduetako grafikoa. Open-Meteo-ri zuzenean eskatzen zaio, estazioaren puntuan eta altueran, eta orduro eguneratzen da. Mapan eremu bat sakatuz gero, haren iragarpena irekitzen da. GIPUZKOA hautatuta, lurralde osoko laburpena eta mapa bat ageri dira: eremu bakoitza aukeratutako aldagaiaren kolorez (tenperatura, hezetasuna, euria edo haizea), egun bakoitzeko 3 orduro, 7 egunera arte.</p>
     </details>
 
-    <details class="met">
-      <summary>Iraganeko egunak eta txostenak</summary>
-      <p>Goiko <b>Eguna</b> hautatzailearekin 2010etik aurrerako edozein egun ikus daiteke: txartelek, GIPUZKOAk eta mapak egun horretako egoera erakusten dute. <b>📄 Txostenak</b> botoiak egun bateko edo bi dataren arteko aldi bateko txostena (PDF) edo datuak (CSV) sortzen ditu, hautatutako txartelarena (GIPUZKOA hautatuta badago, lurralde osoarena), mapa, grafikoak eta taulak barne.</p>
-      <p><b>🔥 Suteak (EGIF).</b> 2010-2025eko Gipuzkoako baso suteen erregistro ofiziala (EGIF, MITECO) ere erakusten da: mapan, "Suteak 2010-2025 (EGIF)" geruza aktibatuta, sute guztiak ikusten dira beren kokalekuan (🔥). Iraganeko egun bat aukeratzean, txartelek estazio bakoitzaren eragin-eremuan egun horretan izandako sute-kopurua erakusten dute. Txostenetan, suteen kopurua eta kokalekua (udalerria, paraje, koordenatuak, azalera eta kausa) ageri dira, mapan eta taulan.</p>
-      <p><b>📊 Datuak deskargatzea (CSV, Excel).</b> "Txostenak" leihoan "Datuak (CSV)" aukeratuz gero, aukeratutako aldiko eta txarteleko datuak jaisten dira, egun eta estazio bakoitzeko lerro batekin: datu meteorologikoak, FWIa eta haren osagaiak, Basugix, hego haizea, suteak eta beteriko datuen markak. Fitxategiak ';' bereizlea eta koma hamartarra ditu, Excelen zuzenean irekitzeko. Deskarga osoak: <a href="#" class="desc-todo">datu guztiak, estazio guztiak, 2010etik (CSV)</a> · <a href="#" class="desc-sute">suteen erregistroa, EGIF 2010-2025 (CSV)</a>.</p>
+    <details class="met" id="metComun">
+      <summary>Datuak eta estazioak</summary>
+      <details class="met">
+        <summary>Eguneratze-ordutegia</summary>
+        <p>Panela bere kabuz eguneratzen da egun osoan zehar (udako ordua; neguan, ordubete lehenago):</p>
+        <div class="tabla-met"><table>
+          <thead><tr><th>Tartea</th><th>Maiztasuna</th><th>Zer egiten du</th></tr></thead>
+          <tbody>
+            <tr><td>07:20 – 13:20</td><td>Orduro</td><td>Gaurko estimazioa kalkulatzen du berriro, azken irakurketara arteko benetako euriarekin, indizeen 3 eguneko iragarpena berritzen du eta euri neurtuaren mapa eguneratzen du.</td></tr>
+            <tr><td>14:10 · 14:40 · 15:10 · 15:40</td><td>30 minuturo</td><td>Eguzki-eguerdiko datua (14:00) jaisten du Euskalmetek argitaratu ondoren; 15:10ekoak eguna ixten du (15:00etako itxieraren ondoren) eta posta eta Telegram abisuak bidaltzen ditu; 15:40koa babeskopia da.</td></tr>
+            <tr><td>16:20 – 23:20</td><td>Orduro</td><td>Biharko estimazioa kalkulatzen du berriro, gaurko 14:00etatik aurrera egindako benetako euriarekin, eta euri neurtuaren mapa eguneratzen du.</td></tr>
+            <tr><td>02:20 · 05:20</td><td>3 orduro</td><td>Gaurko estimazioa (eguna aldatu da). Gauerdiaren ondorengo lehenengoak aurreko egunaren laburpena ere kalkulatzen du.</td></tr>
+          </tbody>
+        </table></div>
+        <p><b>Estimazioa</b> ("kalkulatua"): euriarentzat, estazioak dagoeneko neurtutako ordu osoak hartzen dira (aurreko eguneko 14:00etatik) eta falta direnak iragarpenarekin osatzen dira; tenperatura, hezetasuna eta haizea beti estimatuak dira, Open-Meteo-ren iragarpenarekin. <b>Eguraldia</b> fitxako iragarpena eta mapak, berriz, nabigatzaileak eskatzen dizkio zuzenean Open-Meteo-ri, orduro, egunean zehar edozein unetan.</p>
+      </details>
+
+      <details class="met">
+        <summary>Datuak falta direnean</summary>
+        <ul>
+          <li><b>Euria.</b> 24 orduetako 144 irakurketetatik (10 minuturo bat) 6 edo gutxiago falta badira, estazioaren datua erabiltzen da. Gehiago falta badira, edo egun osoa, euria <b>gertuen dagoen estaziotik</b> hartzen da (datu osoak baditu; bestela, hurrengotik). Guztiek huts eginez gero (akats orokorra), Open-Meteo eredutik.</li>
+          <li><b>Tenperatura, hezetasuna eta haizea.</b> 14:00etako irakurketa zehatza falta bada, estazio beraren <b>13:10 eta 14:50 arteko</b> irakurketen artean arriskuari begira txarrena hartzen da: <b>hezetasun txikiena</b> eta <b>tenperatura eta haize handienak</b>. Tarte horretan ezer ez badago, Open-Meteo ereduaren balioa estazioaren koordenatuetan.</li>
+          <li><b>Estazioak datu bat ere ez badu</b> egun batean (matxura, edo estazioa oraindik martxan ez zegoelako), egun hori ez da asmatzen: hutsune gisa geratzen da.</li>
+          <li><b>Datu akastunak.</b> Fisikoki ezinezkoak diren irakurketak (sentsoreen errore-kodeak, % 0ko hezetasuna, 3.000 mm-ko euria...) baztertu egiten dira kalkulatu aurretik.</li>
+          <li>Beteriko datu guztiak historikoan <b>markatuta</b> geratzen dira, zein aldagai eta nondik hartu den adierazita.</li>
+        </ul>
+      </details>
+
+      <details class="met">
+        <summary>Estazioak eta horien berezitasunak</summary>
+        <div class="tabla-met"><table>
+          <thead><tr><th>Estazioa</th><th>Kodea</th><th>Altuera</th><th>Berezitasunak</th><th>Euria falta bada</th></tr></thead>
+          <tbody>
+            <tr><td>Altzola</td><td>C078</td><td>17 m</td><td>Ez du haize-neurgailurik: haizea (abiadura eta norabidea) Open-Meteo ereduarena da estazioaren koordenatuetan. Tenperatura, hezetasuna eta euria neurketa errealak dira.</td><td>Arrasate, Bidania</td></tr>
+            <tr><td>Arrasate</td><td>C023</td><td>318 m</td><td>Deba ibarraren goiko aldea.</td><td>Zegama, Altzola</td></tr>
+            <tr><td>Berastegi</td><td>C026</td><td>379 m</td><td>2021eko ekainetik 2022ko ekainera ez dago daturik argitaratuta.</td><td>Zizurkil, Bidania</td></tr>
+            <tr><td>Bidania</td><td>C058</td><td>592 m</td><td>Estazio altuena.</td><td>Zizurkil, Ordizia</td></tr>
+            <tr><td>Miramon</td><td>C017</td><td>113 m</td><td>Donostia.</td><td>Pasaia, Zizurkil</td></tr>
+            <tr><td>Mutriku</td><td>—</td><td>20 m</td><td>Ez dago estazio fisikorik: Open-Meteo ereduaren estimazioa da, kostaldeko hutsunea betetzeko (🖥️ eredua). Ez dago tokiko neurketarik zuzentzeko edo egiaztatzeko.</td><td>—</td></tr>
+            <tr><td>Ordizia</td><td>C043</td><td>243 m</td><td>Goierri. 2025eko otsailetik urrira ez dago daturik argitaratuta.</td><td>Bidania, Zegama</td></tr>
+            <tr><td>Pasaia</td><td>B096</td><td>0 m</td><td>Badia-ahoko itsas plataforma. Hezetasuna eta euria maiz falta dira, eta askotan beteta daude (euria, gehienetan, Miramonetik).</td><td>Miramon</td></tr>
+            <tr><td>Zarautz</td><td>C064</td><td>80 m</td><td>Bi estazio errealen konbinazioa: tenperatura, hezetasuna eta haizea Zarautzekoak, eta euria Inurritzakoa (C086), udalerri berean, Zarautzek ez baitu euri-neurgailurik. 2021eko abendutik 2024ko uztailera ez dago daturik argitaratuta.</td><td>Inurritzak huts eginez gero: Zizurkil, Bidania</td></tr>
+            <tr><td>Zegama</td><td>C028</td><td>520 m</td><td>Goierri, Aizkorriren magalean.</td><td>Ordizia, Arrasate</td></tr>
+            <tr><td>Zizurkil</td><td>C029</td><td>149 m</td><td>Oria ibarra, Tolosaldea.</td><td>Bidania, Berastegi</td></tr>
+          </tbody>
+        </table></div>
+        <p>Altuerak eta koordenatuak Euskalmeten estazio-fitxa ofizialetakoak dira.</p>
+        <p>Historikoa estazio bakoitza martxan jarri zenetik dago (gehienak 2010etik), Open Data Euskadiko 10 minuturo irakurketekin kalkulatua, eta egunero Euskalmeten APIarekin eguneratzen da.</p>
+      </details>
+
+      <details class="met">
+        <summary>Eragin-eremuak eta mapa</summary>
+        <p>Gipuzkoako puntu bakoitza bere <b>estazio hurbilenari</b> esleitzen zaio (Thiessen poligonoak): horiek dira estazio bakoitzaren <b>eragin-eremuak</b>. Mapak bi modutan erakusten du arriskua:</p>
+        <ul>
+          <li><b>Gainazal jarraitua</b>: estazioen FWIak interpolatzen ditu, puntu bakoitzean estazio hurbilenei pisu handiagoa emanez (alderantzizko distantzia). Trantsizio leunak ematen ditu.</li>
+          <li><b>Eragin-eremuak</b>: eremu bakoitzak bere estazioaren FWIa hartzen du osorik.</li>
+        </ul>
+        <p>Estazio gutxirekin eta erliebe hain aldakorrarekin, mapa <b>orientazio orokorra</b> da, ez mendi bakoitzean neurtutako balioa: ez ditu jasotzen orientazioaren, altueraren edo erregaiaren tokiko aldeak. Landarediaren eta arrisku egiturazkoaren geruzek interpretatzen laguntzen dute. Mapak, txartelek eta haien barrek beti egun bera eta balio berak erakusten dituzte.</p>
+      </details>
+
+      <details class="met">
+        <summary>GIPUZKOA: lurraldeko batez bestekoa</summary>
+        <p>Ez da estazio bat, laburpen bat baizik: estazioen <b>FWIen batez besteko haztatua</b>, bakoitzaren eragin-eremuaren <b>azaleraren</b> arabera. Indizeak soilik batez besteratzen dira: tenperatura, hezetasuna, euria edo haizea batez besteratzeak ez du zentzurik, kostaldea eta barnealdea nahasten dituelako. FWIa ez-lineala denez, zuzenagoa da estazio bakoitzaren arriskua batez besteratzea, eguraldi "ertain" batekin kalkulatzea baino.</p>
+        <p>Egun jakin batean daturik ez duten edo "berotzen" dauden estazioak kanpoan geratzen dira, eta txartelak lurraldearen zein ehunekorekin kalkulatu den adierazten du; % 30etik behera bada, ez da erakusten. Hiru eguneko iragarpena ere estazioen iragarpenen batez besteko haztatua da.</p>
+      </details>
+
+      <details class="met">
+        <summary>Iraganeko egunak eta txostenak</summary>
+        <p>Goiko <b>Eguna</b> hautatzailearekin 2010etik aurrerako edozein egun ikus daiteke: txartelek, GIPUZKOAk eta mapak egun horretako egoera erakusten dute. <b>📄 Txostenak</b> botoiak egun bateko edo bi dataren arteko aldi bateko txostena (PDF) edo datuak (CSV) sortzen ditu, hautatutako txartelarena (GIPUZKOA hautatuta badago, lurralde osoarena), mapa, grafikoak eta taulak barne.</p>
+        <p><b>🔥 Suteak (EGIF).</b> 2010-2025eko Gipuzkoako baso suteen erregistro ofiziala (EGIF, MITECO) ere erakusten da: mapan, "Suteak 2010-2025 (EGIF)" geruza aktibatuta, sute guztiak ikusten dira beren kokalekuan (🔥). Iraganeko egun bat aukeratzean, txartelek estazio bakoitzaren eragin-eremuan egun horretan izandako sute-kopurua erakusten dute. Txostenetan, suteen kopurua eta kokalekua (udalerria, paraje, koordenatuak, azalera eta kausa) ageri dira, mapan eta taulan.</p>
+        <p><b>📊 Datuak deskargatzea (CSV, Excel).</b> "Txostenak" leihoan "Datuak (CSV)" aukeratuz gero, aukeratutako aldiko eta txarteleko datuak jaisten dira, egun eta estazio bakoitzeko lerro batekin: datu meteorologikoak, FWIa eta haren osagaiak, Basugix, hego haizea, suteak eta beteriko datuen markak. Fitxategiak ';' bereizlea eta koma hamartarra ditu, Excelen zuzenean irekitzeko. Deskarga osoak: <a href="#" class="desc-todo">datu guztiak, estazio guztiak, 2010etik (CSV)</a> · <a href="#" class="desc-sute">suteen erregistroa, EGIF 2010-2025 (CSV)</a>.</p>
+      </details>
+
     </details>
   </section>
 
   <section id="metodo-es" data-lang="es" aria-label="Cómo se calcula el índice">
-    <h2>Cómo se calcula el índice</h2>
-    <p class="nota met-intro">Esta web muestra dos índices: el <b>FWI</b>, de uso internacional, y <b>Basugix</b>, adaptado a Gipuzkoa (ver más abajo). El <b>FWI</b> (<i>Fire Weather Index</i>) es un sistema desarrollado por el Servicio Forestal de Canadá y es el que utiliza en Europa el EFFIS (Sistema Europeo de Información sobre Incendios Forestales). Mide el riesgo que crea el tiempo para que un incendio se inicie y se propague: cuanto más alto, más fácilmente se iniciaría y más rápido se propagaría un incendio. No tiene en cuenta si hay o no una fuente de ignición, ni la vegetación concreta de cada lugar. Es una herramienta orientativa: <b>no sustituye a los avisos oficiales</b>.</p>
+    <h2>Metodología</h2>
+    <p class="nota met-intro" data-modos="fwi">El <b>FWI</b> (<i>Fire Weather Index</i>) es un sistema desarrollado por el Servicio Forestal de Canadá y es el que utiliza en Europa el EFFIS (Sistema Europeo de Información sobre Incendios Forestales). Mide el riesgo que crea el tiempo para que un incendio se inicie y se propague: cuanto más alto, más fácilmente se iniciaría y más rápido se propagaría un incendio. No tiene en cuenta si hay o no una fuente de ignición, ni la vegetación concreta de cada lugar. Es una herramienta orientativa: <b>no sustituye a los avisos oficiales</b>.</p>
 
-    <details class="met">
-      <summary>Datos y hora: el mediodía solar</summary>
-      <p>Cada día se usan los datos del <b>mediodía solar</b>: las <b>12:00 UTC</b>, es decir, en hora oficial, las <b>13:00 en invierno y las 14:00 en verano</b>. De cada estación se toman la temperatura, la humedad relativa y la velocidad y dirección del viento a esa hora, y la <b>lluvia acumulada en las 24 horas</b> anteriores. Es el criterio estándar del sistema FWI y el mismo que usa el EFFIS.</p>
-      <p>Como Euskalmet necesita un tiempo para publicar los datos, se descargan <b>a las 14:10 y a las 14:40</b>, y <b>a las 15:00 se cierra el día</b>, en la ejecución de las 15:10 (en verano; en invierno, una hora antes). El día se cierra siempre con el dato de las 14:00: <b>nunca se usan lecturas posteriores</b>. La web muestra el dato del día en cuanto llega el dato medido de Euskalmet (normalmente a las 14:10 o a las 14:40); hasta entonces, el del día anterior. Si alguna estación aún no tiene su dato, aparece el valor calculado con lo medido hasta ese momento, marcado como "calculado", hasta que llega el dato medido. La página se actualiza sola: cada minuto en las horas en que llegan los datos y cada cinco minutos el resto del día.</p>
-    </details>
-
-    <details class="met" id="metIcona-es">
-      <summary>GBSI (Gipuzkoako Baso Sute Indizea): metodología</summary>
-      <p>El GBSI (Gipuzkoako Baso Sute Indizea) <b>se basa en una adaptación del índice sintético de ICONA de 1968</b>; el método original se describe en el <i>Manual de predicción del peligro de incendios forestales</i> (1982), publicado por ICONA. Esta adaptación para Gipuzkoa expresa el peligro meteorológico de incendios de cada día, de 0 a 16. Se calcula con una serie de tablas, en cuatro pasos, y tiene memoria de un día para otro:</p>
-      <ol>
-        <li><b>Índice de sequía</b> (0–25): el de ayer más 1 en los días secos (menos de 1,3 mm en 24 horas); la lluvia lo reduce, y con más de 13,6 mm vuelve a 0.</li>
-        <li><b>Primera letra clave</b> (a–t): a partir del índice de peligro de ayer y de la lluvia de 24 horas.</li>
-        <li><b>Letra clave final</b>: la primera, corregida según la humedad relativa (5 clases) y la velocidad del viento (5 clases).</li>
-        <li><b>Índice de peligro de hoy</b> (0–16): a partir de la letra final y del índice de sequía, con una tabla para otoño-invierno y otra para primavera-verano (primavera-verano: del 21 de marzo al 22 de septiembre).</li>
-      </ol>
-      <p>A ese índice base se suman las dos correcciones de la versión modificada de 1968 (tablas 5 y 6 del manual): <b>sequía prolongada</b>, de +1 a +10 según los días seguidos sin lluvia (a partir de 16 días; tras un día de lluvia queda la mitad, tras dos la cuarta parte y tras tres desaparece); y <b>viento desfavorable</b>, de +1 a +15 según la velocidad. En Gipuzkoa, el viento desfavorable es el <b>viento sur seco</b>: viento del sur (SE, S o SO, al menos 3 km/h) con humedad por debajo del 50 %. Aplicada a cualquier viento sur, el índice distingue peor los días de incendio, porque aquí sopla muy a menudo al mediodía. Con las correcciones, el índice puede superar 16; el nivel extremo es 13 o más. Para el cálculo del día siguiente se usa el índice base, como indica el método.</p>
-      <p><b>Adaptación para Gipuzkoa:</b> las tablas estacionales del manual se aplican intercambiadas, a propósito. El manual usa la tabla más severa en primavera-verano y la más suave en otoño, porque en la mayor parte de España el peligro es máximo en verano; en Gipuzkoa, en cambio, el periodo de más peligro es el otoño-invierno (con el pico de febrero a abril), así que la tabla más severa se aplica en otoño-invierno y la más suave en primavera-verano.</p>
-      <div class="tabla-met"><table>
-        <thead><tr><th>Índice</th><th>Nivel</th><th>Significado</th></tr></thead>
-        <tbody>
-          <tr><td>0</td><td>Nulo</td><td>Prácticamente no existen condiciones favorables para la ignición o la propagación.</td></tr>
-          <tr><td>1–4</td><td>Bajo</td><td>Pueden originarse incendios con fuentes caloríficas importantes; la propagación suele ser lenta.</td></tr>
-          <tr><td>5–8</td><td>Moderado</td><td>Pueden producirse incendios con fuentes de ignición habituales y la propagación es apreciable.</td></tr>
-          <tr><td>9–12</td><td>Alto</td><td>La ignición es fácil y el fuego puede propagarse rápidamente; la extinción resulta más difícil.</td></tr>
-          <tr><td>≥ 13</td><td>Extremo</td><td>Pequeñas chispas pueden iniciar incendios y la propagación puede ser muy rápida o violenta.</td></tr>
-        </tbody>
-      </table></div>
-      <p>Los datos de entrada son los del FWI: humedad relativa y viento al mediodía solar, y lluvia de las 24 horas anteriores. Tras un hueco de más de 3 días sin datos, el índice vuelve a empezar desde 0. </p>
-      <p><b>En Gipuzkoa</b> (EGIF 2010–2025): los niveles alto y extremo ocupan el 18 % de los días y recogen el 62 % de los incendios; en el extremo (6,6 % de los días), la frecuencia de incendios es 5 veces la de un día medio. Su capacidad para distinguir los días de incendio (AUC 0,821) es similar a la de Basugix (0,827).</p>
-    </details>
-
-    <details class="met">
-      <summary>🌦️ Pestaña de meteorología</summary>
-      <p><b>Mediciones del mediodía solar</b>: los datos con los que se calculan los índices (13:00 en invierno, 14:00 en verano): temperatura, humedad, viento y su dirección, y lluvia de las 24 horas anteriores, junto con los días sin lluvia y con viento sur.</p>
-      <p><b>Resumen del día</b>: el cierre del día natural (00:00-24:00) de cada estación: temperatura media (y máxima y mínima), humedad y viento medios, dirección media (calculada vectorialmente, ponderada por la velocidad) y lluvia del día completo. Se calcula con las lecturas cada 10 minutos a la mañana siguiente y queda guardado; también se incluye en la descarga CSV de la ventana "Informes". En Mutriku no hay estación y Altzola no tiene anemómetro: el resumen completo de Mutriku y el viento de Altzola se calculan con los datos horarios del modelo Open-Meteo en sus coordenadas (🖥️ modelo).</p>
-      <p><b>Lluvia medida</b>: los 32 pluviómetros de Euskalmet en Gipuzkoa (más Eskas, en la muga), con lecturas cada 10 minutos: últimos 60 minutos, hoy desde las 00:00 hasta la última lectura y ayer completo, en un mapa interpolado entre estaciones. Hay un control de calidad: si una estación marca casi nada cuando alrededor ha llovido claramente, se descarta y se marca con "?". Se actualiza en cada ejecución del proceso.</p>
-      <p><b>Mapas: próximas 72 horas</b>: lluvia (acumulada en 3 horas), lluvia acumulada en las próximas 72 horas, humedad, temperatura, viento (con su dirección) y rachas, en mapas continuos de toda Gipuzkoa, cada 3 horas. Es la previsión de Open-Meteo en una malla de ~5 km.</p>
-      <p><b>Previsión meteorológica</b>: el mapa de toda GIPUZKOA (cada 3 horas) y la previsión detallada de cada estación, de Open-Meteo.</p>
-    </details>
-
-    <details class="met">
-      <summary>Días sin lluvia y viento del sur</summary>
-      <p>En cada tarjeta, bajo el viento, aparecen los días que la estación lleva <b>seguidos sin lluvia</b> hasta el día que se está viendo (incluido). Un día cuenta como "de lluvia" si en las 24 horas hasta el mediodía solar cayó <b>1 mm o más</b>; por debajo, la lluvia apenas humedece el combustible. Si hay un hueco de datos en los días anteriores, aparece el signo "≥": como mínimo lleva esos días sin llover.</p>
-      <p>Debajo, los días que lleva <b>seguidos con viento del sur</b>: días en que, a la hora del dato, el viento sopló del <b>sureste, sur o suroeste</b> (SE, S, SO), con al menos 3 km/h (en calma la veleta puede marcar cualquier dirección). Junto con los días sin lluvia, indica cuánto tiempo lleva secándose la vegetación.</p>
-    </details>
-
-    <details class="met">
-      <summary>Horario de actualización</summary>
-      <p>El panel se actualiza solo a lo largo de todo el día (hora de verano; en invierno, una hora antes):</p>
-      <div class="tabla-met"><table>
-        <thead><tr><th>Franja</th><th>Frecuencia</th><th>Qué hace</th></tr></thead>
-        <tbody>
-          <tr><td>07:20 – 13:20</td><td>Cada hora</td><td>Recalcula la estimación de hoy con la lluvia real hasta la última lectura, renueva la previsión de los índices a 3 días y actualiza el mapa de lluvia medida.</td></tr>
-          <tr><td>14:10 · 14:40 · 15:10 · 15:40</td><td>Cada 30 minutos</td><td>Descarga el dato del mediodía solar (14:00) cuando Euskalmet lo ha publicado; la de las 15:10 cierra el día (cierre de las 15:00) y envía el correo y los avisos de Telegram; la de las 15:40 es de respaldo.</td></tr>
-          <tr><td>16:20 – 23:20</td><td>Cada hora</td><td>Recalcula la estimación de mañana con la lluvia real caída desde las 14:00 de hoy y actualiza el mapa de lluvia medida.</td></tr>
-          <tr><td>02:20 · 05:20</td><td>Cada 3 horas</td><td>Estimación de hoy (el día ya ha cambiado). La primera tras la medianoche calcula además el resumen del día anterior.</td></tr>
-        </tbody>
-      </table></div>
-      <p><b>Estimación</b> ("calculado"): para la lluvia se toman las horas completas ya medidas por la estación (desde las 14:00 del día anterior) y las que faltan se completan con la previsión; temperatura, humedad y viento son siempre estimados, con la previsión de Open-Meteo. La previsión y los mapas de la pestaña <b>Meteorología</b>, en cambio, los pide el navegador directamente a Open-Meteo, cada hora, a cualquier hora del día.</p>
-    </details>
-
-    <details class="met">
-      <summary>Cuando faltan datos</summary>
-      <ul>
-        <li><b>Lluvia.</b> Si de las 144 lecturas de las 24 horas (una cada 10 minutos) faltan 6 o menos, se usa el dato de la estación. Si faltan más, o falta el día entero, la lluvia se toma de la <b>estación más cercana</b> (si tiene los datos completos; si no, de la siguiente). Si fallan todas (fallo general), del modelo Open-Meteo.</li>
-        <li><b>Temperatura, humedad y viento.</b> Si falta la lectura exacta de las 14:00, se toma de la propia estación la lectura más desfavorable para el riesgo <b>entre las 13:10 y las 14:50</b>: la <b>humedad más baja</b> y la <b>temperatura y el viento más altos</b>. Si en ese intervalo no hay nada, el valor del modelo Open-Meteo en las coordenadas de la estación.</li>
-        <li><b>Si la estación no tiene ningún dato</b> un día (avería, o porque aún no estaba en funcionamiento), ese día no se inventa: queda como hueco.</li>
-        <li><b>Datos erróneos.</b> Las lecturas físicamente imposibles (códigos de error de los sensores, humedad del 0 %, lluvias de 3.000 mm...) se descartan antes de calcular.</li>
-        <li>Todos los datos rellenados quedan <b>marcados</b> en el histórico, indicando qué variable se rellenó y de dónde.</li>
-      </ul>
-    </details>
-
-    <details class="met">
+    <details class="met" data-modos="fwi">
       <summary>Componentes del sistema FWI y cálculo en cadena</summary>
       <ul>
         <li><b>FFMC</b>: humedad del combustible fino superficial (hojarasca, hierba seca). Cambia en pocos días; indica la facilidad de ignición.</li>
@@ -769,7 +705,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p>FFMC, DMC y DC se calculan día a día <b>a partir del valor del día anterior</b> (en cadena). Por eso los datos de un día influyen también en los siguientes. Si falta un día, se continúa desde el último valor disponible (marcado con * en el detalle). Si el hueco es <b>de más de dos semanas</b>, los códigos se reinician y los <b>45 días</b> siguientes se marcan "en calentamiento" (†): son valores orientativos, poco fiables, y no se incluyen en la climatología ni en la media de GIPUZKOA. Los factores de duración del día están calibrados para latitudes en torno a 46° N, similares a las de Euskadi.</p>
     </details>
 
-    <details class="met" id="metFwi-es">
+    <details class="met" data-modos="fwi" id="metFwi-es">
       <summary>Niveles de riesgo del FWI y percentil</summary>
       <p>Los niveles siguen el criterio del EFFIS:</p>
       <div class="classes">
@@ -783,7 +719,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p>El <b>percentil</b> compara el FWI del día con todos los días históricos <b>del mismo mes</b> en esa estación (desde 2010). Por ejemplo, "percentil 90" significa que el 90 % de los días de ese mes tuvieron un FWI menor. En un clima húmedo aporta más información que las categorías generales: un mismo FWI puede ser habitual en agosto y excepcional en marzo.</p>
     </details>
 
-    <details class="met" id="metIfg-es">
+    <details class="met" data-modos="ifg" id="metIfg-es">
       <summary>Basugix: índice de riesgo de incendio forestal de Gipuzkoa</summary>
       <p>Los niveles del EFFIS están pensados para el clima mediterráneo. En Gipuzkoa, en cambio, <b>dos tercios</b> de los incendios de 2010-2025 ocurrieron en días con FWI "muy bajo" o "bajo", y los niveles altos casi nunca se alcanzan. El motivo: nuestros incendios se producen sobre todo <b>a finales de invierno y en primavera</b> (marzo es el peor mes), con hierba, helecho y argoma secos y viento sur, y el FWI no lo recoge bien.</p>
       <p><b>Basugix</b> es un índice adaptado a Gipuzkoa. Mide la probabilidad de que se produzca un incendio <b>comparada con un día medio</b>, y se expresa en puntos:</p>
@@ -811,45 +747,32 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p>Basugix se consulta en la pestaña <b>"Basugix"</b>, con la misma presentación que el FWI (tarjetas, mapa, previsión e informes). En la tarjeta de GIPUZKOA se calcula a partir de la media ponderada de las probabilidades de incendio de las estaciones. Es una propuesta provisional: se revisará con más datos y nuevos incendios.</p>
     </details>
 
-    <details class="met">
-      <summary>Estaciones y sus particularidades</summary>
+    <details class="met" data-modos="icona" id="metIcona-es">
+      <summary>GBSI (Gipuzkoako Baso Sute Indizea): metodología</summary>
+      <p>El GBSI (Gipuzkoako Baso Sute Indizea) <b>se basa en una adaptación del índice sintético de ICONA de 1968</b>; el método original se describe en el <i>Manual de predicción del peligro de incendios forestales</i> (1982), publicado por ICONA. Esta adaptación para Gipuzkoa expresa el peligro meteorológico de incendios de cada día, de 0 a 16. Se calcula con una serie de tablas, en cuatro pasos, y tiene memoria de un día para otro:</p>
+      <ol>
+        <li><b>Índice de sequía</b> (0–25): el de ayer más 1 en los días secos (menos de 1,3 mm en 24 horas); la lluvia lo reduce, y con más de 13,6 mm vuelve a 0.</li>
+        <li><b>Primera letra clave</b> (a–t): a partir del índice de peligro de ayer y de la lluvia de 24 horas.</li>
+        <li><b>Letra clave final</b>: la primera, corregida según la humedad relativa (5 clases) y la velocidad del viento (5 clases).</li>
+        <li><b>Índice de peligro de hoy</b> (0–16): a partir de la letra final y del índice de sequía, con una tabla para otoño-invierno y otra para primavera-verano (primavera-verano: del 21 de marzo al 22 de septiembre).</li>
+      </ol>
+      <p>A ese índice base se suman las dos correcciones de la versión modificada de 1968 (tablas 5 y 6 del manual): <b>sequía prolongada</b>, de +1 a +10 según los días seguidos sin lluvia (a partir de 16 días; tras un día de lluvia queda la mitad, tras dos la cuarta parte y tras tres desaparece); y <b>viento desfavorable</b>, de +1 a +15 según la velocidad. En Gipuzkoa, el viento desfavorable es el <b>viento sur seco</b>: viento del sur (SE, S o SO, al menos 3 km/h) con humedad por debajo del 50 %. Aplicada a cualquier viento sur, el índice distingue peor los días de incendio, porque aquí sopla muy a menudo al mediodía. Con las correcciones, el índice puede superar 16; el nivel extremo es 13 o más. Para el cálculo del día siguiente se usa el índice base, como indica el método.</p>
+      <p><b>Adaptación para Gipuzkoa:</b> las tablas estacionales del manual se aplican intercambiadas, a propósito. El manual usa la tabla más severa en primavera-verano y la más suave en otoño, porque en la mayor parte de España el peligro es máximo en verano; en Gipuzkoa, en cambio, el periodo de más peligro es el otoño-invierno (con el pico de febrero a abril), así que la tabla más severa se aplica en otoño-invierno y la más suave en primavera-verano.</p>
       <div class="tabla-met"><table>
-        <thead><tr><th>Estación</th><th>Código</th><th>Altitud</th><th>Particularidades</th><th>Si falta la lluvia</th></tr></thead>
+        <thead><tr><th>Índice</th><th>Nivel</th><th>Significado</th></tr></thead>
         <tbody>
-          <tr><td>Altzola</td><td>C078</td><td>17 m</td><td>No tiene anemómetro: el viento (velocidad y dirección) es el del modelo Open-Meteo en las coordenadas de la estación. La temperatura, la humedad y la lluvia son mediciones reales.</td><td>Arrasate, Bidania</td></tr>
-          <tr><td>Arrasate</td><td>C023</td><td>318 m</td><td>Alto Deba.</td><td>Zegama, Altzola</td></tr>
-          <tr><td>Berastegi</td><td>C026</td><td>379 m</td><td>Sin datos publicados de junio de 2021 a junio de 2022.</td><td>Zizurkil, Bidania</td></tr>
-          <tr><td>Bidania</td><td>C058</td><td>592 m</td><td>La estación más alta.</td><td>Zizurkil, Ordizia</td></tr>
-          <tr><td>Miramon</td><td>C017</td><td>113 m</td><td>Donostia.</td><td>Pasaia, Zizurkil</td></tr>
-          <tr><td>Mutriku</td><td>—</td><td>20 m</td><td>No hay estación física: es una estimación del modelo Open-Meteo para cubrir el hueco de la costa (🖥️ modelo). No hay mediciones locales con las que corregirla o comprobarla.</td><td>—</td></tr>
-          <tr><td>Ordizia</td><td>C043</td><td>243 m</td><td>Goierri. Sin datos publicados de febrero a octubre de 2025.</td><td>Bidania, Zegama</td></tr>
-          <tr><td>Pasaia</td><td>B096</td><td>0 m</td><td>Plataforma marina en la bocana. Faltan a menudo la humedad y la lluvia, y muchas veces están rellenadas (la lluvia, casi siempre desde Miramon).</td><td>Miramon</td></tr>
-          <tr><td>Zarautz</td><td>C064</td><td>80 m</td><td>Combina dos estaciones reales: temperatura, humedad y viento de Zarautz, y lluvia de Inurritza (C086), en el mismo municipio, porque Zarautz no tiene pluviómetro. Sin datos publicados de diciembre de 2021 a julio de 2024.</td><td>Si falla Inurritza: Zizurkil, Bidania</td></tr>
-          <tr><td>Zegama</td><td>C028</td><td>520 m</td><td>Goierri, al pie del Aizkorri.</td><td>Ordizia, Arrasate</td></tr>
-          <tr><td>Zizurkil</td><td>C029</td><td>149 m</td><td>Valle del Oria, Tolosaldea.</td><td>Bidania, Berastegi</td></tr>
+          <tr><td>0</td><td>Nulo</td><td>Prácticamente no existen condiciones favorables para la ignición o la propagación.</td></tr>
+          <tr><td>1–4</td><td>Bajo</td><td>Pueden originarse incendios con fuentes caloríficas importantes; la propagación suele ser lenta.</td></tr>
+          <tr><td>5–8</td><td>Moderado</td><td>Pueden producirse incendios con fuentes de ignición habituales y la propagación es apreciable.</td></tr>
+          <tr><td>9–12</td><td>Alto</td><td>La ignición es fácil y el fuego puede propagarse rápidamente; la extinción resulta más difícil.</td></tr>
+          <tr><td>≥ 13</td><td>Extremo</td><td>Pequeñas chispas pueden iniciar incendios y la propagación puede ser muy rápida o violenta.</td></tr>
         </tbody>
       </table></div>
-      <p>Las altitudes y coordenadas son las de las fichas oficiales de las estaciones de Euskalmet.</p>
-      <p>El histórico de cada estación empieza cuando entró en funcionamiento (la mayoría, en 2010). Está calculado con las lecturas cada 10 minutos de Open Data Euskadi y se actualiza a diario con la API de Euskalmet.</p>
+      <p>Los datos de entrada son los del FWI: humedad relativa y viento al mediodía solar, y lluvia de las 24 horas anteriores. Tras un hueco de más de 3 días sin datos, el índice vuelve a empezar desde 0. </p>
+      <p><b>En Gipuzkoa</b> (EGIF 2010–2025): los niveles alto y extremo ocupan el 18 % de los días y recogen el 62 % de los incendios; en el extremo (6,6 % de los días), la frecuencia de incendios es 5 veces la de un día medio. Su capacidad para distinguir los días de incendio (AUC 0,821) es similar a la de Basugix (0,827).</p>
     </details>
 
-    <details class="met">
-      <summary>Zonas de influencia y mapa</summary>
-      <p>Cada punto de Gipuzkoa se asigna a su <b>estación más cercana</b> (polígonos de Thiessen): son las <b>zonas de influencia</b> de cada estación. El mapa muestra el riesgo de dos formas:</p>
-      <ul>
-        <li><b>Superficie continua</b>: interpola los valores de las estaciones, dando más peso en cada punto a las estaciones más cercanas (distancia inversa). Da transiciones suaves.</li>
-        <li><b>Zonas de influencia</b>: cada zona toma entero el valor de su estación.</li>
-      </ul>
-      <p>Con pocas estaciones y un relieve tan variado, el mapa es una <b>orientación general</b>, no un valor medido en cada monte: no recoge las diferencias locales de orientación, altitud o combustible. Las capas de vegetación y de riesgo estructural ayudan a interpretarlo. El mapa, las tarjetas y sus barras muestran siempre el mismo día y los mismos valores.</p>
-    </details>
-
-    <details class="met">
-      <summary>GIPUZKOA: la media del territorio</summary>
-      <p>No es una estación, sino un resumen: la <b>media ponderada de los FWI</b> de las estaciones según la <b>superficie</b> de la zona de influencia de cada una. Solo se promedian los índices: promediar la temperatura, la humedad, la lluvia o el viento no tiene sentido, porque mezcla la costa y el interior. Como el FWI no es lineal, es más correcto promediar el riesgo de cada estación que calcularlo con un tiempo "medio".</p>
-      <p>Las estaciones sin datos ese día, o "en calentamiento", quedan fuera, y la tarjeta indica con qué porcentaje del territorio se ha calculado; si baja del 30 %, no se muestra. La previsión a tres días también es la media ponderada de las previsiones de las estaciones.</p>
-    </details>
-
-    <details class="met">
+    <details class="met" data-modos="fwi ifg">
       <summary>Aviso de viento sur (💨)</summary>
       <p>El FWI tiene en cuenta la <b>velocidad</b> del viento, pero no su <b>dirección</b>. En Gipuzkoa el viento sur (de tipo foehn) es seco y cálido: seca la vegetación muy rápido y está detrás de muchos incendios, sobre todo en invierno y primavera.</p>
       <p>Por eso se añade un aviso cuando el viento viene <b>del sureste, sur o suroeste</b> (120°–240°) a <b>3 km/h o más</b>. Está calibrado con el registro de incendios <b>EGIF</b> de Gipuzkoa 2010-2025 (497 incendios y 63.837 días-estación). De todos los umbrales de velocidad probados, 3 km/h fue el que mejor se ajustaba a los datos: lo importante es la dirección, y ese umbral tan bajo solo descarta los días de calma.</p>
@@ -857,17 +780,110 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p>En la pestaña FWI, el aviso <b>no modifica el FWI</b>: es información adicional, y el multiplicador es aproximado. En la pestaña Basugix, el viento sur ya está incluido en el propio índice.</p>
     </details>
 
-    <details class="met">
+    <details class="met" data-modos="fwi ifg">
       <summary>Previsión a tres días</summary>
       <p>Se calcula igual que el FWI real, pero con la previsión meteorológica de <b>Open-Meteo</b> para el mediodía solar, corregida con el comportamiento histórico de cada estación y partiendo de los códigos del último día medido. El rango bajo cada valor indica dónde cayó el valor real en alrededor del 80 % de los casos de 2025 y 2026. En las pruebas, el error fue de unos 3 puntos de FWI a un día y de unos 4 a tres días; en los días más extremos suele quedarse corta. La previsión de cada día se guarda, para compararla después con lo medido y comprobar su fiabilidad.</p>
+    </details>
+
+    <details class="met" data-modos="fwi ifg icona">
+      <summary>Datos y hora: el mediodía solar</summary>
+      <p>Cada día se usan los datos del <b>mediodía solar</b>: las <b>12:00 UTC</b>, es decir, en hora oficial, las <b>13:00 en invierno y las 14:00 en verano</b>. De cada estación se toman la temperatura, la humedad relativa y la velocidad y dirección del viento a esa hora, y la <b>lluvia acumulada en las 24 horas</b> anteriores. Es el criterio estándar del sistema FWI y el mismo que usa el EFFIS.</p>
+      <p>Como Euskalmet necesita un tiempo para publicar los datos, se descargan <b>a las 14:10 y a las 14:40</b>, y <b>a las 15:00 se cierra el día</b>, en la ejecución de las 15:10 (en verano; en invierno, una hora antes). El día se cierra siempre con el dato de las 14:00: <b>nunca se usan lecturas posteriores</b>. La web muestra el dato del día en cuanto llega el dato medido de Euskalmet (normalmente a las 14:10 o a las 14:40); hasta entonces, el del día anterior. Si alguna estación aún no tiene su dato, aparece el valor calculado con lo medido hasta ese momento, marcado como "calculado", hasta que llega el dato medido. La página se actualiza sola: cada minuto en las horas en que llegan los datos y cada cinco minutos el resto del día.</p>
+    </details>
+
+    <details class="met" data-modos="meteo">
+      <summary>🌦️ Pestaña de meteorología</summary>
+      <p><b>Mediciones del mediodía solar</b>: los datos con los que se calculan los índices (13:00 en invierno, 14:00 en verano): temperatura, humedad, viento y su dirección, y lluvia de las 24 horas anteriores, junto con los días sin lluvia y con viento sur.</p>
+      <p><b>Resumen del día</b>: el cierre del día natural (00:00-24:00) de cada estación: temperatura media (y máxima y mínima), humedad y viento medios, dirección media (calculada vectorialmente, ponderada por la velocidad) y lluvia del día completo. Se calcula con las lecturas cada 10 minutos a la mañana siguiente y queda guardado; también se incluye en la descarga CSV de la ventana "Informes". En Mutriku no hay estación y Altzola no tiene anemómetro: el resumen completo de Mutriku y el viento de Altzola se calculan con los datos horarios del modelo Open-Meteo en sus coordenadas (🖥️ modelo).</p>
+      <p><b>Lluvia medida</b>: los 32 pluviómetros de Euskalmet en Gipuzkoa (más Eskas, en la muga), con lecturas cada 10 minutos: últimos 60 minutos, hoy desde las 00:00 hasta la última lectura y ayer completo, en un mapa interpolado entre estaciones. Hay un control de calidad: si una estación marca casi nada cuando alrededor ha llovido claramente, se descarta y se marca con "?". Se actualiza en cada ejecución del proceso.</p>
+      <p><b>Mapas: próximas 72 horas</b>: lluvia (acumulada en 3 horas), lluvia acumulada en las próximas 72 horas, humedad, temperatura, viento (con su dirección) y rachas, en mapas continuos de toda Gipuzkoa, cada 3 horas. Es la previsión de Open-Meteo en una malla de ~5 km.</p>
+      <p><b>Previsión meteorológica</b>: el mapa de toda GIPUZKOA (cada 3 horas) y la previsión detallada de cada estación, de Open-Meteo.</p>
+    </details>
+
+    <details class="met" data-modos="meteo">
+      <summary>Días sin lluvia y viento del sur</summary>
+      <p>En cada tarjeta, bajo el viento, aparecen los días que la estación lleva <b>seguidos sin lluvia</b> hasta el día que se está viendo (incluido). Un día cuenta como "de lluvia" si en las 24 horas hasta el mediodía solar cayó <b>1 mm o más</b>; por debajo, la lluvia apenas humedece el combustible. Si hay un hueco de datos en los días anteriores, aparece el signo "≥": como mínimo lleva esos días sin llover.</p>
+      <p>Debajo, los días que lleva <b>seguidos con viento del sur</b>: días en que, a la hora del dato, el viento sopló del <b>sureste, sur o suroeste</b> (SE, S, SO), con al menos 3 km/h (en calma la veleta puede marcar cualquier dirección). Junto con los días sin lluvia, indica cuánto tiempo lleva secándose la vegetación.</p>
+    </details>
+
+    <details class="met" data-modos="meteo">
+      <summary>Previsión meteorológica</summary>
       <p><b>Previsión meteorológica.</b> Bajo la previsión de los índices hay una previsión meteorológica a 7 días para cada estación o zona de influencia (temperatura, lluvia, humedad mínima y viento, destacando el viento sur) y un gráfico de las próximas 72 horas. Se pide directamente a Open-Meteo, en el punto y la altitud de la estación, y se actualiza cada hora. Pulsando una zona en el mapa se abre su previsión. Con GIPUZKOA seleccionada aparecen un resumen de todo el territorio y un mapa con cada zona coloreada según la variable elegida (temperatura, humedad, lluvia o viento), cada 3 horas y hasta 7 días.</p>
     </details>
 
-    <details class="met">
-      <summary>Días pasados e informes</summary>
-      <p>Con el selector <b>Día</b> de arriba se puede ver cualquier día desde 2010: las tarjetas, GIPUZKOA y el mapa muestran la situación de ese día. El botón <b>📄 Informes</b> genera el informe (PDF) o los datos (CSV) de un día o de un periodo entre dos fechas, de la tarjeta seleccionada (o de todo el territorio si está seleccionada GIPUZKOA), con mapa, gráficos y tablas.</p>
-      <p><b>🔥 Incendios (EGIF).</b> También se muestra el registro oficial de incendios forestales de Gipuzkoa 2010-2025 (EGIF, MITECO): en el mapa, activando la capa "Incendios 2010-2025 (EGIF)", se ven todos los incendios en su ubicación (🔥). Al elegir un día pasado, las tarjetas muestran el número de incendios de ese día en la zona de influencia de cada estación. En los informes aparecen el número de incendios y su ubicación (municipio, paraje, coordenadas, superficie y causa), en el mapa y en una tabla.</p>
-      <p><b>📊 Descarga de datos (CSV, Excel).</b> Eligiendo "Datos (CSV)" en la ventana de "Informes" se descargan los datos del periodo y la tarjeta elegidos, con una fila por día y estación: datos meteorológicos, FWI y sus componentes, Basugix, viento sur, incendios y marcas de datos rellenados. El fichero usa ';' como separador y coma decimal, para abrirlo directamente en Excel. Descargas completas: <a href="#" class="desc-todo">todos los datos, todas las estaciones, desde 2010 (CSV)</a> · <a href="#" class="desc-sute">registro de incendios, EGIF 2010-2025 (CSV)</a>.</p>
+    <details class="met" id="metComun-es">
+      <summary>Datos y estaciones</summary>
+      <details class="met">
+        <summary>Horario de actualización</summary>
+        <p>El panel se actualiza solo a lo largo de todo el día (hora de verano; en invierno, una hora antes):</p>
+        <div class="tabla-met"><table>
+          <thead><tr><th>Franja</th><th>Frecuencia</th><th>Qué hace</th></tr></thead>
+          <tbody>
+            <tr><td>07:20 – 13:20</td><td>Cada hora</td><td>Recalcula la estimación de hoy con la lluvia real hasta la última lectura, renueva la previsión de los índices a 3 días y actualiza el mapa de lluvia medida.</td></tr>
+            <tr><td>14:10 · 14:40 · 15:10 · 15:40</td><td>Cada 30 minutos</td><td>Descarga el dato del mediodía solar (14:00) cuando Euskalmet lo ha publicado; la de las 15:10 cierra el día (cierre de las 15:00) y envía el correo y los avisos de Telegram; la de las 15:40 es de respaldo.</td></tr>
+            <tr><td>16:20 – 23:20</td><td>Cada hora</td><td>Recalcula la estimación de mañana con la lluvia real caída desde las 14:00 de hoy y actualiza el mapa de lluvia medida.</td></tr>
+            <tr><td>02:20 · 05:20</td><td>Cada 3 horas</td><td>Estimación de hoy (el día ya ha cambiado). La primera tras la medianoche calcula además el resumen del día anterior.</td></tr>
+          </tbody>
+        </table></div>
+        <p><b>Estimación</b> ("calculado"): para la lluvia se toman las horas completas ya medidas por la estación (desde las 14:00 del día anterior) y las que faltan se completan con la previsión; temperatura, humedad y viento son siempre estimados, con la previsión de Open-Meteo. La previsión y los mapas de la pestaña <b>Meteorología</b>, en cambio, los pide el navegador directamente a Open-Meteo, cada hora, a cualquier hora del día.</p>
+      </details>
+
+      <details class="met">
+        <summary>Cuando faltan datos</summary>
+        <ul>
+          <li><b>Lluvia.</b> Si de las 144 lecturas de las 24 horas (una cada 10 minutos) faltan 6 o menos, se usa el dato de la estación. Si faltan más, o falta el día entero, la lluvia se toma de la <b>estación más cercana</b> (si tiene los datos completos; si no, de la siguiente). Si fallan todas (fallo general), del modelo Open-Meteo.</li>
+          <li><b>Temperatura, humedad y viento.</b> Si falta la lectura exacta de las 14:00, se toma de la propia estación la lectura más desfavorable para el riesgo <b>entre las 13:10 y las 14:50</b>: la <b>humedad más baja</b> y la <b>temperatura y el viento más altos</b>. Si en ese intervalo no hay nada, el valor del modelo Open-Meteo en las coordenadas de la estación.</li>
+          <li><b>Si la estación no tiene ningún dato</b> un día (avería, o porque aún no estaba en funcionamiento), ese día no se inventa: queda como hueco.</li>
+          <li><b>Datos erróneos.</b> Las lecturas físicamente imposibles (códigos de error de los sensores, humedad del 0 %, lluvias de 3.000 mm...) se descartan antes de calcular.</li>
+          <li>Todos los datos rellenados quedan <b>marcados</b> en el histórico, indicando qué variable se rellenó y de dónde.</li>
+        </ul>
+      </details>
+
+      <details class="met">
+        <summary>Estaciones y sus particularidades</summary>
+        <div class="tabla-met"><table>
+          <thead><tr><th>Estación</th><th>Código</th><th>Altitud</th><th>Particularidades</th><th>Si falta la lluvia</th></tr></thead>
+          <tbody>
+            <tr><td>Altzola</td><td>C078</td><td>17 m</td><td>No tiene anemómetro: el viento (velocidad y dirección) es el del modelo Open-Meteo en las coordenadas de la estación. La temperatura, la humedad y la lluvia son mediciones reales.</td><td>Arrasate, Bidania</td></tr>
+            <tr><td>Arrasate</td><td>C023</td><td>318 m</td><td>Alto Deba.</td><td>Zegama, Altzola</td></tr>
+            <tr><td>Berastegi</td><td>C026</td><td>379 m</td><td>Sin datos publicados de junio de 2021 a junio de 2022.</td><td>Zizurkil, Bidania</td></tr>
+            <tr><td>Bidania</td><td>C058</td><td>592 m</td><td>La estación más alta.</td><td>Zizurkil, Ordizia</td></tr>
+            <tr><td>Miramon</td><td>C017</td><td>113 m</td><td>Donostia.</td><td>Pasaia, Zizurkil</td></tr>
+            <tr><td>Mutriku</td><td>—</td><td>20 m</td><td>No hay estación física: es una estimación del modelo Open-Meteo para cubrir el hueco de la costa (🖥️ modelo). No hay mediciones locales con las que corregirla o comprobarla.</td><td>—</td></tr>
+            <tr><td>Ordizia</td><td>C043</td><td>243 m</td><td>Goierri. Sin datos publicados de febrero a octubre de 2025.</td><td>Bidania, Zegama</td></tr>
+            <tr><td>Pasaia</td><td>B096</td><td>0 m</td><td>Plataforma marina en la bocana. Faltan a menudo la humedad y la lluvia, y muchas veces están rellenadas (la lluvia, casi siempre desde Miramon).</td><td>Miramon</td></tr>
+            <tr><td>Zarautz</td><td>C064</td><td>80 m</td><td>Combina dos estaciones reales: temperatura, humedad y viento de Zarautz, y lluvia de Inurritza (C086), en el mismo municipio, porque Zarautz no tiene pluviómetro. Sin datos publicados de diciembre de 2021 a julio de 2024.</td><td>Si falla Inurritza: Zizurkil, Bidania</td></tr>
+            <tr><td>Zegama</td><td>C028</td><td>520 m</td><td>Goierri, al pie del Aizkorri.</td><td>Ordizia, Arrasate</td></tr>
+            <tr><td>Zizurkil</td><td>C029</td><td>149 m</td><td>Valle del Oria, Tolosaldea.</td><td>Bidania, Berastegi</td></tr>
+          </tbody>
+        </table></div>
+        <p>Las altitudes y coordenadas son las de las fichas oficiales de las estaciones de Euskalmet.</p>
+        <p>El histórico de cada estación empieza cuando entró en funcionamiento (la mayoría, en 2010). Está calculado con las lecturas cada 10 minutos de Open Data Euskadi y se actualiza a diario con la API de Euskalmet.</p>
+      </details>
+
+      <details class="met">
+        <summary>Zonas de influencia y mapa</summary>
+        <p>Cada punto de Gipuzkoa se asigna a su <b>estación más cercana</b> (polígonos de Thiessen): son las <b>zonas de influencia</b> de cada estación. El mapa muestra el riesgo de dos formas:</p>
+        <ul>
+          <li><b>Superficie continua</b>: interpola los valores de las estaciones, dando más peso en cada punto a las estaciones más cercanas (distancia inversa). Da transiciones suaves.</li>
+          <li><b>Zonas de influencia</b>: cada zona toma entero el valor de su estación.</li>
+        </ul>
+        <p>Con pocas estaciones y un relieve tan variado, el mapa es una <b>orientación general</b>, no un valor medido en cada monte: no recoge las diferencias locales de orientación, altitud o combustible. Las capas de vegetación y de riesgo estructural ayudan a interpretarlo. El mapa, las tarjetas y sus barras muestran siempre el mismo día y los mismos valores.</p>
+      </details>
+
+      <details class="met">
+        <summary>GIPUZKOA: la media del territorio</summary>
+        <p>No es una estación, sino un resumen: la <b>media ponderada de los FWI</b> de las estaciones según la <b>superficie</b> de la zona de influencia de cada una. Solo se promedian los índices: promediar la temperatura, la humedad, la lluvia o el viento no tiene sentido, porque mezcla la costa y el interior. Como el FWI no es lineal, es más correcto promediar el riesgo de cada estación que calcularlo con un tiempo "medio".</p>
+        <p>Las estaciones sin datos ese día, o "en calentamiento", quedan fuera, y la tarjeta indica con qué porcentaje del territorio se ha calculado; si baja del 30 %, no se muestra. La previsión a tres días también es la media ponderada de las previsiones de las estaciones.</p>
+      </details>
+
+      <details class="met">
+        <summary>Días pasados e informes</summary>
+        <p>Con el selector <b>Día</b> de arriba se puede ver cualquier día desde 2010: las tarjetas, GIPUZKOA y el mapa muestran la situación de ese día. El botón <b>📄 Informes</b> genera el informe (PDF) o los datos (CSV) de un día o de un periodo entre dos fechas, de la tarjeta seleccionada (o de todo el territorio si está seleccionada GIPUZKOA), con mapa, gráficos y tablas.</p>
+        <p><b>🔥 Incendios (EGIF).</b> También se muestra el registro oficial de incendios forestales de Gipuzkoa 2010-2025 (EGIF, MITECO): en el mapa, activando la capa "Incendios 2010-2025 (EGIF)", se ven todos los incendios en su ubicación (🔥). Al elegir un día pasado, las tarjetas muestran el número de incendios de ese día en la zona de influencia de cada estación. En los informes aparecen el número de incendios y su ubicación (municipio, paraje, coordenadas, superficie y causa), en el mapa y en una tabla.</p>
+        <p><b>📊 Descarga de datos (CSV, Excel).</b> Eligiendo "Datos (CSV)" en la ventana de "Informes" se descargan los datos del periodo y la tarjeta elegidos, con una fila por día y estación: datos meteorológicos, FWI y sus componentes, Basugix, viento sur, incendios y marcas de datos rellenados. El fichero usa ';' como separador y coma decimal, para abrirlo directamente en Excel. Descargas completas: <a href="#" class="desc-todo">todos los datos, todas las estaciones, desde 2010 (CSV)</a> · <a href="#" class="desc-sute">registro de incendios, EGIF 2010-2025 (CSV)</a>.</p>
+      </details>
+
     </details>
   </section>
 
@@ -994,6 +1010,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     document.querySelectorAll('.modo-fwi').forEach(x => x.hidden = m !== 'fwi');
     document.querySelectorAll('.modo-meteo').forEach(x => x.hidden = m !== 'meteo');
     document.querySelectorAll('.modo-icona').forEach(x => x.hidden = m !== 'icona');
+    document.querySelectorAll('[data-modos]').forEach(x => x.hidden = !x.dataset.modos.split(' ').includes(m));
     document.body.classList.toggle('modo-meteo', m === 'meteo');
     history.replaceState(null, '', m === 'ifg' ? '#basugix' : (m === 'meteo' ? '#eguraldia' : (m === 'icona' ? '#icona' : location.pathname + location.search)));
     if (DATA) aplicarFecha();
