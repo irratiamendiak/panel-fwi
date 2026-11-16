@@ -156,11 +156,12 @@ def enviar_telegram(texto, chat=None, prueba=False):
     tok, chat = os.environ.get("TELEGRAM_TOKEN"), chat or os.environ.get("TELEGRAM_CHAT")
     if prueba or not tok or not chat:
         print(("[prueba] " if prueba else "[Telegram sin configurar] ") + "mensaje:\n" + texto + "\n")
-        return
+        return True if prueba else False
     datos = urllib.parse.urlencode({"chat_id": chat, "text": texto, "parse_mode": "HTML",
                                     "disable_web_page_preview": "true"}).encode()
     with urllib.request.urlopen(f"https://api.telegram.org/bot{tok}/sendMessage", datos, timeout=30) as r:
         r.read()
+    return True
 
 
 def enviar_telegram_documento(nombre, datos, caption, chat=None, prueba=False):
@@ -182,6 +183,7 @@ def enviar_telegram_documento(nombre, datos, caption, chat=None, prueba=False):
                                  {"Content-Type": f"multipart/form-data; boundary={borde}"})
     with urllib.request.urlopen(req, timeout=120) as r:
         r.read()
+    return True
 
 
 def enviar_correo(asunto, cuerpo_html, prueba=False, adjuntos=None):
@@ -196,7 +198,7 @@ def enviar_correo(asunto, cuerpo_html, prueba=False, adjuntos=None):
             Path("prueba_" + nom).write_bytes(datos)
         print(("[prueba] " if prueba else "[correo sin configurar] ") + f"asunto: {asunto} -> prueba_correo.html"
               + "".join(f", prueba_{n}" for n, _ in adjuntos or []))
-        return
+        return True if prueba else False
     m = MIMEMultipart("mixed")
     m["Subject"], m["From"] = asunto, os.environ.get("EMAIL_FROM") or f"Basugix <{usu}>"
     lista = [x.strip() for x in dest.split(",") if x.strip()]
@@ -342,12 +344,11 @@ def correo_diario(d, hoy, prueba, bol):
                   '(gaurko datua eta 3 eguneko iragarpena), DC eta ISI estazioz estazio, eta eguraldia (eguzki-eguerdiko neurketa eta '
                   '3 eguneko iragarpena), metodologiarekin.</p>'
                   '<p style="margin:0;color:#56636b;font-size:13px">Datuak: Euskalmet, Open-Meteo</p></div>')
-        enviar_correo(f"Baso sute arriskua Gipuzkoan · {fecha_eu}" + (f" · {valores}" if valores else ""), cuerpo, prueba,
-                      adjuntos=[(f"Basugix_{hoy}.pdf", pdf)])
-        return
+        return enviar_correo(f"Baso sute arriskua Gipuzkoan · {fecha_eu}" + (f" · {valores}" if valores else ""), cuerpo, prueba,
+                             adjuntos=[(f"Basugix_{hoy}.pdf", pdf)])
     cuerpo = ('<div style="max-width:760px;margin:0 auto;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#14231c">'
               + bloque_correo(d, "eu", hoy) + "</div>")
-    enviar_correo(f"Baso sute arriskua · {hoy}" + (f" · GIPUZKOA {valores}" if valores else ""), cuerpo, prueba)
+    return enviar_correo(f"Baso sute arriskua · {hoy}" + (f" · GIPUZKOA {valores}" if valores else ""), cuerpo, prueba)
 
 
 def telegram_boletin(hoy, prueba, bol, est):
@@ -360,8 +361,7 @@ def telegram_boletin(hoy, prueba, bol, est):
         return False
     pie = (f"🔥 <b>Baso sute arriskua Gipuzkoan</b>\n{bol['fecha_eu']}"
            + (f"\nGIPUZKOA: <b>{bol['valores']}</b>" if bol["valores"] else ""))
-    enviar_telegram_documento(f"Basugix_{hoy}.pdf", bol["pdf"], pie, prueba=prueba)
-    return True
+    return enviar_telegram_documento(f"Basugix_{hoy}.pdf", bol["pdf"], pie, prueba=prueba)
 
 
 # ---------------------------------------------------------------- Telegram: avisos técnicos
@@ -424,14 +424,20 @@ def main():
     if ahora < cierre and not (a.forzar or a.forzar_telegram):
         print("Aún no se ha cerrado el dato del día: no se notifica nada.")
         return 0
+    # No enviar el informe de ayer con la previsión de hoy: esperar a que el resumen
+    # de Gipuzkoa contenga realmente la observación del mediodía solar de hoy.
+    resumen = next((e for e in d.get("estaciones", []) if e.get("resumen")), None)
+    ultimo = resumen.get("dias", [])[-1] if resumen and resumen.get("dias") else None
+    if not ultimo or ultimo.get("fecha") != hoy:
+        print("El dato de hoy aún no está publicado en fwi.json; se reintentará en la próxima ejecución.")
+        return 0
     nuevo_correo = est.get("correo") != hoy or a.forzar
     nuevo_tg = est.get("telegram") != hoy or a.forzar or a.forzar_telegram
     if nuevo_correo or nuevo_tg:
         bol = preparar_boletin(d, hoy)             # el PDF se genera una sola vez para los dos canales
         if nuevo_correo:
             try:
-                correo_diario(d, hoy, a.prueba, bol)
-                if not a.prueba:
+                if correo_diario(d, hoy, a.prueba, bol) and not a.prueba:
                     est["correo"] = hoy
             except Exception as e:
                 print("No se ha podido enviar el correo:", e)
