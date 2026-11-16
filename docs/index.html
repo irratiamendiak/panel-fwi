@@ -2497,7 +2497,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     ctx.clearRect(0, 0, W, H);
     const tr = () => { ctx.beginPath(); g.rings.forEach(r => { r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); }); };
     const est = d.estaciones.map(e => ({e, v: e[vari] ? e[vari][paso] : null,
-      dir: (vari === 'r' ? e.rd : e.d) ? (vari === 'r' ? e.rd : e.d)[paso] : null}));
+      dir: (vari === 'r' && e.rd && e.rd[paso] != null ? e.rd[paso] : e.d && e.d[paso] != null ? e.d[paso] : null)}));
     const gs = 46 * kz, rej = []; tr();
     for (let py = gs / 2; py < H; py += gs) for (let px = gs / 2; px < W; px += gs) if (ctx.isPointInPath(px, py)) rej.push([px, py]);
     ctx.save(); tr(); ctx.clip();
