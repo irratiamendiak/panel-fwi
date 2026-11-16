@@ -2125,10 +2125,32 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     const P = ([x, y]) => [(x-x0)*kx*esc, (y1-y)*esc];
     const cam = g => anill(g).map(a => 'M' + a.map(q => P(q).map(v => v.toFixed(1)).join(',')).join('L') + 'Z').join('');
     let m = `<svg viewBox="-8 -8 ${W+16} ${H+16}" role="img" aria-label="${Tm('Gipuzkoako eguraldi-mapa','Mapa del tiempo de Gipuzkoa')}">`;
-    geo.zonas.features.forEach(f => {
-      const v = valores[f.properties.estacion];
-      m += `<path d="${cam(f.geometry)}" fill="${(c => c ? 'rgb(' + c.map(Math.round).join(',') + ')' : '#c9d0cc')(colorTramo(RAMPAS[METEO.vari], TRAMOS['g' + METEO.vari], v ? v[METEO.vari] : null))}" stroke="#fff" stroke-width="1.2"><title>${f.properties.estacion}</title></path>`;
-    });
+    // Interpolazio jarraitua: estazioen balioak alderantzizko distantziaren arabera.
+    // SVGko sareta txikiak gainazal jarraitua osatzen du; clipPath-ak Gipuzkoako mugara mozten du.
+    const mugak = geo.contorno.features.map(f => cam(f.geometry)).join('');
+    m += `<defs><clipPath id="clipMeteoGip"><path d="${mugak}"/></clipPath></defs><g clip-path="url(#clipMeteoGip)">`;
+    const laginak = geo.zonas.features.map(f => {
+      const pr = f.properties, v = valores[pr.estacion];
+      if (!v || pr.lat == null || v[METEO.vari] == null || !Number.isFinite(v[METEO.vari])) return null;
+      const [px, py] = P([pr.lon, pr.lat]);
+      return {x:px, y:py, value:v[METEO.vari], nombre:pr.estacion};
+    }).filter(Boolean);
+    const paso = 4;
+    for (let yy = 0; yy < H; yy += paso) {
+      for (let xx = 0; xx < W; xx += paso) {
+        let suma = 0, pesos = 0, exacto = null;
+        for (const p of laginak) {
+          const dx = xx + paso/2 - p.x, dy = yy + paso/2 - p.y, d2 = dx*dx + dy*dy;
+          if (d2 < 1) { exacto = p.value; break; }
+          const peso = 1 / d2;
+          suma += p.value * peso; pesos += peso;
+        }
+        const valor = exacto == null ? (pesos ? suma/pesos : null) : exacto;
+        const c = colorTramo(RAMPAS[METEO.vari], TRAMOS['g' + METEO.vari], valor);
+        if (c) m += `<rect x="${xx}" y="${yy}" width="${paso+0.5}" height="${paso+0.5}" fill="rgb(${c.map(Math.round).join(',')})"/>`;
+      }
+    }
+    m += '</g>';
     geo.contorno.features.forEach(f => m += `<path d="${cam(f.geometry)}" fill="none" stroke="#14231c" stroke-width="1.6"/>`);
     geo.zonas.features.forEach(f => {
       const pr = f.properties, v = valores[pr.estacion]; if (!v || pr.lat == null) return;
@@ -2156,8 +2178,8 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <div class="mapa-gip">${m}</div>
       ${leyendaTramos(r, TRAMOS['g' + METEO.vari], V[METEO.vari][1])}
       <div class="esc-extra">➤ ${Tm('haizearen norabidea (gorriz: hegoaldekoa)','dirección del viento (en rojo: del sur)')}</div>`;
-    $('#mtNota').innerHTML = Tm(`Eremu bakoitza bere estazioaren puntuko iragarpenaren kolorez (${V[METEO.vari][0].toLowerCase()}). Sakatu egun bat, ordu-tarte bat edo estazio bat (mapan) xehetasuna ikusteko. Iragarpena: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), eskatua ${fmtOrdua(new Date(METEO.cuando))}etan.`,
-      `Cada zona, con el color de la previsión en el punto de su estación (${V[METEO.vari][0].toLowerCase()}). Pulsa un día, una franja horaria o una estación (en el mapa) para ver el detalle. Previsión: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), consultada a las ${fmtOrdua(new Date(METEO.cuando))}.`);
+    $('#mtNota').innerHTML = Tm(`Gainazal jarraitua, estazioen arteko interpolazioarekin (${V[METEO.vari][0].toLowerCase()}). Sakatu egun bat, ordu-tarte bat edo estazio bat (mapan) xehetasuna ikusteko. Iragarpena: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), eskatua ${fmtOrdua(new Date(METEO.cuando))}etan.`,
+      `Superficie continua interpolada entre las estaciones (${V[METEO.vari][0].toLowerCase()}). Pulsa un día, una franja horaria o una estación (en el mapa) para ver el detalle. Previsión: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), consultada a las ${fmtOrdua(new Date(METEO.cuando))}.`);
   }
 
   // ---- Mapak: hurrengo 72 orduak. Open-Meteo-ren iragarpena ~5 km-ko sareta batean, 3 orduro.
