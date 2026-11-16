@@ -157,7 +157,7 @@ body:not(.modo-meteo) .solo-meteo{display:none !important}
 .mt-gip .esc .bar{width:220px;height:10px;border-radius:5px}
 .mt-graf{overflow-x:auto}.mt-graf svg{display:block;min-width:720px}
 #m72Sec{margin-top:18px}
-#redSec{margin-top:18px}
+#redSec,#vieSec{margin-top:18px}#vieCv{width:100%;height:auto;display:block}
 .esc-tr{position:relative;padding-right:46px;margin-top:8px;max-width:760px}
 .esc-tr .segs{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
 .esc-tr .segs i{flex:1;border-right:1px solid rgba(255,255,255,.7)}.esc-tr .segs i:last-child{border-right:0}
@@ -177,7 +177,7 @@ body:not(.modo-meteo) .solo-meteo{display:none !important}
 .res-tabla .v{display:inline-block;min-width:36px;padding:2px 6px;border-radius:999px;font-weight:700}
 .res-tabla .tipo{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}.red-wrap{max-width:820px}#redCv{width:100%;height:auto;display:block}
 .m72-ctl{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
-.m72-ctl button,#m72Play{font:inherit;font-size:13.5px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.m72-ctl button,#m72Play,#viePlay{font:inherit;font-size:13.5px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 .m72-ctl button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .m72-tiempo{display:flex;align-items:center;gap:10px;margin:2px 0 8px}.m72-tiempo input{flex:1}.m72-tiempo b{min-width:210px}
 .m72-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
@@ -437,6 +437,20 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     </div>
   </section>
 
+  <section id="vieSec" class="solo-meteo" data-lang="auto" aria-label="Haize neurtua / Viento medido">
+    <h2 id="vieTit">💨 Haize neurtua</h2>
+    <div class="card">
+      <div class="m72-tiempo" id="vieTiempo">
+        <button type="button" id="viePlay" title="▶">▶</button>
+        <b id="vieLab">…</b>
+        <input type="range" id="vieSl" min="0" max="12" value="0" step="1">
+      </div>
+      <div class="red-wrap"><canvas id="vieCv" width="1520" height="1040"></canvas></div>
+      <div class="m72-esc" id="vieEsc"></div>
+      <p class="nota" id="vieNota"></p>
+    </div>
+  </section>
+
   <section id="m72Sec" class="solo-meteo" data-lang="auto" aria-label="Mapak 72 h / Mapas 72 h">
     <h2 id="m72Tit">🗺️ Mapak: hurrengo 72 orduak</h2>
     <div class="card">
@@ -597,6 +611,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p><b>Eguzki-eguerdiko neurketak</b>: indizeak kalkulatzeko erabiltzen diren datuak (13:00 neguan, 14:00 udan): tenperatura, hezetasuna, haizea eta haren norabidea, eta aurreko 24 orduetako euria, euririk gabeko egunekin eta hego haizearekin.</p>
       <p><b>Eguneko laburpena</b>: egun naturalaren itxiera (00:00-24:00), estazio bakoitzeko: batez besteko tenperatura (eta maximoa eta minimoa), batez besteko hezetasuna eta haizea, batez besteko norabidea (bektorialki kalkulatua, abiaduraren arabera haztatuta) eta egun osoko euria. 10 minuturo irakurketekin kalkulatzen da, hurrengo goizean, eta gorde egiten da; "Txostenak" leihoko CSV deskargan ere badago. Mutrikun ez dago estaziorik eta Altzolak ez du haize-neurgailurik: Mutrikuko laburpen osoa eta Altzolako haizea Open-Meteo ereduaren orduroko datuekin kalkulatzen dira, puntu horien koordenatuetan (🖥️ eredua).</p>
       <p><b>Euri neurtua</b>: Euskalmeten 32 euri-neurgailuen datuak Gipuzkoan (gehi Eskas, mugan), 10 minuturo irakurketekin: azken 60 minutuak, gaur 00:00etatik azken irakurketara arte eta atzo osoa, estazioen artean interpolatutako mapa batean. Kalitate-kontrol bat dago: estazio batek ia ezer ez badu inguruan argi euria egin duenean, baztertu eta "?" ikurrarekin markatzen da. Prozesua exekutatzen den bakoitzean eguneratzen da.</p>
+      <p><b>Haize neurtua</b>: Euskalmeten haize-neurgailuen azken orduetako irakurketak (10 minuturo), denboran animatuta: koloreak abiadura erakusten du eta geziek norabidea (haizea nora doan; gorriz, hego haizea). Gezi handiak estazioetako neurketak dira; txikiak, estazioen arteko interpolazioa. ▶ botoiarekin edo irristagailuarekin kontrolatzen da.</p>
       <p><b>Mapak: hurrengo 72 orduak</b>: euria (3 orduko metatua), hurrengo 72 orduetako euri metatua, hezetasuna, tenperatura, haizea (norabidearekin) eta boladak, Gipuzkoa osorako mapa jarraituetan, 3 orduro. Open-Meteo-ren iragarpena da, ~5 km-ko sareta batean.</p>
       <p><b>Eguraldi-iragarpena</b>: GIPUZKOA osorako mapa (3 orduro) eta estazio bakoitzeko iragarpen zehatza, Open-Meteo-ren eskutik.</p>
     </details>
@@ -796,6 +811,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p><b>Mediciones del mediodía solar</b>: los datos con los que se calculan los índices (13:00 en invierno, 14:00 en verano): temperatura, humedad, viento y su dirección, y lluvia de las 24 horas anteriores, junto con los días sin lluvia y con viento sur.</p>
       <p><b>Resumen del día</b>: el cierre del día natural (00:00-24:00) de cada estación: temperatura media (y máxima y mínima), humedad y viento medios, dirección media (calculada vectorialmente, ponderada por la velocidad) y lluvia del día completo. Se calcula con las lecturas cada 10 minutos a la mañana siguiente y queda guardado; también se incluye en la descarga CSV de la ventana "Informes". En Mutriku no hay estación y Altzola no tiene anemómetro: el resumen completo de Mutriku y el viento de Altzola se calculan con los datos horarios del modelo Open-Meteo en sus coordenadas (🖥️ modelo).</p>
       <p><b>Lluvia medida</b>: los 32 pluviómetros de Euskalmet en Gipuzkoa (más Eskas, en la muga), con lecturas cada 10 minutos: últimos 60 minutos, hoy desde las 00:00 hasta la última lectura y ayer completo, en un mapa interpolado entre estaciones. Hay un control de calidad: si una estación marca casi nada cuando alrededor ha llovido claramente, se descarta y se marca con "?". Se actualiza en cada ejecución del proceso.</p>
+      <p><b>Viento medido</b>: lecturas de los anemómetros de Euskalmet de las últimas horas (cada 10 minutos), animadas en el tiempo: el color muestra la velocidad y las flechas la dirección (hacia dónde sopla; en rojo, viento sur). Las flechas grandes son mediciones de las estaciones; las pequeñas, la interpolación entre ellas. Se controla con el botón ▶ o con el deslizador.</p>
       <p><b>Mapas: próximas 72 horas</b>: lluvia (acumulada en 3 horas), lluvia acumulada en las próximas 72 horas, humedad, temperatura, viento (con su dirección) y rachas, en mapas continuos de toda Gipuzkoa, cada 3 horas. Es la previsión de Open-Meteo en una malla de ~5 km.</p>
       <p><b>Previsión meteorológica</b>: el mapa de toda GIPUZKOA (cada 3 horas) y la previsión detallada de cada estación, de Open-Meteo.</p>
     </details>
@@ -2413,8 +2429,149 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     setInterval(() => redCargar().then(redRender), 5 * 60e3);
   }
 
+  // ---- Haize neurtua: Euskalmeten haize-neurgailuen azken orduak (data/viento_red.json), 10 minuturo, denboran animatuta
+  const VIE = {datos: null, paso: 0, play: false, t: null, cache: {}, visible: true};
+  function vieCargar(){
+    return fetch('data/viento_red.json', {cache: 'no-store'}).then(r => r.ok ? r.json() : null).then(j => {
+      VIE.datos = j; VIE.cache = {};
+      if (j && j.pasos && VIE.paso >= j.pasos.length) VIE.paso = 0;
+    }).catch(() => {});
+  }
+  function vieGeom(cv){
+    const geo = METEO.geo; if (!geo) return null;
+    const rings = geo.contorno.features.flatMap(f => m72Anillos(f.geometry));
+    let x0 = 99, x1 = -99, y0 = 99, y1 = -99;
+    rings.flat().forEach(([x, y]) => { x0 = Math.min(x0,x); x1 = Math.max(x1,x); y0 = Math.min(y0,y); y1 = Math.max(y1,y); });
+    const W = cv.width, H = cv.height, kz = W / 760, pad = 10 * kz, kx = Math.cos((y0 + y1) / 2 * Math.PI / 180);
+    const esc = Math.min((W - 2*pad) / ((x1 - x0) * kx), (H - 2*pad) / (y1 - y0));
+    return {geo, rings, W, H, kz, kx,
+      P: ([x, y]) => [pad + (x - x0) * kx * esc, pad + (y1 - y) * esc],
+      inv: (px, py) => [x0 + (px - pad) / (kx * esc), y1 - (py - pad) / esc]};
+  }
+  // Abiaduraren gainazal jarraitua (1/d⁴ interpolazioa), bereizmen txikian eta fotograma bakoitzeko cachean
+  function vieCampo(g, d, paso){
+    if (VIE.cache[paso]) return VIE.cache[paso];
+    const ok = d.estaciones.filter(e => e.v && e.v[paso] != null);
+    if (ok.length < 3) return null;
+    const S = 4, w = Math.ceil(g.W / S), h = Math.ceil(g.H / S), tmp = document.createElement('canvas');
+    tmp.width = w; tmp.height = h;
+    const c2 = tmp.getContext('2d'), img = c2.createImageData(w, h), ramp = M72_RAMP.W, tt = TRAMOS.W;
+    for (let py = 0; py < h; py++) for (let px = 0; px < w; px++){
+      const [x, y] = g.inv(px * S + S / 2, py * S + S / 2); let sw = 0, sv = 0, ex = null;
+      for (const e of ok){ const dx = (x - e.lon) * g.kx, dy = y - e.lat, dd = dx*dx + dy*dy; if (dd < 1e-10){ ex = e.v[paso]; break; } const q = 1 / (dd * dd); sw += q; sv += q * e.v[paso]; }
+      const col = rampaRGB(ramp, tramoMedio(tt, ex != null ? ex : sv / sw)), i = (py * w + px) * 4;
+      img.data[i] = col[0]; img.data[i+1] = col[1]; img.data[i+2] = col[2]; img.data[i+3] = 240;
+    }
+    c2.putImageData(img, 0, 0);
+    return (VIE.cache[paso] = tmp);
+  }
+  // Gezia: tuparen mutura gorantz; "grados" = joaten den norabidea (iparretik erlojuaren norantzan)
+  function vieFlecha(ctx, a, b, grados, s, relleno, borde, lw){
+    ctx.save(); ctx.translate(a, b); ctx.rotate(grados * Math.PI / 180);
+    ctx.fillStyle = relleno; ctx.strokeStyle = borde; ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(s*.45, s*.5); ctx.lineTo(0, s*.15); ctx.lineTo(-s*.45, s*.5); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+  }
+  function vieDibujar(){
+    const cv = $('#vieCv'), d = VIE.datos; if (!d || !d.pasos || !METEO.geo) return;
+    const g = vieGeom(cv), paso = VIE.paso, W = g.W, H = g.H, kz = g.kz, kx = g.kx, P = g.P, ctx = cv.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+    const tr = () => { ctx.beginPath(); g.rings.forEach(r => { r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); }); };
+    const est = d.estaciones.map(e => ({e, v: e.v ? e.v[paso] : null, dir: e.d ? e.d[paso] : null}));
+    // interpolazio-gezien sareta (Gipuzkoaren barruan soilik)
+    const gs = 46 * kz, rej = []; tr();
+    for (let py = gs / 2; py < H; py += gs) for (let px = gs / 2; px < W; px += gs) if (ctx.isPointInPath(px, py)) rej.push([px, py]);
+    ctx.save(); tr(); ctx.clip();
+    const campo = vieCampo(g, d, paso);
+    if (campo){ ctx.imageSmoothingEnabled = true; ctx.drawImage(campo, 0, 0, W, H); }
+    ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = kz;
+    g.geo.zonas.features.forEach(z => m72Anillos(z.geometry).forEach(r => { ctx.beginPath(); r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.stroke(); }));
+    ctx.restore();
+    ctx.strokeStyle = '#14231c'; ctx.lineWidth = 1.6 * kz; tr(); ctx.stroke();
+    // gezi txikiak: haize-bektorearen interpolazioa (ez dira neurketak)
+    const vec = est.filter(o => o.v != null && o.dir != null && o.v >= 1).map(o => { const r = o.dir * Math.PI / 180; return {lon: o.e.lon, lat: o.e.lat, ux: -o.v * Math.sin(r), uy: -o.v * Math.cos(r)}; });
+    if (vec.length >= 3) rej.forEach(([px, py]) => {
+      const [x, y] = g.inv(px, py); let sw = 0, sx = 0, sy = 0;
+      for (const q of vec){ const dx = (x - q.lon) * kx, dy = y - q.lat, dd = dx*dx + dy*dy + 1e-10, w = 1 / (dd * dd); sw += w; sx += w * q.ux; sy += w * q.uy; }
+      const ux = sx / sw, uy = sy / sw, vel = Math.hypot(ux, uy); if (vel < 1) return;
+      vieFlecha(ctx, px, py, Math.atan2(ux, uy) * 180 / Math.PI, (7 + Math.min(vel, 50) / 6) * kz, 'rgba(20,35,28,.6)', 'rgba(255,255,255,.7)', .8 * kz);
+    });
+    // estazioak: gezi handia (gorriz hego haizea), balioa eta izena
+    ctx.textAlign = 'center';
+    const ocup = [], nombres = [], solapa = (r, q) => r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y;
+    est.forEach(o => {
+      const [a, b] = P([o.e.lon, o.e.lat]); let s = 6 * kz;
+      if (o.v == null){ ctx.beginPath(); ctx.arc(a, b, 3 * kz, 0, 7); ctx.strokeStyle = '#8a969c'; ctx.lineWidth = 1.5 * kz; ctx.stroke(); }
+      else if (o.dir == null || o.v < 1){ ctx.beginPath(); ctx.arc(a, b, 3.2 * kz, 0, 7); ctx.fillStyle = '#14231c'; ctx.fill(); }
+      else {
+        s = (8 + Math.min(o.v, 60) / 5) * kz;
+        const sur = ['SE','S','SO'].includes(sector8(o.dir)) && o.v >= 3;
+        vieFlecha(ctx, a, b, o.dir + 180, s, sur ? '#d9382b' : '#14231c', '#fff', kz);
+      }
+      const t = o.v == null ? '—' : fmt(o.v, 0), malo = o.v == null;
+      ctx.font = 'bold ' + (11 * kz) + 'px system-ui, sans-serif'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 3 * kz;
+      ctx.strokeText(t, a, b - s - 3 * kz); ctx.fillStyle = malo ? '#8a969c' : '#14231c'; ctx.fillText(t, a, b - s - 3 * kz);
+      const tw = ctx.measureText(t).width;
+      ocup.push({x: a - tw / 2 - 2 * kz, y: b - s - 13 * kz, w: tw + 4 * kz, h: 13 * kz}, {x: a - s * .5, y: b - s, w: s, h: 1.5 * s});
+      nombres.push({a, b, s, izena: o.e.nombre || o.e.cod || ''});
+    });
+    // estazio-izenak: balioekin eta elkarrekin talka egiten ez dutenak soilik (estazio asko daudenean)
+    ctx.font = (9 * kz) + 'px system-ui, sans-serif'; ctx.lineWidth = 3.2 * kz; ctx.strokeStyle = 'rgba(255,255,255,.98)';
+    nombres.forEach(({a, b, s, izena}) => {
+      if (!izena) return;
+      const w = ctx.measureText(izena).width, h = 10 * kz;
+      for (const [dx, dy] of [[0, s * .5 + 10 * kz], [w / 2 + s * .5 + 4 * kz, 3 * kz], [-(w / 2 + s * .5 + 4 * kz), 3 * kz], [0, -(s + 18 * kz)]]){
+        const x = a + dx, y = b + dy, r = {x: x - w / 2 - 2 * kz, y: y - h, w: w + 4 * kz, h: h + 2 * kz};
+        if (r.x < 2 * kz || r.x + r.w > W - 2 * kz || r.y < 2 * kz || r.y + r.h > H - 2 * kz || ocup.some(q => solapa(r, q))) continue;
+        ocup.push(r); ctx.strokeText(izena, x, y); ctx.fillStyle = '#263238'; ctx.fillText(izena, x, y); break;
+      }
+    });
+  }
+  function vieRender(){
+    const d = VIE.datos, sl = $('#vieSl'), pb = $('#viePlay');
+    $('#vieTit').textContent = Tm('💨 Haize neurtua', '💨 Viento medido');
+    pb.textContent = VIE.play ? '⏸' : '▶';
+    if (!d || !d.pasos || !d.pasos.length || !d.estaciones){
+      $('#vieLab').textContent = Tm('Oraindik ez dago daturik (prozesuaren hurrengo exekuzioan sortuko da).', 'Todavía no hay datos (se generarán en la próxima ejecución del proceso).');
+      sl.hidden = true; pb.hidden = true; return;
+    }
+    sl.hidden = false; pb.hidden = false;
+    const n = d.pasos.length, tramo = d.paso_min || 10, paso = Math.max(0, Math.min(n - 1, VIE.paso)), min = tramo * (n - 1 - paso);
+    VIE.paso = paso; sl.max = n - 1; sl.value = paso;
+    const dia = d.fecha && d.pasos[0] <= d.pasos[n - 1] ? fmtFechaLuzea(fecha(d.fecha)) + ' · ' : '';
+    $('#vieLab').textContent = dia + d.pasos[paso] + ' · ' + (min ? '−' + min + ' min' : Tm('azken irakurketa', 'última lectura'));
+    vieDibujar();
+    const hay = d.estaciones.filter(e => e.v && e.v.some(x => x != null)).length, horas = Math.round((n - 1) * tramo / 60);
+    $('#vieEsc').innerHTML = leyendaTramos(M72_RAMP.W, TRAMOS.W, 'km/h')
+      + `<div class="esc-extra">➤ ${Tm('norabidea (haizea nora doan); gorriz: hegoaldekoa', 'dirección (hacia dónde sopla); en rojo: del sur')} · ${Tm('gezi handiak: estazioak; txikiak: interpolazioa', 'flechas grandes: estaciones; pequeñas: interpolación')}</div>`;
+    $('#vieNota').innerHTML = Tm(`Euskalmeteko ${hay} haize-neurgailuren ${tramo} minuturo irakurketak, azken ${horas} orduetakoak (ordu ofiziala). Koloreak abiadura erakusten du, estazioen arteko balioak interpolatuta; gezi handiak neurketak dira, eta txikiak estazioen arteko interpolazioa. Haize-neurgailurik gabeko estazioak ez dira agertzen; irakurketarik ez duen estazioa zirkulu hutsez markatzen da.`,
+      `Lecturas cada ${tramo} minutos de ${hay} anemómetros de Euskalmet, de las últimas ${horas} horas (hora oficial). El color muestra la velocidad, con los valores entre estaciones interpolados; las flechas grandes son mediciones y las pequeñas, la interpolación entre estaciones. Las estaciones sin anemómetro no aparecen; la que no tiene lectura se marca con un círculo vacío.`);
+  }
+  function vieTick(){
+    clearTimeout(VIE.t);
+    if (!VIE.play) return;
+    const n = VIE.datos && VIE.datos.pasos ? VIE.datos.pasos.length : 0;
+    if (n > 1 && VIE.visible && MODO === 'meteo' && !document.hidden){ VIE.paso = (VIE.paso + 1) % n; vieRender(); }
+    VIE.t = setTimeout(vieTick, VIE.paso === n - 1 ? 1800 : 650);
+  }
+  function viePlay(on){ VIE.play = on; vieRender(); if (on) vieTick(); else clearTimeout(VIE.t); }
+  function vieIniciar(){
+    $('#viePlay').addEventListener('click', () => viePlay(!VIE.play));
+    $('#vieSl').addEventListener('input', e => { VIE.play = false; clearTimeout(VIE.t); VIE.paso = +e.target.value; vieRender(); });
+    if ('IntersectionObserver' in window) new IntersectionObserver(es => { VIE.visible = es.some(x => x.isIntersecting); }, {threshold: 0.1}).observe($('#vieSec'));
+    vieRender();
+    Promise.all([cargarGeo().then(g => { METEO.geo = METEO.geo || g; }), vieCargar()]).then(() => {
+      const n = VIE.datos && VIE.datos.pasos ? VIE.datos.pasos.length : 0;
+      const quieto = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      VIE.paso = quieto ? Math.max(0, n - 1) : 0;
+      vieRender();
+      if (n > 1 && !quieto) viePlay(true);
+    });
+    setInterval(() => vieCargar().then(vieRender), 5 * 60e3);
+  }
+
   function meteoIniciar(){
     redIniciar();
+    vieIniciar();
     m72Iniciar();
     $('#meteoObs').addEventListener('click', ev => {
       const b = ev.target.closest('[data-mt]'); if (!b) return;
