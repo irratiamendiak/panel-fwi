@@ -5,18 +5,13 @@ on:
     # Todas las horas son UTC. El dato del FWI es el del mediodía solar, que son siempre las 12:00 UTC
     # (13:00 en invierno, 14:00 en verano). El día se cierra una hora después (14:00 en invierno,
     # 15:00 en verano). GitHub retrasa o se salta a veces los crons, y más a las horas en punto, así que
-    # hay varios lanzamientos de envío: notificar.py solo envía si el dato está cerrado y si hoy no se
-    # ha enviado ya, de modo que los de respaldo no duplican nada.
+    # Los envíos de correo y Telegram se gestionan en notificar.yml, de forma independiente,
+    # para que los retrasos de esta actualización no bloqueen el boletín.
     - cron: "17 6 * * *"     # previsión de primera hora (08:17 en verano, 07:17 en invierno)
     - cron: "7 13 * * *"     # envío diario: 14:07 en invierno, 15:07 en verano (hora peninsular)
     - cron: "37 13 * * *"    # respaldo
     - cron: "7 14 * * *"     # respaldo
-  workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
-    inputs:
-      notificar:
-        description: "Enviar también correo y Telegram (aunque ya se hayan enviado hoy)"
-        type: boolean
-        default: false
+  workflow_dispatch:   # permite recalcular los datos manualmente
 
 permissions:
   contents: write      # para guardar los datos nuevos en el repositorio
