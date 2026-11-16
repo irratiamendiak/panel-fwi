@@ -172,7 +172,7 @@ def enviar_telegram_documento(nombre, datos, caption, chat=None, prueba=False):
         if prueba:
             Path("prueba_telegram_" + nombre).write_bytes(datos)
         print(("[prueba] " if prueba else "[Telegram sin configurar] ") + f"documento: {nombre} ({len(datos)} bytes)\n{caption}\n")
-        return
+        return True if prueba else False
     borde = "----fwi" + uuid.uuid4().hex
     cuerpo = b""
     for k, v in (("chat_id", chat), ("caption", caption[:1024]), ("parse_mode", "HTML")):
@@ -219,6 +219,7 @@ def enviar_correo(asunto, cuerpo_html, prueba=False, adjuntos=None):
             s.starttls(context=ssl.create_default_context())
             s.login(usu, pw)
             s.sendmail(usu, lista, m.as_string())
+    return True
 
 
 # ---------------------------------------------------------------- correo: informe del día y previsión
