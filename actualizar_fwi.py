@@ -1252,13 +1252,10 @@ def _sensor_viento(alm, sensores_viento, cod, dia):
     if not v:
         sensores_viento[cod] = {}
         return None
-    # Euskalmet publica la racha máxima como una medida independiente del viento medio.
-    # El nombre concreto puede variar según la configuración del sensor; se detecta por "gust".
+    # Variable de Euskalmet: velocidad máxima del viento (máxima diezminutaria).
+    # No confundirla con mean_speed ni con una racha de otro periodo.
     k_racha = next((k for k in claves if "/measuresForWind/" in k and
-                    any(x in k.lower() for x in ("gust", "racha"))), None)
-    if not k_racha:  # algunas configuraciones nombran la racha como velocidad máxima
-        k_racha = next((k for k in claves if "/measuresForWind/" in k and
-                        "max" in k.lower() and "speed" in k.lower()), None)
+                    "max" in k.lower() and "speed" in k.lower()), None)
     racha = None
     if k_racha:
         s_, t_, m_ = k_racha.split("/")
@@ -1280,7 +1277,7 @@ def _sensor_viento(alm, sensores_viento, cod, dia):
 
 
 def _viento_hora(alm, cod, sens, hora_utc):
-    """Velocidad media y racha máxima (km/h), más sus direcciones, en seis tramos de 10 minutos."""
+    """Velocidad media y velocidad máxima diezminutaria (km/h) en seis tramos horarios."""
     dv = alm.hora(cod, "viento", sens, hora_utc.date(), hora_utc.hour)
     try:
         dd = alm.hora(cod, "direccion", sens, hora_utc.date(), hora_utc.hour)
