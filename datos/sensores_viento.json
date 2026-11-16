@@ -1,0 +1,155 @@
+{
+ "B096": {
+  "viento": {
+   "sensor": "VV06",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "DV06",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C017": {
+  "viento": {
+   "sensor": "Y008",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y008",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C023": {
+  "viento": {
+   "sensor": "Y024",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y024",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C026": {
+  "viento": {
+   "sensor": "Y0DB",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y0DB",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C028": {
+  "viento": {
+   "sensor": "Y0R8",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y0R8",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C029": {
+  "viento": {
+   "sensor": "Y0AP",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y0AP",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C043": {
+  "viento": {
+   "sensor": "Y0AQ",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y0AQ",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C052": {},
+ "C058": {
+  "viento": {
+   "sensor": "Y0BE",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y0BE",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C077": {},
+ "C078": {},
+ "C080": {},
+ "C084": {},
+ "C086": {},
+ "C0D0": {},
+ "C0D1": {},
+ "C0D2": {},
+ "C0D3": {},
+ "C0DB": {},
+ "C0DC": {},
+ "C0DD": {},
+ "C0E1": {},
+ "C0E5": {},
+ "C0E7": {},
+ "C0E8": {},
+ "C0E9": {},
+ "C0EA": {},
+ "C0EC": {
+  "viento": {
+   "sensor": "Y0BD",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y0BD",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C0F0": {
+  "viento": {
+   "sensor": "Y0R4",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y0R4",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ },
+ "C0F1": {},
+ "C0F4": {},
+ "C064": {
+  "viento": {
+   "sensor": "Y0AQ",
+   "tipo": "measuresForWind",
+   "medida": "mean_speed"
+  },
+  "direccion": {
+   "sensor": "Y0AQ",
+   "tipo": "measuresForWind",
+   "medida": "mean_direction"
+  }
+ }
+}
