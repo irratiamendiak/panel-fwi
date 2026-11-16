@@ -30,7 +30,7 @@ import os
 import sys
 import time
 from bisect import bisect_left, bisect_right
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -1219,6 +1219,134 @@ def actualizar_red_lluvia(alm, ahora, limite=None):
     print(f"Red de pluviómetros: {llamadas} horas descargadas; hoy hasta las {hasta}.")
 
 
+# ---------------------------------------------------------------- red de anemómetros (viento medido)
+# Mapa "Haize neurtua" de la web: velocidad y dirección del viento cada 10 minutos de las últimas horas.
+# Se prueban todas las estaciones de la red de lluvia más Zarautz (C064, cuya lluvia viene de Inurritza):
+# las que no tienen anemómetro (p. ej. Altzola) se descartan una vez y se recuerda en VIENTO_SENSORES.
+RED_VIENTO = RED_LLUVIA + [('C064', 'Zarautz', 43.293, -2.14542)]
+VIENTO_ESTADO = Path("datos/viento_red.json")      # lecturas de 10 minutos por hora UTC (solo se guardan unas horas)
+VIENTO_WEB = Path("docs/data/viento_red.json")      # lo que lee el mapa de la web
+VIENTO_SENSORES = Path("datos/sensores_viento.json")
+VIENTO_HORAS = 3                                    # ventana del mapa, en horas (19 pasos de 10 minutos)
+VIENTO_MAX_KMH = 200.0                              # por encima de esto la lectura es un error del sensor
+
+
+def _sensor_viento(alm, sensores_viento, cod, dia):
+    """{'viento': sensor, 'direccion': sensor} de la estación, o None si no tiene anemómetro (o no se sabe aún)."""
+    if cod in sensores_viento:
+        return sensores_viento[cod] or None            # {} = ya sabemos que no tiene anemómetro
+    r = alm.cli.get(f"/euskalmet/readings/aggregated/summarized/byDay/forStation/{cod}/at/{dia:%Y}/{dia:%m}/{dia:%d}")
+    if r.status_code != 200:
+        return None
+    claves = [it.get("key") or "" for it in r.json().get("items", [])]
+    if not claves:
+        return None                                    # catálogo vacío: no se concluye nada, se reintenta otro día
+
+    def buscar(sufijo):
+        for k in claves:
+            if k.endswith("/" + sufijo):
+                s_, t_, m_ = k.split("/")
+                return {"sensor": s_, "tipo": t_, "medida": m_}
+        return None
+    v = buscar(ew.MEDIDAS["viento"])
+    if not v:
+        sensores_viento[cod] = {}
+        return None
+    # la dirección no suele aparecer en el catálogo: se prueba con la veleta del mismo sensor
+    d = buscar(ew.MEDIDAS_OPCIONALES["direccion"]) or dict(v, medida="mean_direction")
+    sensores_viento[cod] = {"viento": v, "direccion": d}
+    return sensores_viento[cod]
+
+
+def _viento_hora(alm, cod, sens, hora_utc):
+    """([km/h], [grados]) de los seis tramos de 10 minutos de la hora UTC dada (None donde no hay lectura)."""
+    dv = alm.hora(cod, "viento", sens, hora_utc.date(), hora_utc.hour)
+    try:
+        dd = alm.hora(cod, "direccion", sens, hora_utc.date(), hora_utc.hour)
+    except RuntimeError:
+        dd = {}                                        # sin dirección se sigue mostrando la velocidad
+    vel, dirs = [], []
+    for m in range(0, 60, 10):
+        x, y = dv.get((hora_utc.hour, m)), dd.get((hora_utc.hour, m))
+        x = None if x is None else float(x) * ew.VIENTO_FACTOR
+        vel.append(round(x, 1) if x is not None and 0 <= x <= VIENTO_MAX_KMH else None)
+        y = None if y is None else float(y)
+        dirs.append(int(round(y)) % 360 if y is not None and 0 <= y <= 360 else None)
+    return vel, dirs
+
+
+def actualizar_red_viento(alm, ahora, limite=None):
+    """Descarga las lecturas de 10 minutos de viento (velocidad y dirección) de los anemómetros de la red y
+    publica las últimas VIENTO_HORAS horas. Se guardan las lecturas por hora UTC (como Euskalmet las sirve); una
+    hora incompleta se vuelve a pedir en las ejecuciones siguientes (durante 4 horas)."""
+    ahora_utc = ahora.astimezone(timezone.utc)
+    tope = ahora_utc - timedelta(minutes=10)                       # igual que la lluvia: margen de 10 min
+    ultimo = ahora_utc - timedelta(minutes=20)                     # último tramo de 10 min ya publicado
+    ultimo = ultimo.replace(minute=ultimo.minute // 10 * 10, second=0, microsecond=0)
+    n = VIENTO_HORAS * 6 + 1
+    tramos = [ultimo - timedelta(minutes=10 * k) for k in range(n - 1, -1, -1)]
+    horas = sorted({t.replace(minute=0) for t in tramos})
+    clave_h = lambda h: h.strftime("%Y-%m-%dT%H")
+    try:
+        est = json.loads(VIENTO_ESTADO.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        est = {}
+    guardado = {k: v for k, v in est.get("horas", {}).items() if k >= clave_h(horas[0])}
+    try:
+        sensores_viento = json.loads(VIENTO_SENSORES.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        sensores_viento = {}
+    ayer = ahora.date() - timedelta(days=1)
+    llamadas = 0
+    for cod, nombre, _, _ in RED_VIENTO:
+        if limite and time.monotonic() > limite:
+            break
+        pendientes = []
+        for h in horas:
+            prev = guardado.get(clave_h(h), {}).get(cod)
+            completa = prev is not None and all(x is not None for x in prev["v"] + prev["d"])
+            vieja = h + timedelta(hours=4) < tope                   # tras 4 h se acepta lo que haya
+            if not (completa or (prev is not None and vieja)):
+                pendientes.append(h)
+        if not pendientes:
+            continue
+        try:
+            sens = _sensor_viento(alm, sensores_viento, cod, ayer)
+        except RuntimeError:
+            continue
+        if not sens:
+            continue
+        for h in pendientes:
+            try:
+                v, d = _viento_hora(alm, cod, sens, h); llamadas += 2
+            except RuntimeError:
+                break
+            guardado.setdefault(clave_h(h), {})[cod] = {"v": v, "d": d}
+    VIENTO_ESTADO.parent.mkdir(parents=True, exist_ok=True)
+    VIENTO_ESTADO.write_text(json.dumps({"horas": guardado}, separators=(",", ":")), encoding="utf-8")
+    VIENTO_SENSORES.write_text(json.dumps(sensores_viento, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    filas = []
+    for cod, nombre, la, lo in RED_VIENTO:
+        if not sensores_viento.get(cod):
+            continue
+        v, d = [], []
+        for t in tramos:
+            reg = guardado.get(clave_h(t.replace(minute=0)), {}).get(cod)
+            i = t.minute // 10
+            v.append(reg["v"][i] if reg else None)
+            d.append(reg["d"][i] if reg else None)
+        filas.append({"cod": cod, "nombre": nombre, "lat": la, "lon": lo, "v": v, "d": d})
+    loc = [t.astimezone(ew.ZONA) for t in tramos]
+    VIENTO_WEB.parent.mkdir(parents=True, exist_ok=True)
+    VIENTO_WEB.write_text(json.dumps({"actualizado": ahora.isoformat(timespec="minutes"), "fecha": loc[-1].date().isoformat(),
+                                      "hasta": loc[-1].strftime("%H:%M"), "paso_min": 10,
+                                      "pasos": [t.strftime("%H:%M") for t in loc], "estaciones": filas},
+                                     ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    con = sum(1 for f in filas if any(x is not None for x in f["v"]))
+    print(f"Red de anemómetros: {llamadas} llamadas; {con} de {len(filas)} estaciones con datos; último tramo {loc[-1]:%H:%M}.")
+
+
 def escribir(datos, inicial, hora, ahora, dias_json, previsor=None):
     orden = list(ew.ESTACIONES) + list(NOMBRES_EXTRA) + list(MODELO_ESTACIONES)
     filas_csv = []
@@ -1404,6 +1532,11 @@ def main() -> int:
         actualizar_red_lluvia(alm, ahora, limite)
     except Exception as e:
         print("No se ha podido actualizar la red de pluviómetros:", type(e).__name__, e)
+    # viento medido en la red de anemómetros (mapa "Haize neurtua" de la web); si falla, no impide nada más
+    try:
+        actualizar_red_viento(alm, ahora, limite)
+    except Exception as e:
+        print("No se ha podido actualizar la red de anemómetros:", type(e).__name__, e)
     previsor = None if a.sin_prevision else crear_previsor(alm, sensores, hora)
     escribir(datos, (a.ffmc, a.dmc, a.dc), hora, ahora, a.dias_json, previsor)
     print(f"\nListo: {nuevas} filas nuevas, {cli.llamadas} llamadas a la API. "
