@@ -68,23 +68,6 @@ jobs:
           echo "No se han podido guardar los datos tras 4 intentos."
           exit 1
 
-      - name: Notificaciones (correo y Telegram)
-        # En las ejecuciones programadas, notificar.py decide solo: no envía antes del cierre del dato
-        # ni repite lo ya enviado hoy. En las manuales solo se envía si se marca la casilla (--forzar).
-        # Sin continue-on-error: si falla, se ejecuta el aviso técnico del final.
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.notificar)
-        env:
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
-          TELEGRAM_CHAT_TEC: ${{ secrets.TELEGRAM_CHAT_TEC }}
-        run: python notificar.py ${{ github.event_name == 'workflow_dispatch' && '--forzar' || '' }}
-
       - name: Publicar PDF para descargar y revisar
         if: always()
         uses: actions/upload-artifact@v4
