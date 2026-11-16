@@ -1252,27 +1252,52 @@ def _sensor_viento(alm, sensores_viento, cod, dia):
     if not v:
         sensores_viento[cod] = {}
         return None
-    # la dirección no suele aparecer en el catálogo: se prueba con la veleta del mismo sensor
+    # Euskalmet publica la racha máxima como una medida independiente del viento medio.
+    # El nombre concreto puede variar según la configuración del sensor; se detecta por "gust".
+    k_racha = next((k for k in claves if "/measuresForWind/" in k and
+                    any(x in k.lower() for x in ("gust", "racha"))), None)
+    racha = None
+    if k_racha:
+        s_, t_, m_ = k_racha.split("/")
+        racha = {"sensor": s_, "tipo": t_, "medida": m_}
+    # La dirección de la racha también es opcional y no todas las estaciones la publican.
+    k_dir_racha = next((k for k in claves if "/measuresForWind/" in k and
+                        any(x in k.lower() for x in ("gust_direction", "direction_gust", "racha_direction"))), None)
+    dir_racha = None
+    if k_dir_racha:
+        s_, t_, m_ = k_dir_racha.split("/")
+        dir_racha = {"sensor": s_, "tipo": t_, "medida": m_}
+    # la dirección media no suele aparecer en el catálogo: se prueba con la veleta del mismo sensor
     d = buscar(ew.MEDIDAS_OPCIONALES["direccion"]) or dict(v, medida="mean_direction")
-    sensores_viento[cod] = {"viento": v, "direccion": d}
+    sensores_viento[cod] = {"viento": v, "direccion": d, "racha": racha, "direccion_racha": dir_racha}
     return sensores_viento[cod]
 
 
 def _viento_hora(alm, cod, sens, hora_utc):
-    """([km/h], [grados]) de los seis tramos de 10 minutos de la hora UTC dada (None donde no hay lectura)."""
+    """Velocidad media y racha máxima (km/h), más sus direcciones, en seis tramos de 10 minutos."""
     dv = alm.hora(cod, "viento", sens, hora_utc.date(), hora_utc.hour)
     try:
         dd = alm.hora(cod, "direccion", sens, hora_utc.date(), hora_utc.hour)
     except RuntimeError:
-        dd = {}                                        # sin dirección se sigue mostrando la velocidad
-    vel, dirs = [], []
+        dd = {}
+    dr = alm.hora(cod, "racha", sens, hora_utc.date(), hora_utc.hour) if sens.get("racha") else {}
+    try:
+        ddr = alm.hora(cod, "direccion_racha", sens, hora_utc.date(), hora_utc.hour) if sens.get("direccion_racha") else {}
+    except RuntimeError:
+        ddr = {}
+    vel, dirs, rachas, dirs_racha = [], [], [], []
     for m in range(0, 60, 10):
         x, y = dv.get((hora_utc.hour, m)), dd.get((hora_utc.hour, m))
+        z, q = dr.get((hora_utc.hour, m)), ddr.get((hora_utc.hour, m))
         x = None if x is None else float(x) * ew.VIENTO_FACTOR
+        z = None if z is None else float(z) * ew.VIENTO_FACTOR
         vel.append(round(x, 1) if x is not None and 0 <= x <= VIENTO_MAX_KMH else None)
+        rachas.append(round(z, 1) if z is not None and 0 <= z <= VIENTO_MAX_KMH else None)
         y = None if y is None else float(y)
+        q = None if q is None else float(q)
         dirs.append(int(round(y)) % 360 if y is not None and 0 <= y <= 360 else None)
-    return vel, dirs
+        dirs_racha.append(int(round(q)) % 360 if q is not None and 0 <= q <= 360 else None)
+    return vel, dirs, rachas if sens.get("racha") else None, dirs_racha if sens.get("direccion_racha") else None
 
 
 def actualizar_red_viento(alm, ahora, limite=None):
@@ -1304,7 +1329,9 @@ def actualizar_red_viento(alm, ahora, limite=None):
         pendientes = []
         for h in horas:
             prev = guardado.get(clave_h(h), {}).get(cod)
-            completa = prev is not None and all(x is not None for x in prev["v"] + prev["d"])
+            completa = (prev is not None and all(x is not None for x in prev["v"] + prev["d"])
+                        and (prev.get("r") is None or all(x is not None for x in prev["r"]))
+                        and (prev.get("rd") is None or all(x is not None for x in prev["rd"])))
             vieja = h + timedelta(hours=4) < tope                   # tras 4 h se acepta lo que haya
             if not (completa or (prev is not None and vieja)):
                 pendientes.append(h)
@@ -1318,10 +1345,10 @@ def actualizar_red_viento(alm, ahora, limite=None):
             continue
         for h in pendientes:
             try:
-                v, d = _viento_hora(alm, cod, sens, h); llamadas += 2
+                v, d, r, rd = _viento_hora(alm, cod, sens, h); llamadas += 2 + int(bool(sens.get("racha"))) + int(bool(sens.get("direccion_racha")))
             except RuntimeError:
                 break
-            guardado.setdefault(clave_h(h), {})[cod] = {"v": v, "d": d}
+            guardado.setdefault(clave_h(h), {})[cod] = {"v": v, "d": d, "r": r, "rd": rd}
     VIENTO_ESTADO.parent.mkdir(parents=True, exist_ok=True)
     VIENTO_ESTADO.write_text(json.dumps({"horas": guardado}, separators=(",", ":")), encoding="utf-8")
     VIENTO_SENSORES.write_text(json.dumps(sensores_viento, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -1330,13 +1357,17 @@ def actualizar_red_viento(alm, ahora, limite=None):
     for cod, nombre, la, lo in RED_VIENTO:
         if not sensores_viento.get(cod):
             continue
-        v, d = [], []
+        v, d, r, rd = [], [], [], []
         for t in tramos:
             reg = guardado.get(clave_h(t.replace(minute=0)), {}).get(cod)
             i = t.minute // 10
             v.append(reg["v"][i] if reg else None)
             d.append(reg["d"][i] if reg else None)
-        filas.append({"cod": cod, "nombre": nombre, "lat": la, "lon": lo, "v": v, "d": d})
+            r.append(reg["r"][i] if reg and reg.get("r") is not None else None)
+            rd.append(reg["rd"][i] if reg and reg.get("rd") is not None else None)
+        filas.append({"cod": cod, "nombre": nombre, "lat": la, "lon": lo, "v": v, "d": d,
+                      "r": r if sensores_viento.get(cod, {}).get("racha") else None,
+                      "rd": rd if sensores_viento.get(cod, {}).get("direccion_racha") else None})
     loc = [t.astimezone(ew.ZONA) for t in tramos]
     VIENTO_WEB.parent.mkdir(parents=True, exist_ok=True)
     VIENTO_WEB.write_text(json.dumps({"actualizado": ahora.isoformat(timespec="minutes"), "fecha": loc[-1].date().isoformat(),
