@@ -2522,7 +2522,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       else if (o.dir == null || o.v < 1){ ctx.beginPath(); ctx.arc(a, b, 3.2 * kz, 0, 7); ctx.fillStyle = '#14231c'; ctx.fill(); }
       else {
         s = (8 + Math.min(o.v, 80) / 6) * kz;
-        const sur = vari === 'v' && ['SE','S','SO'].includes(sector8(o.dir)) && o.v >= 3;
+        const sur = ['SE','S','SO'].includes(sector8(o.dir)) && o.v >= 3;
         vieFlecha(ctx, a, b, o.dir + 180, s, sur ? '#d9382b' : '#14231c', '#fff', kz);
       }
       const t = o.v == null ? '—' : fmt(o.v, 0), malo = o.v == null;
