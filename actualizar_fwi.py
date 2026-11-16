@@ -1256,6 +1256,9 @@ def _sensor_viento(alm, sensores_viento, cod, dia):
     # El nombre concreto puede variar según la configuración del sensor; se detecta por "gust".
     k_racha = next((k for k in claves if "/measuresForWind/" in k and
                     any(x in k.lower() for x in ("gust", "racha"))), None)
+    if not k_racha:  # algunas configuraciones nombran la racha como velocidad máxima
+        k_racha = next((k for k in claves if "/measuresForWind/" in k and
+                        "max" in k.lower() and "speed" in k.lower()), None)
     racha = None
     if k_racha:
         s_, t_, m_ = k_racha.split("/")
@@ -1263,6 +1266,9 @@ def _sensor_viento(alm, sensores_viento, cod, dia):
     # La dirección de la racha también es opcional y no todas las estaciones la publican.
     k_dir_racha = next((k for k in claves if "/measuresForWind/" in k and
                         any(x in k.lower() for x in ("gust_direction", "direction_gust", "racha_direction"))), None)
+    if not k_dir_racha:
+        k_dir_racha = next((k for k in claves if "/measuresForWind/" in k and
+                            "max" in k.lower() and "direction" in k.lower()), None)
     dir_racha = None
     if k_dir_racha:
         s_, t_, m_ = k_dir_racha.split("/")
