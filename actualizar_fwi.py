@@ -1229,11 +1229,106 @@ VIENTO_WEB = Path("docs/data/viento_red.json")      # lo que lee el mapa de la w
 VIENTO_SENSORES = Path("datos/sensores_viento.json")
 VIENTO_HORAS = 3                                    # ventana del mapa, en horas (19 pasos de 10 minutos)
 VIENTO_MAX_KMH = 200.0                              # por encima de esto la lectura es un error del sensor
+VIENTO_LISTA = Path("datos/estaciones_euskalmet.json")   # listado de estaciones de Euskalmet (se descarga una vez)
+# Zona del mapa: (lat mín, lat máx, lon mín, lon máx) = Gipuzkoa más ~10 km de margen, para que las estaciones de
+# alrededor mejoren la interpolación en los bordes. Con None se usan todas las estaciones de Euskadi con anemómetro
+# (más llamadas a la API, y las de fuera de Gipuzkoa no se ven en el mapa).
+VIENTO_CAJA = (42.82, 43.45, -2.65, -1.65)
+
+
+def _utm30_a_wgs84(x, y):
+    """ETRS89 / UTM huso 30N (las coordenadas oficiales de Euskadi) -> (latitud, longitud)."""
+    a, f, k0 = 6378137.0, 1 / 298.257222101, 0.9996
+    e2 = f * (2 - f); ep2 = e2 / (1 - e2)
+    x -= 500000.0
+    mu = (y / k0) / (a * (1 - e2 / 4 - 3 * e2 ** 2 / 64 - 5 * e2 ** 3 / 256))
+    e1 = (1 - math.sqrt(1 - e2)) / (1 + math.sqrt(1 - e2))
+    fi = (mu + (3 * e1 / 2 - 27 * e1 ** 3 / 32) * math.sin(2 * mu) + (21 * e1 ** 2 / 16 - 55 * e1 ** 4 / 32) * math.sin(4 * mu)
+          + (151 * e1 ** 3 / 96) * math.sin(6 * mu) + (1097 * e1 ** 4 / 512) * math.sin(8 * mu))
+    N1 = a / math.sqrt(1 - e2 * math.sin(fi) ** 2); T1 = math.tan(fi) ** 2; C1 = ep2 * math.cos(fi) ** 2
+    R1 = a * (1 - e2) / (1 - e2 * math.sin(fi) ** 2) ** 1.5; D = x / (N1 * k0)
+    lat = fi - (N1 * math.tan(fi) / R1) * (D ** 2 / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 ** 2 - 9 * ep2) * D ** 4 / 24
+                                           + (61 + 90 * T1 + 298 * C1 + 45 * T1 ** 2 - 252 * ep2 - 3 * C1 ** 2) * D ** 6 / 720)
+    lon = math.radians(-3.0) + (D - (1 + 2 * T1 + C1) * D ** 3 / 6
+                                + (5 - 2 * C1 + 28 * T1 - 3 * C1 ** 2 + 8 * ep2 + 24 * T1 ** 2) * D ** 5 / 120) / math.cos(fi)
+    return math.degrees(lat), math.degrees(lon)
+
+
+def _listar_estaciones_euskalmet(alm):
+    """[(cod, nombre, lat, lon)] de todas las estaciones que publica Euskalmet, o None si no se puede leer el listado.
+    Se guarda en VIENTO_LISTA (borra ese fichero para volver a descargarlo). El formato exacto de la respuesta no se
+    conoce con seguridad, así que se aceptan varios nombres de campo, y se imprime el primer registro para poder
+    ajustarlo si hiciera falta."""
+    try:
+        return [tuple(x) for x in json.loads(VIENTO_LISTA.read_text(encoding="utf-8"))]
+    except (OSError, ValueError, TypeError):
+        pass
+    r = alm.cli.get("/euskalmet/stations")
+    if r.status_code != 200:
+        print(f"Listado de estaciones de Euskalmet: HTTP {r.status_code}; se usa la lista fija.")
+        return None
+    datos = r.json()
+    items = datos if isinstance(datos, list) else next((datos[k] for k in ("stations", "items", "data", "results")
+                                                        if isinstance(datos.get(k), list)), [])
+    if not items:
+        print("Listado de estaciones de Euskalmet: respuesta vacía; se usa la lista fija.")
+        return None
+    print("Listado de estaciones de Euskalmet: ejemplo de registro:", json.dumps(items[0], ensure_ascii=False)[:300])
+
+    def campo(it, *claves):
+        for k in claves:
+            if it.get(k) is not None:
+                return it[k]
+        return None
+    res = []
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        cod = campo(it, "id", "stationId", "code", "codigo")
+        nombre = campo(it, "name", "stationName", "nombre", "title")
+        if isinstance(nombre, dict):
+            nombre = next(iter(nombre.values()), None)
+        la = campo(it, "latitude", "lat", "latitud"); lo = campo(it, "longitude", "lon", "lng", "longitud")
+        try:
+            if la is None or lo is None:
+                x, y = campo(it, "x", "utmX", "xUtm"), campo(it, "y", "utmY", "yUtm")
+                la, lo = _utm30_a_wgs84(float(x), float(y))
+            la, lo = float(la), float(lo)
+            if abs(la) > 90 or abs(lo) > 180:                         # vienen en UTM aunque se llamen lat/lon
+                la, lo = _utm30_a_wgs84(lo, la) if la > lo else _utm30_a_wgs84(la, lo)
+        except (TypeError, ValueError):
+            continue
+        if cod and 41.5 < la < 44.5 and -4.0 < lo < -0.5:             # solo Euskadi y alrededores (descarta errores)
+            res.append((str(cod), str(nombre or cod), round(la, 5), round(lo, 5)))
+    if not res:
+        print("Listado de estaciones de Euskalmet: no se han podido leer coordenadas; se usa la lista fija.")
+        return None
+    VIENTO_LISTA.parent.mkdir(parents=True, exist_ok=True)
+    VIENTO_LISTA.write_text(json.dumps(res, ensure_ascii=False, indent=0), encoding="utf-8")
+    print(f"Listado de estaciones de Euskalmet: {len(res)} estaciones.")
+    return res
+
+
+def _estaciones_viento(alm):
+    """Estaciones donde buscar anemómetro: las de la lista fija (coordenadas oficiales) más todas las de Euskalmet
+    que caigan dentro de VIENTO_CAJA. Si no se puede leer el listado, solo la lista fija."""
+    fijas = {c: (c, n, la, lo) for c, n, la, lo in RED_VIENTO}
+    try:
+        todas = _listar_estaciones_euskalmet(alm)
+    except Exception as e:
+        print("Listado de estaciones de Euskalmet:", type(e).__name__, str(e)[:150])
+        todas = None
+    for c, n, la, lo in todas or []:
+        if c in fijas:
+            continue
+        if VIENTO_CAJA is None or (VIENTO_CAJA[0] <= la <= VIENTO_CAJA[1] and VIENTO_CAJA[2] <= lo <= VIENTO_CAJA[3]):
+            fijas[c] = (c, n, la, lo)
+    return list(fijas.values())
 
 
 def _sensor_viento(alm, sensores_viento, cod, dia):
     """{'viento': sensor, 'direccion': sensor} de la estación, o None si no tiene anemómetro (o no se sabe aún)."""
-    if cod in sensores_viento and (not sensores_viento[cod] or "racha" in sensores_viento[cod]):
+    if cod in sensores_viento:
         return sensores_viento[cod] or None            # {} = ya sabemos que no tiene anemómetro
     r = alm.cli.get(f"/euskalmet/readings/aggregated/summarized/byDay/forStation/{cod}/at/{dia:%Y}/{dia:%m}/{dia:%d}")
     if r.status_code != 200:
@@ -1252,58 +1347,27 @@ def _sensor_viento(alm, sensores_viento, cod, dia):
     if not v:
         sensores_viento[cod] = {}
         return None
-    # Variable de Euskalmet: velocidad máxima del viento (máxima diezminutaria).
-    # No confundirla con mean_speed ni con una racha de otro periodo.
-    k_racha = next((k for k in claves if "/measuresForWind/" in k and
-                    "max" in k.lower() and "speed" in k.lower()), None)
-    racha = None
-    if k_racha:
-        s_, t_, m_ = k_racha.split("/")
-        racha = {"sensor": s_, "tipo": t_, "medida": m_}
-    # La dirección de la racha también es opcional y no todas las estaciones la publican.
-    k_dir_racha = next((k for k in claves if "/measuresForWind/" in k and
-                        any(x in k.lower() for x in ("gust_direction", "direction_gust", "racha_direction"))), None)
-    if not k_dir_racha:
-        k_dir_racha = next((k for k in claves if "/measuresForWind/" in k and
-                            "max" in k.lower() and "direction" in k.lower()), None)
-    dir_racha = None
-    if k_dir_racha:
-        s_, t_, m_ = k_dir_racha.split("/")
-        dir_racha = {"sensor": s_, "tipo": t_, "medida": m_}
-    # la dirección media no suele aparecer en el catálogo: se prueba con la veleta del mismo sensor
+    # la dirección no suele aparecer en el catálogo: se prueba con la veleta del mismo sensor
     d = buscar(ew.MEDIDAS_OPCIONALES["direccion"]) or dict(v, medida="mean_direction")
-    sensores_viento[cod] = {"viento": v, "direccion": d, "racha": racha, "direccion_racha": dir_racha}
+    sensores_viento[cod] = {"viento": v, "direccion": d}
     return sensores_viento[cod]
 
 
 def _viento_hora(alm, cod, sens, hora_utc):
-    """Velocidad media y velocidad máxima diezminutaria (km/h) en seis tramos horarios."""
+    """([km/h], [grados]) de los seis tramos de 10 minutos de la hora UTC dada (None donde no hay lectura)."""
     dv = alm.hora(cod, "viento", sens, hora_utc.date(), hora_utc.hour)
     try:
         dd = alm.hora(cod, "direccion", sens, hora_utc.date(), hora_utc.hour)
     except RuntimeError:
-        dd = {}
-    try:
-        dr = alm.hora(cod, "racha", sens, hora_utc.date(), hora_utc.hour) if sens.get("racha") else {}
-    except RuntimeError:
-        dr = {}                                        # si falla la medida opcional, se conserva el viento medio
-    try:
-        ddr = alm.hora(cod, "direccion_racha", sens, hora_utc.date(), hora_utc.hour) if sens.get("direccion_racha") else {}
-    except RuntimeError:
-        ddr = {}
-    vel, dirs, rachas, dirs_racha = [], [], [], []
+        dd = {}                                        # sin dirección se sigue mostrando la velocidad
+    vel, dirs = [], []
     for m in range(0, 60, 10):
         x, y = dv.get((hora_utc.hour, m)), dd.get((hora_utc.hour, m))
-        z, q = dr.get((hora_utc.hour, m)), ddr.get((hora_utc.hour, m))
         x = None if x is None else float(x) * ew.VIENTO_FACTOR
-        z = None if z is None else float(z) * ew.VIENTO_FACTOR
         vel.append(round(x, 1) if x is not None and 0 <= x <= VIENTO_MAX_KMH else None)
-        rachas.append(round(z, 1) if z is not None and 0 <= z <= VIENTO_MAX_KMH else None)
         y = None if y is None else float(y)
-        q = None if q is None else float(q)
         dirs.append(int(round(y)) % 360 if y is not None and 0 <= y <= 360 else None)
-        dirs_racha.append(int(round(q)) % 360 if q is not None and 0 <= q <= 360 else None)
-    return vel, dirs, rachas if sens.get("racha") else None, dirs_racha if sens.get("direccion_racha") else None
+    return vel, dirs
 
 
 def actualizar_red_viento(alm, ahora, limite=None):
@@ -1329,15 +1393,14 @@ def actualizar_red_viento(alm, ahora, limite=None):
         sensores_viento = {}
     ayer = ahora.date() - timedelta(days=1)
     llamadas = 0
-    for cod, nombre, _, _ in RED_VIENTO:
+    estaciones = _estaciones_viento(alm)
+    for cod, nombre, _, _ in estaciones:
         if limite and time.monotonic() > limite:
             break
         pendientes = []
         for h in horas:
             prev = guardado.get(clave_h(h), {}).get(cod)
-            completa = (prev is not None and "r" in prev
-                        and all(x is not None for x in prev["v"] + prev["d"])
-                        and (prev.get("r") is None or all(x is not None for x in prev["r"])))
+            completa = prev is not None and all(x is not None for x in prev["v"] + prev["d"])
             vieja = h + timedelta(hours=4) < tope                   # tras 4 h se acepta lo que haya
             if not (completa or (prev is not None and vieja)):
                 pendientes.append(h)
@@ -1351,29 +1414,25 @@ def actualizar_red_viento(alm, ahora, limite=None):
             continue
         for h in pendientes:
             try:
-                v, d, r, rd = _viento_hora(alm, cod, sens, h); llamadas += 2 + int(bool(sens.get("racha"))) + int(bool(sens.get("direccion_racha")))
+                v, d = _viento_hora(alm, cod, sens, h); llamadas += 2
             except RuntimeError:
                 break
-            guardado.setdefault(clave_h(h), {})[cod] = {"v": v, "d": d, "r": r, "rd": rd}
+            guardado.setdefault(clave_h(h), {})[cod] = {"v": v, "d": d}
     VIENTO_ESTADO.parent.mkdir(parents=True, exist_ok=True)
     VIENTO_ESTADO.write_text(json.dumps({"horas": guardado}, separators=(",", ":")), encoding="utf-8")
     VIENTO_SENSORES.write_text(json.dumps(sensores_viento, ensure_ascii=False, indent=1), encoding="utf-8")
 
     filas = []
-    for cod, nombre, la, lo in RED_VIENTO:
+    for cod, nombre, la, lo in estaciones:
         if not sensores_viento.get(cod):
             continue
-        v, d, r, rd = [], [], [], []
+        v, d = [], []
         for t in tramos:
             reg = guardado.get(clave_h(t.replace(minute=0)), {}).get(cod)
             i = t.minute // 10
             v.append(reg["v"][i] if reg else None)
             d.append(reg["d"][i] if reg else None)
-            r.append(reg["r"][i] if reg and reg.get("r") is not None else None)
-            rd.append(reg["rd"][i] if reg and reg.get("rd") is not None else None)
-        filas.append({"cod": cod, "nombre": nombre, "lat": la, "lon": lo, "v": v, "d": d,
-                      "r": r if sensores_viento.get(cod, {}).get("racha") else None,
-                      "rd": rd if sensores_viento.get(cod, {}).get("direccion_racha") else None})
+        filas.append({"cod": cod, "nombre": nombre, "lat": la, "lon": lo, "v": v, "d": d})
     loc = [t.astimezone(ew.ZONA) for t in tramos]
     VIENTO_WEB.parent.mkdir(parents=True, exist_ok=True)
     VIENTO_WEB.write_text(json.dumps({"actualizado": ahora.isoformat(timespec="minutes"), "fecha": loc[-1].date().isoformat(),
