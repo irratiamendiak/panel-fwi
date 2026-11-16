@@ -1286,7 +1286,10 @@ def _viento_hora(alm, cod, sens, hora_utc):
         dd = alm.hora(cod, "direccion", sens, hora_utc.date(), hora_utc.hour)
     except RuntimeError:
         dd = {}
-    dr = alm.hora(cod, "racha", sens, hora_utc.date(), hora_utc.hour) if sens.get("racha") else {}
+    try:
+        dr = alm.hora(cod, "racha", sens, hora_utc.date(), hora_utc.hour) if sens.get("racha") else {}
+    except RuntimeError:
+        dr = {}                                        # si falla la medida opcional, se conserva el viento medio
     try:
         ddr = alm.hora(cod, "direccion_racha", sens, hora_utc.date(), hora_utc.hour) if sens.get("direccion_racha") else {}
     except RuntimeError:
