@@ -9,7 +9,13 @@
    "sensor": "DV06",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "VV06",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C017": {
   "viento": {
@@ -21,7 +27,13 @@
    "sensor": "Y008",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y008",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C023": {
   "viento": {
@@ -33,7 +45,13 @@
    "sensor": "Y024",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y024",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C026": {
   "viento": {
@@ -45,7 +63,13 @@
    "sensor": "Y0DB",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y0DB",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C028": {
   "viento": {
@@ -57,7 +81,13 @@
    "sensor": "Y0R8",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y0R8",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C029": {
   "viento": {
@@ -69,7 +99,13 @@
    "sensor": "Y0AP",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y0AP",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C043": {
   "viento": {
@@ -81,7 +117,13 @@
    "sensor": "Y0AQ",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y0AQ",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C052": {},
  "C058": {
@@ -94,7 +136,13 @@
    "sensor": "Y0BE",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y0BE",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C077": {},
  "C078": {},
@@ -124,7 +172,13 @@
    "sensor": "Y0BD",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y0BD",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C0F0": {
   "viento": {
@@ -136,7 +190,13 @@
    "sensor": "Y0R4",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y0R4",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  },
  "C0F1": {},
  "C0F4": {},
@@ -150,6 +210,12 @@
    "sensor": "Y0AQ",
    "tipo": "measuresForWind",
    "medida": "mean_direction"
-  }
+  },
+  "racha": {
+   "sensor": "Y0AQ",
+   "tipo": "measuresForWind",
+   "medida": "max_speed"
+  },
+  "direccion_racha": null
  }
 }
