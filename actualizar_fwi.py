@@ -1233,7 +1233,7 @@ VIENTO_MAX_KMH = 200.0                              # por encima de esto la lect
 
 def _sensor_viento(alm, sensores_viento, cod, dia):
     """{'viento': sensor, 'direccion': sensor} de la estación, o None si no tiene anemómetro (o no se sabe aún)."""
-    if cod in sensores_viento:
+    if cod in sensores_viento and (not sensores_viento[cod] or "racha" in sensores_viento[cod]):
         return sensores_viento[cod] or None            # {} = ya sabemos que no tiene anemómetro
     r = alm.cli.get(f"/euskalmet/readings/aggregated/summarized/byDay/forStation/{cod}/at/{dia:%Y}/{dia:%m}/{dia:%d}")
     if r.status_code != 200:
@@ -1329,9 +1329,9 @@ def actualizar_red_viento(alm, ahora, limite=None):
         pendientes = []
         for h in horas:
             prev = guardado.get(clave_h(h), {}).get(cod)
-            completa = (prev is not None and all(x is not None for x in prev["v"] + prev["d"])
-                        and (prev.get("r") is None or all(x is not None for x in prev["r"]))
-                        and (prev.get("rd") is None or all(x is not None for x in prev["rd"])))
+            completa = (prev is not None and "r" in prev
+                        and all(x is not None for x in prev["v"] + prev["d"])
+                        and (prev.get("r") is None or all(x is not None for x in prev["r"])))
             vieja = h + timedelta(hours=4) < tope                   # tras 4 h se acepta lo que haya
             if not (completa or (prev is not None and vieja)):
                 pendientes.append(h)
