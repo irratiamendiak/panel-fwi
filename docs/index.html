@@ -2146,8 +2146,8 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
           suma += p.value * peso; pesos += peso;
         }
         const valor = exacto == null ? (pesos ? suma/pesos : null) : exacto;
-        const c = colorTramo(RAMPAS[METEO.vari], TRAMOS['g' + METEO.vari], valor);
-        if (c) m += `<rect x="${xx}" y="${yy}" width="${paso+0.5}" height="${paso+0.5}" fill="rgb(${c.map(Math.round).join(',')})"/>`;
+        const c = colorRampa(RAMPAS[METEO.vari], valor);
+        if (valor != null && Number.isFinite(valor)) m += `<rect x="${xx}" y="${yy}" width="${paso+0.5}" height="${paso+0.5}" fill="${c}"/>`;
       }
     }
     m += '</g>';
@@ -2272,8 +2272,6 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     }
     const tmp = document.createElement('canvas'); tmp.width = W; tmp.height = H; tmp.getContext('2d').putImageData(img, 0, 0);
     ctx.save(); trazar(); ctx.clip(); ctx.drawImage(tmp, 0, 0);
-    ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = kz;
-    geo.zonas.features.forEach(z => m72Anillos(z.geometry).forEach(r => { ctx.beginPath(); r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.stroke(); }));
     ctx.restore();
     ctx.strokeStyle = '#14231c'; ctx.lineWidth = completo ? 1.6 * kz : 1; trazar(); ctx.stroke();
     if (!completo) return;
@@ -2382,8 +2380,6 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       const tmp = document.createElement('canvas'); tmp.width = W; tmp.height = H; tmp.getContext('2d').putImageData(img, 0, 0);
       const tr = () => { ctx.beginPath(); rings.forEach(r => { r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); }); };
       ctx.save(); tr(); ctx.clip(); ctx.drawImage(tmp, 0, 0);
-      ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = kz;
-      geo.zonas.features.forEach(z => m72Anillos(z.geometry).forEach(r => { ctx.beginPath(); r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.stroke(); }));
       ctx.restore(); ctx.strokeStyle = '#14231c'; ctx.lineWidth = 1.6 * kz; tr(); ctx.stroke();
     }
     // pluviómetros con su valor (gris y con "?" si el control de calidad lo descarta)
@@ -2505,8 +2501,6 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     ctx.save(); tr(); ctx.clip();
     const campo = vieCampo(g, d, paso);
     if (campo){ ctx.imageSmoothingEnabled = true; ctx.drawImage(campo, 0, 0, W, H); }
-    ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = kz;
-    g.geo.zonas.features.forEach(z => m72Anillos(z.geometry).forEach(r => { ctx.beginPath(); r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.stroke(); }));
     ctx.restore();
     ctx.strokeStyle = '#14231c'; ctx.lineWidth = 1.6 * kz; tr(); ctx.stroke();
     // gezi txikiak: haize-bektorearen interpolazioa (ez dira neurketak)
