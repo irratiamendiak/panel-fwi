@@ -440,19 +440,24 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   <section id="vieSec" class="solo-meteo" data-lang="auto" aria-label="Haize neurtua / Viento medido">
     <h2 id="vieTit">💨 Haize neurtua</h2>
     <div class="card">
-      <div class="m72-tiempo" id="vieTiempo">
-        <button type="button" id="viePlay" title="▶">▶</button>
-        <b id="vieLab">…</b>
-        <input type="range" id="vieSl" min="0" max="12" value="0" step="1">
-      </div>
       <div class="vie-grid">
         <div class="vie-mapa">
           <h3 data-lang="eu">Haizearen batez besteko abiadura</h3><h3 data-lang="es">Velocidad media del viento</h3>
+          <div class="m72-tiempo vie-tiempo">
+            <button type="button" id="viePlayV" title="Reproducir">▶</button>
+            <b id="vieLabV">…</b>
+            <input type="range" id="vieSlV" min="0" max="12" value="0" step="1" aria-label="Hora del mapa de viento medio">
+          </div>
           <div class="red-wrap"><canvas id="vieCv" width="1520" height="1040"></canvas></div>
           <div class="m72-esc" id="vieEsc"></div>
         </div>
         <div class="vie-mapa">
-          <h3 data-lang="eu">Haize-bolada maximoak</h3><h3 data-lang="es">Rachas máximas de viento</h3>
+          <h3 data-lang="eu">Haizearen gehieneko abiadura (10 minutukoa)</h3><h3 data-lang="es">Velocidad máxima del viento (máxima diezminutaria)</h3>
+          <div class="m72-tiempo vie-tiempo">
+            <button type="button" id="viePlayR" title="Reproducir">▶</button>
+            <b id="vieLabR">…</b>
+            <input type="range" id="vieSlR" min="0" max="12" value="0" step="1" aria-label="Hora del mapa de rachas máximas">
+          </div>
           <div class="red-wrap"><canvas id="vieCvR" width="1520" height="1040"></canvas></div>
           <div class="m72-esc" id="vieEscR"></div>
         </div>
@@ -2440,11 +2445,14 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   }
 
   // ---- Haize neurtua: Euskalmeten haize-neurgailuen azken orduak (data/viento_red.json), 10 minuturo, denboran animatuta
-  const VIE = {datos: null, paso: 0, play: false, t: null, cache: {}, visible: true};
+  const VIE = {datos: null, pasoV: 0, pasoR: 0, playV: false, playR: false, tV: null, tR: null, cache: {}, visible: true};
   function vieCargar(){
     return fetch('data/viento_red.json', {cache: 'no-store'}).then(r => r.ok ? r.json() : null).then(j => {
       VIE.datos = j; VIE.cache = {};
-      if (j && j.pasos && VIE.paso >= j.pasos.length) VIE.paso = 0;
+      if (j && j.pasos){
+        VIE.pasoV = Math.min(VIE.pasoV, j.pasos.length - 1);
+        VIE.pasoR = Math.min(VIE.pasoR, j.pasos.length - 1);
+      }
     }).catch(() => {});
   }
   function vieGeom(cv){
@@ -2483,9 +2491,9 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     ctx.fillStyle = relleno; ctx.strokeStyle = borde; ctx.lineWidth = lw;
     ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(s*.45, s*.5); ctx.lineTo(0, s*.15); ctx.lineTo(-s*.45, s*.5); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
   }
-  function vieDibujar(canvasId, vari){
+  function vieDibujar(canvasId, vari, paso){
     const cv = $('#' + canvasId), d = VIE.datos; if (!d || !d.pasos || !METEO.geo) return;
-    const g = vieGeom(cv), paso = VIE.paso, W = g.W, H = g.H, kz = g.kz, kx = g.kx, P = g.P, ctx = cv.getContext('2d');
+    const g = vieGeom(cv), W = g.W, H = g.H, kz = g.kz, kx = g.kx, P = g.P, ctx = cv.getContext('2d');
     ctx.clearRect(0, 0, W, H);
     const tr = () => { ctx.beginPath(); g.rings.forEach(r => { r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); }); };
     const est = d.estaciones.map(e => ({e, v: e[vari] ? e[vari][paso] : null,
@@ -2535,49 +2543,71 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       }
     });
   }
-  function vieRender(){
-    const d = VIE.datos, sl = $('#vieSl'), pb = $('#viePlay');
-    $('#vieTit').textContent = Tm('💨 Haize neurtua', '💨 Viento medido');
-    pb.textContent = VIE.play ? '⏸' : '▶';
-    if (!d || !d.pasos || !d.pasos.length || !d.estaciones){
-      $('#vieLab').textContent = Tm('Oraindik ez dago daturik (prozesuaren hurrengo exekuzioan sortuko da).', 'Todavía no hay datos (se generarán en la próxima ejecución del proceso).');
-      sl.hidden = true; pb.hidden = true; return;
-    }
-    sl.hidden = false; pb.hidden = false;
-    const n = d.pasos.length, tramo = d.paso_min || 10, paso = Math.max(0, Math.min(n - 1, VIE.paso)), min = tramo * (n - 1 - paso);
-    VIE.paso = paso; sl.max = n - 1; sl.value = paso;
+  function vieEtiqueta(paso){
+    const d = VIE.datos, n = d.pasos.length, tramo = d.paso_min || 10;
+    const min = tramo * (n - 1 - paso);
     const dia = d.fecha && d.pasos[0] <= d.pasos[n - 1] ? fmtFechaLuzea(fecha(d.fecha)) + ' · ' : '';
-    $('#vieLab').textContent = dia + d.pasos[paso] + ' · ' + (min ? '−' + min + ' min' : Tm('azken irakurketa', 'última lectura'));
-    vieDibujar('vieCv', 'v');
-    vieDibujar('vieCvR', 'r');
+    return dia + d.pasos[paso] + ' · ' + (min ? '−' + min + ' min' : Tm('azken irakurketa', 'última lectura'));
+  }
+  function vieRender(){
+    const d = VIE.datos;
+    $('#vieTit').textContent = Tm('💨 Haize neurtua', '💨 Viento medido');
+    if (!d || !d.pasos || !d.pasos.length || !d.estaciones){
+      $('#vieLabV').textContent = $('#vieLabR').textContent = Tm('Oraindik ez dago daturik (prozesuaren hurrengo exekuzioan sortuko da).', 'Todavía no hay datos (se generarán en la próxima ejecución del proceso).');
+      ['vieSlV','vieSlR','viePlayV','viePlayR'].forEach(id => { $('#'+id).hidden = true; });
+      return;
+    }
+    const n = d.pasos.length, tramo = d.paso_min || 10, horas = Math.round((n - 1) * tramo / 60);
+    VIE.pasoV = Math.max(0, Math.min(n - 1, VIE.pasoV));
+    VIE.pasoR = Math.max(0, Math.min(n - 1, VIE.pasoR));
+    for (const [suf, paso, play] of [['V',VIE.pasoV,VIE.playV],['R',VIE.pasoR,VIE.playR]]){
+      const sl = $('#vieSl'+suf), pb = $('#viePlay'+suf);
+      sl.hidden = false; pb.hidden = false; sl.max = n - 1; sl.value = paso;
+      pb.textContent = play ? '⏸' : '▶';
+      $('#vieLab'+suf).textContent = vieEtiqueta(paso);
+    }
+    vieDibujar('vieCv', 'v', VIE.pasoV);
+    vieDibujar('vieCvR', 'r', VIE.pasoR);
     const hay = d.estaciones.filter(e => e.v && e.v.some(x => x != null)).length;
-    const hayR = d.estaciones.filter(e => e.r && e.r.some(x => x != null)).length, horas = Math.round((n - 1) * tramo / 60);
+    const hayR = d.estaciones.filter(e => e.r && e.r.some(x => x != null)).length;
     $('#vieEsc').innerHTML = leyendaTramos(M72_RAMP.W, TRAMOS.W, 'km/h')
       + `<div class="esc-extra">➤ ${Tm('Norabidea; gezi handiak neurketak dira, txikiak interpolazioa', 'Dirección; las flechas grandes son mediciones y las pequeñas, interpolación')}</div>`;
     $('#vieEscR').innerHTML = leyendaTramos(M72_RAMP.G, TRAMOS.G, 'km/h')
-      + `<div class="esc-extra">${hayR} ${Tm('estaziok racha neurtua dute', 'estaciones con dato de racha máxima')}</div>`;
-    $('#vieNota').innerHTML = Tm(`Euskalmeteko ${hay} haize-neurgailuren batez besteko abiadura eta ${hayR} estaziotako racha maximoak, ${tramo} minuturo, azken ${horas} orduetan. Balioak estazioen artean interpolatzen dira. Racha-norabidea eskuragarri ez badago, bigarren mapak ez du norabide-gezirik erakusten.`,
-      `Velocidad media de ${hay} anemómetros de Euskalmet y racha máxima de ${hayR} estaciones, cada ${tramo} minutos, durante las últimas ${horas} horas. Los valores se interpolan entre estaciones. Si no está disponible la dirección de la racha, el segundo mapa no muestra flechas de dirección.`);
+      + `<div class="esc-extra">${hayR} ${Tm('estaziok abiadura maximo hamarminututarra neurtzen dute', 'estaciones con dato de velocidad máxima diezminutaria')}</div>`;
+    $('#vieNota').innerHTML = Tm(`Euskalmeteko ${hay} haize-neurgailuren batez besteko abiadura eta ${hayR} estaziotako gehieneko abiadura hamar minutukoa, 10 minuturo argitaratuta, azken ${horas} orduetan. Mapek ordu-hautagailu independenteak dituzte.`,
+      `Velocidad media de ${hay} anemómetros de Euskalmet y velocidad máxima diezminutaria de ${hayR} estaciones, publicada en intervalos de 10 minutos, durante las últimas ${horas} horas. Cada mapa tiene su propio selector horario.`);
   }
-  function vieTick(){
-    clearTimeout(VIE.t);
-    if (!VIE.play) return;
+  function vieTick(suf){
+    const playKey = suf === 'V' ? 'playV' : 'playR', timerKey = suf === 'V' ? 'tV' : 'tR', pasoKey = suf === 'V' ? 'pasoV' : 'pasoR';
+    clearTimeout(VIE[timerKey]);
+    if (!VIE[playKey]) return;
     const n = VIE.datos && VIE.datos.pasos ? VIE.datos.pasos.length : 0;
-    if (n > 1 && VIE.visible && MODO === 'meteo' && !document.hidden){ VIE.paso = (VIE.paso + 1) % n; vieRender(); }
-    VIE.t = setTimeout(vieTick, VIE.paso === n - 1 ? 1800 : 650);
+    if (n > 1 && VIE.visible && MODO === 'meteo' && !document.hidden){
+      VIE[pasoKey] = (VIE[pasoKey] + 1) % n; vieRender();
+    }
+    VIE[timerKey] = setTimeout(() => vieTick(suf), VIE[pasoKey] === n - 1 ? 1800 : 650);
   }
-  function viePlay(on){ VIE.play = on; vieRender(); if (on) vieTick(); else clearTimeout(VIE.t); }
+  function viePlay(suf, on){
+    const playKey = suf === 'V' ? 'playV' : 'playR', timerKey = suf === 'V' ? 'tV' : 'tR';
+    VIE[playKey] = on; clearTimeout(VIE[timerKey]); vieRender();
+    if (on) vieTick(suf);
+  }
   function vieIniciar(){
-    $('#viePlay').addEventListener('click', () => viePlay(!VIE.play));
-    $('#vieSl').addEventListener('input', e => { VIE.play = false; clearTimeout(VIE.t); VIE.paso = +e.target.value; vieRender(); });
+    for (const suf of ['V','R']){
+      $('#viePlay'+suf).addEventListener('click', () => viePlay(suf, !VIE[suf === 'V' ? 'playV' : 'playR']));
+      $('#vieSl'+suf).addEventListener('input', e => {
+        const pasoKey = suf === 'V' ? 'pasoV' : 'pasoR', playKey = suf === 'V' ? 'playV' : 'playR', timerKey = suf === 'V' ? 'tV' : 'tR';
+        VIE[playKey] = false; clearTimeout(VIE[timerKey]); VIE[pasoKey] = +e.target.value; vieRender();
+      });
+    }
     if ('IntersectionObserver' in window) new IntersectionObserver(es => { VIE.visible = es.some(x => x.isIntersecting); }, {threshold: 0.1}).observe($('#vieSec'));
     vieRender();
     Promise.all([cargarGeo().then(g => { METEO.geo = METEO.geo || g; }), vieCargar()]).then(() => {
       const n = VIE.datos && VIE.datos.pasos ? VIE.datos.pasos.length : 0;
       const quieto = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-      VIE.paso = quieto ? Math.max(0, n - 1) : 0;
+      VIE.pasoV = VIE.pasoR = quieto ? Math.max(0, n - 1) : 0;
       vieRender();
-      if (n > 1 && !quieto) viePlay(true);
+      if (n > 1 && !quieto){ viePlay('V', true); viePlay('R', true); }
     });
     setInterval(() => vieCargar().then(vieRender), 5 * 60e3);
   }
