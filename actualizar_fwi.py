@@ -1228,7 +1228,8 @@ VIENTO_ESTADO = Path("datos/viento_red.json")      # lecturas de 10 minutos por 
 VIENTO_WEB = Path("docs/data/viento_red.json")      # lo que lee el mapa de la web
 VIENTO_SENSORES = Path("datos/sensores_viento.json")
 VIENTO_HORAS = 3                                    # ventana del mapa, en horas (19 pasos de 10 minutos)
-RACHA_SUFIJOS = ("measuresForWind/max_speed", "measuresForWind/max_gust", "measuresForWind/gust_speed")   # racha máxima
+RACHA_NOMBRES = ("max_speed", "max_gust", "gust_speed", "max_wind_speed")                  # nombres posibles de la racha máxima
+RACHA_SUFIJOS = tuple("measuresForWind/" + n for n in RACHA_NOMBRES)
 VIENTO_MAX_KMH = 200.0                              # por encima de esto la lectura es un error del sensor
 VIENTO_LISTA = Path("datos/estaciones_euskalmet.json")   # listado de estaciones de Euskalmet (se descarga una vez)
 # Zona del mapa: (lat mín, lat máx, lon mín, lon máx) = Gipuzkoa más ~10 km de margen, para que las estaciones de
@@ -1365,10 +1366,32 @@ def _sensor_viento(alm, sensores_viento, cod, dia):
             if len(partes) == 3 and partes[1] == "measuresForWind" and "max" in partes[2] and "dir" not in partes[2]:
                 rch = {"sensor": partes[0], "tipo": partes[1], "medida": partes[2]}
                 break
-    print(f"{cod}: medidas de viento en el catálogo: "
-          f"{sorted(k for k in claves if '/measuresForWind/' in k)}; racha: {rch['medida'] if rch else 'NO ENCONTRADA'}")
-    sensores_viento[cod] = {"viento": v, "direccion": d, "racha": rch}
+    print(f"{cod}: medidas de viento en el catálogo: {sorted(k for k in claves if '/measuresForWind/' in k)}; "
+          f"racha: {rch['medida'] if rch else 'no está en el catálogo (se probará al leer)'}")
+    # "racha_ok": la medida figura en el catálogo; si no, se comprueba al leer las lecturas (_racha_hora)
+    sensores_viento[cod] = {"viento": v, "direccion": d, "racha": rch or dict(v, medida=RACHA_NOMBRES[0]), "racha_ok": bool(rch)}
     return sensores_viento[cod]
+
+
+def _racha_hora(alm, cod, sens, hora_utc, hay_viento):
+    """Lecturas de racha máxima de la hora. Si la medida guardada no devuelve nada pero el anemómetro sí midió
+    viento, se prueban los otros nombres posibles y se guarda el que funcione (sens['racha'], 'racha_ok')."""
+    base = sens.get("racha") or dict(sens["viento"], medida=RACHA_NOMBRES[0])
+    candidatos = [base] + [dict(sens["viento"], medida=m) for m in RACHA_NOMBRES if m != base["medida"]]
+    if sens.get("racha_ok") or not hay_viento:
+        candidatos = candidatos[:1]                     # ya comprobada, o no hay viento con el que comprobarla
+    for c in candidatos:
+        var = "racha:" + c["medida"]
+        try:
+            dr = alm.hora(cod, var, {var: c}, hora_utc.date(), hora_utc.hour)
+        except RuntimeError:
+            return {}
+        if any(dr.get((hora_utc.hour, m)) is not None for m in range(0, 60, 10)):
+            if not sens.get("racha_ok"):
+                print(f"{cod}: racha = {c['medida']}")
+            sens["racha"], sens["racha_ok"] = c, True
+            return dr
+    return {}
 
 
 def _viento_hora(alm, cod, sens, hora_utc):
@@ -1378,10 +1401,8 @@ def _viento_hora(alm, cod, sens, hora_utc):
         dd = alm.hora(cod, "direccion", sens, hora_utc.date(), hora_utc.hour)
     except RuntimeError:
         dd = {}                                        # sin dirección se sigue mostrando la velocidad
-    try:
-        dr = alm.hora(cod, "racha", sens, hora_utc.date(), hora_utc.hour) if sens.get("racha") else {}
-    except RuntimeError:
-        dr = {}                                        # sin racha se sigue mostrando el viento medio
+    hay_viento = any(dv.get((hora_utc.hour, m)) is not None for m in range(0, 60, 10))
+    dr = _racha_hora(alm, cod, sens, hora_utc, hay_viento)
     vel, dirs, rach = [], [], []
     for m in range(0, 60, 10):
         x, y, z = dv.get((hora_utc.hour, m)), dd.get((hora_utc.hour, m)), dr.get((hora_utc.hour, m))
@@ -1416,18 +1437,22 @@ def actualizar_red_viento(alm, ahora, limite=None):
     except (OSError, ValueError):
         sensores_viento = {}
     ayer = ahora.date() - timedelta(days=1)
+    hoy_iso = ahora.date().isoformat()
     llamadas = 0
     estaciones = _estaciones_viento(alm)
     for cod, nombre, _, _ in estaciones:
         if limite and time.monotonic() > limite:
             break
         pendientes = []
+        cache_cod = sensores_viento.get(cod) or {}
+        # racha aún sin encontrar en esta estación: se reintenta una vez al día con todas las horas de la ventana
+        reprobar = bool(cache_cod) and not cache_cod.get("racha_ok") and cache_cod.get("racha_probada") != hoy_iso
         for h in horas:
             prev = guardado.get(clave_h(h), {}).get(cod)
             # las horas guardadas antes de existir la racha (sin "r") se piden otra vez una vez
             completa = prev is not None and "r" in prev and all(x is not None for x in prev["v"] + prev["d"])
             vieja = h + timedelta(hours=4) < tope                   # tras 4 h se acepta lo que haya
-            if not (completa or (prev is not None and vieja)):
+            if reprobar or not (completa or (prev is not None and vieja)):
                 pendientes.append(h)
         if not pendientes:
             continue
@@ -1443,6 +1468,8 @@ def actualizar_red_viento(alm, ahora, limite=None):
             except RuntimeError:
                 break
             guardado.setdefault(clave_h(h), {})[cod] = {"v": v, "d": d, "r": r}
+        if reprobar and not sens.get("racha_ok"):
+            sens["racha_probada"] = hoy_iso            # no se vuelve a probar hasta mañana
     VIENTO_ESTADO.parent.mkdir(parents=True, exist_ok=True)
     VIENTO_ESTADO.write_text(json.dumps({"horas": guardado}, separators=(",", ":")), encoding="utf-8")
     VIENTO_SENSORES.write_text(json.dumps(sensores_viento, ensure_ascii=False, indent=1), encoding="utf-8")
