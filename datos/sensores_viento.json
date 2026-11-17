@@ -15,7 +15,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C017": {
   "viento": {
@@ -33,7 +34,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C023": {
   "viento": {
@@ -51,7 +53,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C026": {
   "viento": {
@@ -69,7 +72,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C028": {
   "viento": {
@@ -87,7 +91,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C029": {
   "viento": {
@@ -105,7 +110,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C043": {
   "viento": {
@@ -123,7 +129,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C052": {},
  "C058": {
@@ -142,7 +149,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C077": {},
  "C078": {},
@@ -178,7 +186,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C0F0": {
   "viento": {
@@ -196,7 +205,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C0F1": {},
  "C0F4": {},
@@ -216,7 +226,8 @@
    "tipo": "measuresForWind",
    "medida": "max_speed"
   },
-  "direccion_racha": null
+  "direccion_racha": null,
+  "racha_ok": true
  },
  "C0DE": {}
 }
