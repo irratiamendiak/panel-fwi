@@ -158,7 +158,7 @@ body:not(.modo-meteo) .solo-meteo{display:none !important}
 .mt-graf{overflow-x:auto}.mt-graf svg{display:block;min-width:720px}
 #m72Sec{margin-top:18px}
 #redSec,#vieSec{margin-top:18px}#vieCv,#vieCv2{width:100%;height:auto;display:block}
-.vie-dos{display:grid;grid-template-columns:1fr 1fr;gap:14px}.vie-dos h3{font-size:14.5px;margin:2px 0 6px}.vie-dos .esc-tr{padding-right:30px}
+.vie-dos{display:grid;grid-template-columns:1fr 1fr;gap:14px}.vie-dos h3{font-size:14.5px;margin:2px 0 6px}.vie-dos .m72-tiempo{margin:0 0 6px}.vie-dos .m72-tiempo b{min-width:0;flex:0 1 auto;font-size:12.5px;white-space:nowrap}
 @media (max-width:860px){.vie-dos{grid-template-columns:1fr}}
 .esc-tr{position:relative;padding-right:46px;margin-top:8px;max-width:760px}
 .esc-tr .segs{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
@@ -442,19 +442,24 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   <section id="vieSec" class="solo-meteo" data-lang="auto" aria-label="Haize neurtua / Viento medido">
     <h2 id="vieTit">💨 Haize neurtua</h2>
     <div class="card">
-      <div class="m72-tiempo" id="vieTiempo">
-        <button type="button" id="viePlay" title="▶">▶</button>
-        <b id="vieLab">…</b>
-        <input type="range" id="vieSl" min="0" max="12" value="0" step="1">
-      </div>
       <div class="vie-dos">
         <div>
           <h3 id="vieT1">Batez besteko haizea</h3>
+          <div class="m72-tiempo" id="vieTiempo">
+            <button type="button" id="viePlay" title="▶">▶</button>
+            <b id="vieLab">…</b>
+            <input type="range" id="vieSl" min="0" max="12" value="0" step="1">
+          </div>
           <canvas id="vieCv" width="1520" height="1040"></canvas>
           <div class="m72-esc" id="vieEsc"></div>
         </div>
         <div>
           <h3 id="vieT2">Gehienezko boladak</h3>
+          <div class="m72-tiempo" id="vieTiempo2">
+            <button type="button" id="viePlay2" title="▶">▶</button>
+            <b id="vieLab2">…</b>
+            <input type="range" id="vieSl2" min="0" max="12" value="0" step="1">
+          </div>
           <canvas id="vieCv2" width="1520" height="1040"></canvas>
           <div class="m72-esc" id="vieEsc2"></div>
         </div>
@@ -623,7 +628,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p><b>Eguzki-eguerdiko neurketak</b>: indizeak kalkulatzeko erabiltzen diren datuak (13:00 neguan, 14:00 udan): tenperatura, hezetasuna, haizea eta haren norabidea, eta aurreko 24 orduetako euria, euririk gabeko egunekin eta hego haizearekin.</p>
       <p><b>Eguneko laburpena</b>: egun naturalaren itxiera (00:00-24:00), estazio bakoitzeko: batez besteko tenperatura (eta maximoa eta minimoa), batez besteko hezetasuna eta haizea, batez besteko norabidea (bektorialki kalkulatua, abiaduraren arabera haztatuta) eta egun osoko euria. 10 minuturo irakurketekin kalkulatzen da, hurrengo goizean, eta gorde egiten da; "Txostenak" leihoko CSV deskargan ere badago. Mutrikun ez dago estaziorik eta Altzolak ez du haize-neurgailurik: Mutrikuko laburpen osoa eta Altzolako haizea Open-Meteo ereduaren orduroko datuekin kalkulatzen dira, puntu horien koordenatuetan (🖥️ eredua).</p>
       <p><b>Euri neurtua</b>: Euskalmeten 32 euri-neurgailuen datuak Gipuzkoan (gehi Eskas, mugan), 10 minuturo irakurketekin: azken 60 minutuak, gaur 00:00etatik azken irakurketara arte eta atzo osoa, estazioen artean interpolatutako mapa batean. Kalitate-kontrol bat dago: estazio batek ia ezer ez badu inguruan argi euria egin duenean, baztertu eta "?" ikurrarekin markatzen da. Prozesua exekutatzen den bakoitzean eguneratzen da.</p>
-      <p><b>Haize neurtua</b>: Euskalmeten haize-neurgailuen azken orduetako irakurketak (10 minuturo), denboran animatuta: koloreak abiadura erakusten du eta geziek norabidea (haizea nora doan; gorriz, hego haizea). Gezi handiak estazioetako neurketak dira; txikiak, estazioen arteko interpolazioa. ▶ botoiarekin edo irristagailuarekin kontrolatzen da. Alboan <b>gehienezko boladen</b> mapa dago: 10 minutuko tarte bakoitzean haize-neurgailu bakoitzak erregistratutako bolada altuena (norabiderik gabe), bere kolore-eskalarekin; bi mapak batera mugitzen dira.</p>
+      <p><b>Haize neurtua</b>: Euskalmeten haize-neurgailuen azken orduetako irakurketak (10 minuturo), denboran animatuta: koloreak abiadura erakusten du eta geziek norabidea (haizea nora doan; gorriz, hego haizea). Gezi handiak estazioetako neurketak dira; txikiak, estazioen arteko interpolazioa. ▶ botoiarekin edo irristagailuarekin kontrolatzen da. Alboan <b>gehienezko boladen</b> mapa dago: 10 minutuko tarte bakoitzean haize-neurgailu bakoitzak erregistratutako bolada altuena (norabiderik gabe), bere kolore-eskalarekin eta haize ertainaren norabidearen geziekin; mapa bakoitzak bere denbora-kontrola du.</p>
       <p><b>Mapak: hurrengo 72 orduak</b>: euria (3 orduko metatua), hurrengo 72 orduetako euri metatua, hezetasuna, tenperatura, haizea (norabidearekin) eta boladak, Gipuzkoa osorako mapa jarraituetan, 3 orduro. Open-Meteo-ren iragarpena da, ~5 km-ko sareta batean.</p>
       <p><b>Eguraldi-iragarpena</b>: GIPUZKOA osorako mapa (3 orduro) eta estazio bakoitzeko iragarpen zehatza, Open-Meteo-ren eskutik.</p>
     </details>
@@ -823,7 +828,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       <p><b>Mediciones del mediodía solar</b>: los datos con los que se calculan los índices (13:00 en invierno, 14:00 en verano): temperatura, humedad, viento y su dirección, y lluvia de las 24 horas anteriores, junto con los días sin lluvia y con viento sur.</p>
       <p><b>Resumen del día</b>: el cierre del día natural (00:00-24:00) de cada estación: temperatura media (y máxima y mínima), humedad y viento medios, dirección media (calculada vectorialmente, ponderada por la velocidad) y lluvia del día completo. Se calcula con las lecturas cada 10 minutos a la mañana siguiente y queda guardado; también se incluye en la descarga CSV de la ventana "Informes". En Mutriku no hay estación y Altzola no tiene anemómetro: el resumen completo de Mutriku y el viento de Altzola se calculan con los datos horarios del modelo Open-Meteo en sus coordenadas (🖥️ modelo).</p>
       <p><b>Lluvia medida</b>: los 32 pluviómetros de Euskalmet en Gipuzkoa (más Eskas, en la muga), con lecturas cada 10 minutos: últimos 60 minutos, hoy desde las 00:00 hasta la última lectura y ayer completo, en un mapa interpolado entre estaciones. Hay un control de calidad: si una estación marca casi nada cuando alrededor ha llovido claramente, se descarta y se marca con "?". Se actualiza en cada ejecución del proceso.</p>
-      <p><b>Viento medido</b>: lecturas de los anemómetros de Euskalmet de las últimas horas (cada 10 minutos), animadas en el tiempo: el color muestra la velocidad y las flechas la dirección (hacia dónde sopla; en rojo, viento sur). Las flechas grandes son mediciones de las estaciones; las pequeñas, la interpolación entre ellas. Se controla con el botón ▶ o con el deslizador. Al lado se muestra el mapa de <b>rachas máximas</b>: para cada tramo de 10 minutos, la racha más alta registrada por cada anemómetro (sin dirección), con su propia escala de color; ambos mapas avanzan a la vez.</p>
+      <p><b>Viento medido</b>: lecturas de los anemómetros de Euskalmet de las últimas horas (cada 10 minutos), animadas en el tiempo: el color muestra la velocidad y las flechas la dirección (hacia dónde sopla; en rojo, viento sur). Las flechas grandes son mediciones de las estaciones; las pequeñas, la interpolación entre ellas. Se controla con el botón ▶ o con el deslizador. Al lado se muestra el mapa de <b>rachas máximas</b>: para cada tramo de 10 minutos, la racha más alta registrada por cada anemómetro, con su propia escala de color y las flechas de la dirección del viento medio; cada mapa tiene su propio control de tiempo.</p>
       <p><b>Mapas: próximas 72 horas</b>: lluvia (acumulada en 3 horas), lluvia acumulada en las próximas 72 horas, humedad, temperatura, viento (con su dirección) y rachas, en mapas continuos de toda Gipuzkoa, cada 3 horas. Es la previsión de Open-Meteo en una malla de ~5 km.</p>
       <p><b>Previsión meteorológica</b>: el mapa de toda GIPUZKOA (cada 3 horas) y la previsión detallada de cada estación, de Open-Meteo.</p>
     </details>
@@ -2460,11 +2465,11 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   }
 
   // ---- Haize neurtua: Euskalmeten haize-neurgailuen azken orduak (data/viento_red.json), 10 minuturo, denboran animatuta
-  const VIE = {datos: null, paso: 0, play: false, t: null, cache: {}, visible: true};
+  const VIE = {datos: null, cache: {}, visible: true, m: {v: {paso: 0, play: false, t: null}, r: {paso: 0, play: false, t: null}}};   // cada mapa (v = media, r = rachas) con su propio tiempo
   function vieCargar(){
     return fetch('data/viento_red.json', {cache: 'no-store'}).then(r => r.ok ? r.json() : null).then(j => {
       VIE.datos = j; VIE.cache = {};
-      if (j && j.pasos && VIE.paso >= j.pasos.length) VIE.paso = 0;
+      if (j && j.pasos) for (const k in VIE.m) if (VIE.m[k].paso >= j.pasos.length) VIE.m[k].paso = 0;
     }).catch(() => {});
   }
   function vieGeom(cv){
@@ -2503,11 +2508,10 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
   }
   function vieDibujar(cv, k){
     const d = VIE.datos; if (!d || !d.pasos || !METEO.geo) return;
-    const RACHA = k === 'r';
-    const g = vieGeom(cv), paso = VIE.paso, W = g.W, H = g.H, kz = g.kz, kx = g.kx, P = g.P, ctx = cv.getContext('2d');
+    const g = vieGeom(cv), paso = VIE.m[k].paso, W = g.W, H = g.H, kz = g.kz, kx = g.kx, P = g.P, ctx = cv.getContext('2d');
     ctx.clearRect(0, 0, W, H);
     const tr = () => { ctx.beginPath(); g.rings.forEach(r => { r.forEach((p, i) => { const [a, b] = P(p); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); }); };
-    const est = d.estaciones.map(e => ({e, v: e[k] ? e[k][paso] : null, dir: !RACHA && e.d ? e.d[paso] : null}));
+    const est = d.estaciones.map(e => ({e, v: e[k] ? e[k][paso] : null, dir: e.d ? e.d[paso] : null}   /* la racha no tiene dirección propia: se usa la del viento medio */));
     // interpolazio-gezien sareta (Gipuzkoaren barruan soilik)
     const gs = 46 * kz, rej = []; tr();
     for (let py = gs / 2; py < H; py += gs) for (let px = gs / 2; px < W; px += gs) if (ctx.isPointInPath(px, py)) rej.push([px, py]);
@@ -2518,7 +2522,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     ctx.strokeStyle = '#14231c'; ctx.lineWidth = 1.6 * kz; tr(); ctx.stroke();
     // gezi txikiak: haize-bektorearen interpolazioa (ez dira neurketak)
     const vec = est.filter(o => o.v != null && o.dir != null && o.v >= 1).map(o => { const r = o.dir * Math.PI / 180; return {lon: o.e.lon, lat: o.e.lat, ux: -o.v * Math.sin(r), uy: -o.v * Math.cos(r)}; });
-    if (!RACHA && vec.length >= 3) rej.forEach(([px, py]) => {
+    if (vec.length >= 3) rej.forEach(([px, py]) => {
       const [x, y] = g.inv(px, py); let sw = 0, sx = 0, sy = 0;
       for (const q of vec){ const dx = (x - q.lon) * kx, dy = y - q.lat, dd = dx*dx + dy*dy + 1e-10, w = 1 / (dd * dd); sw += w; sx += w * q.ux; sy += w * q.uy; }
       const ux = sx / sw, uy = sy / sw, vel = Math.hypot(ux, uy); if (vel < 1) return;
@@ -2530,7 +2534,7 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     est.forEach(o => {
       const [a, b] = P([o.e.lon, o.e.lat]); let s = 6 * kz;
       if (o.v == null){ ctx.beginPath(); ctx.arc(a, b, 3 * kz, 0, 7); ctx.strokeStyle = '#8a969c'; ctx.lineWidth = 1.5 * kz; ctx.stroke(); }
-      else if (RACHA || o.dir == null || o.v < 1){ ctx.beginPath(); ctx.arc(a, b, 3.2 * kz, 0, 7); ctx.fillStyle = '#14231c'; ctx.fill(); }
+      else if (o.dir == null || o.v < 1){ ctx.beginPath(); ctx.arc(a, b, 3.2 * kz, 0, 7); ctx.fillStyle = '#14231c'; ctx.fill(); }
       else {
         s = (8 + Math.min(o.v, 60) / 5) * kz;
         const sur = ['SE','S','SO'].includes(sector8(o.dir)) && o.v >= 3;
@@ -2555,50 +2559,58 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
       }
     });
   }
-  function vieRender(){
-    const d = VIE.datos, sl = $('#vieSl'), pb = $('#viePlay');
-    $('#vieTit').textContent = Tm('💨 Haize neurtua', '💨 Viento medido');
-    pb.textContent = VIE.play ? '⏸' : '▶';
+  function vieMapa(k){
+    const d = VIE.datos, m = VIE.m[k], x = k === 'r' ? '2' : '', sl = $('#vieSl' + x), pb = $('#viePlay' + x), lab = $('#vieLab' + x);
+    pb.textContent = m.play ? '⏸' : '▶';
     if (!d || !d.pasos || !d.pasos.length || !d.estaciones){
-      $('#vieLab').textContent = Tm('Oraindik ez dago daturik (prozesuaren hurrengo exekuzioan sortuko da).', 'Todavía no hay datos (se generarán en la próxima ejecución del proceso).');
+      lab.textContent = Tm('Oraindik ez dago daturik (prozesuaren hurrengo exekuzioan sortuko da).', 'Todavía no hay datos (se generarán en la próxima ejecución del proceso).');
       sl.hidden = true; pb.hidden = true; return;
     }
     sl.hidden = false; pb.hidden = false;
-    const n = d.pasos.length, tramo = d.paso_min || 10, paso = Math.max(0, Math.min(n - 1, VIE.paso)), min = tramo * (n - 1 - paso);
-    VIE.paso = paso; sl.max = n - 1; sl.value = paso;
+    const n = d.pasos.length, tramo = d.paso_min || 10, paso = Math.max(0, Math.min(n - 1, m.paso)), min = tramo * (n - 1 - paso);
+    m.paso = paso; sl.max = n - 1; sl.value = paso;
     const dia = d.fecha && d.pasos[0] <= d.pasos[n - 1] ? fmtFechaLuzea(fecha(d.fecha)) + ' · ' : '';
-    $('#vieLab').textContent = dia + d.pasos[paso] + ' · ' + (min ? '−' + min + ' min' : Tm('azken irakurketa', 'última lectura'));
-    vieDibujar($('#vieCv'), 'v'); vieDibujar($('#vieCv2'), 'r');
+    lab.textContent = dia + d.pasos[paso] + ' · ' + (min ? '−' + min + ' min' : Tm('azken irakurketa', 'última lectura'));
+    vieDibujar($('#vieCv' + x), k);
+  }
+  function vieRender(){
+    const d = VIE.datos;
+    $('#vieTit').textContent = Tm('💨 Haize neurtua', '💨 Viento medido');
+    vieMapa('v'); vieMapa('r');
+    if (!d || !d.pasos || !d.pasos.length || !d.estaciones) return;
+    const n = d.pasos.length, tramo = d.paso_min || 10;
     const hayR = d.estaciones.filter(e => e.r && e.r.some(x => x != null)).length;
     $('#vieT1').textContent = Tm('Batez besteko haizea', 'Viento medio');
     $('#vieT2').textContent = Tm('Gehienezko boladak', 'Rachas máximas');
     const hay = d.estaciones.filter(e => e.v && e.v.some(x => x != null)).length, horas = Math.round((n - 1) * tramo / 60);
     $('#vieEsc2').innerHTML = leyendaTramos(M72_RAMP.G, TRAMOS.G, 'km/h')
-      + `<div class="esc-extra">${hayR ? Tm('10 minutuko tarte bakoitzeko gehienezko bolada', 'racha máxima de cada tramo de 10 minutos') : Tm('Boladen daturik ez oraindik (prozesuaren hurrengo exekuzioan sortuko da)', 'Todavía no hay datos de rachas (se generarán en la próxima ejecución del proceso)')}</div>`;
+      + `<div class="esc-extra">${hayR ? Tm('10 minutuko tarte bakoitzeko gehienezko bolada', 'racha máxima de cada tramo de 10 minutos') + ' · ➤ ' + Tm('haize ertainaren norabidea', 'dirección del viento medio') : Tm('Boladen daturik ez oraindik (prozesuaren hurrengo exekuzioan sortuko da)', 'Todavía no hay datos de rachas (se generarán en la próxima ejecución del proceso)')}</div>`;
     $('#vieEsc').innerHTML = leyendaTramos(M72_RAMP.W, TRAMOS.W, 'km/h')
       + `<div class="esc-extra">➤ ${Tm('norabidea (haizea nora doan); gorriz: hegoaldekoa', 'dirección (hacia dónde sopla); en rojo: del sur')} · ${Tm('gezi handiak: estazioak; txikiak: interpolazioa', 'flechas grandes: estaciones; pequeñas: interpolación')}</div>`;
-    $('#vieNota').innerHTML = Tm(`Euskalmeteko ${hay} haize-neurgailuren ${tramo} minuturo irakurketak, azken ${horas} orduetakoak (ordu ofiziala). Koloreak abiadura erakusten du, estazioen arteko balioak interpolatuta; gezi handiak neurketak dira, eta txikiak estazioen arteko interpolazioa. Eskuineko mapak tarte bakoitzeko gehienezko bolada erakusten du (norabiderik gabe), eta bi mapak batera mugitzen dira. Haize-neurgailurik gabeko estazioak ez dira agertzen; irakurketarik ez duen estazioa zirkulu hutsez markatzen da.`,
-      `Lecturas cada ${tramo} minutos de ${hay} anemómetros de Euskalmet, de las últimas ${horas} horas (hora oficial). El color muestra la velocidad, con los valores entre estaciones interpolados; las flechas grandes son mediciones y las pequeñas, la interpolación entre estaciones. El mapa de la derecha muestra la racha máxima de cada tramo (sin dirección) y se mueve a la vez que el de la izquierda. Las estaciones sin anemómetro no aparecen; la que no tiene lectura se marca con un círculo vacío.`);
+    $('#vieNota').innerHTML = Tm(`Euskalmeteko ${hay} haize-neurgailuren ${tramo} minuturo irakurketak, azken ${horas} orduetakoak (ordu ofiziala). Koloreak abiadura erakusten du, estazioen arteko balioak interpolatuta; gezi handiak neurketak dira, eta txikiak estazioen arteko interpolazioa. Eskuineko mapak tarte bakoitzeko gehienezko bolada erakusten du (geziek haize ertainaren norabidea markatzen dute), eta mapa bakoitzak bere denbora-kontrola du. Haize-neurgailurik gabeko estazioak ez dira agertzen; irakurketarik ez duen estazioa zirkulu hutsez markatzen da.`,
+      `Lecturas cada ${tramo} minutos de ${hay} anemómetros de Euskalmet, de las últimas ${horas} horas (hora oficial). El color muestra la velocidad, con los valores entre estaciones interpolados; las flechas grandes son mediciones y las pequeñas, la interpolación entre estaciones. El mapa de la derecha muestra la racha máxima de cada tramo (las flechas marcan la dirección del viento medio) y cada mapa tiene su propio control de tiempo. Las estaciones sin anemómetro no aparecen; la que no tiene lectura se marca con un círculo vacío.`);
   }
-  function vieTick(){
-    clearTimeout(VIE.t);
-    if (!VIE.play) return;
+  function vieTick(k){
+    const m = VIE.m[k]; clearTimeout(m.t);
+    if (!m.play) return;
     const n = VIE.datos && VIE.datos.pasos ? VIE.datos.pasos.length : 0;
-    if (n > 1 && VIE.visible && MODO === 'meteo' && !document.hidden){ VIE.paso = (VIE.paso + 1) % n; vieRender(); }
-    VIE.t = setTimeout(vieTick, VIE.paso === n - 1 ? 1800 : 650);
+    if (n > 1 && VIE.visible && MODO === 'meteo' && !document.hidden){ m.paso = (m.paso + 1) % n; vieMapa(k); }
+    m.t = setTimeout(() => vieTick(k), m.paso === n - 1 ? 1800 : 650);
   }
-  function viePlay(on){ VIE.play = on; vieRender(); if (on) vieTick(); else clearTimeout(VIE.t); }
+  function viePlay(k, on){ const m = VIE.m[k]; m.play = on; vieMapa(k); if (on) vieTick(k); else clearTimeout(m.t); }
   function vieIniciar(){
-    $('#viePlay').addEventListener('click', () => viePlay(!VIE.play));
-    $('#vieSl').addEventListener('input', e => { VIE.play = false; clearTimeout(VIE.t); VIE.paso = +e.target.value; vieRender(); });
+    [['v', ''], ['r', '2']].forEach(([k, x]) => {
+      $('#viePlay' + x).addEventListener('click', () => viePlay(k, !VIE.m[k].play));
+      $('#vieSl' + x).addEventListener('input', e => { const m = VIE.m[k]; m.play = false; clearTimeout(m.t); m.paso = +e.target.value; vieMapa(k); });
+    });
     if ('IntersectionObserver' in window) new IntersectionObserver(es => { VIE.visible = es.some(x => x.isIntersecting); }, {threshold: 0.1}).observe($('#vieSec'));
     vieRender();
     Promise.all([cargarGeo().then(g => { METEO.geo = METEO.geo || g; }), vieCargar()]).then(() => {
       const n = VIE.datos && VIE.datos.pasos ? VIE.datos.pasos.length : 0;
       const quieto = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-      VIE.paso = quieto ? Math.max(0, n - 1) : 0;
+      for (const k in VIE.m) VIE.m[k].paso = quieto ? Math.max(0, n - 1) : 0;
       vieRender();
-      if (n > 1 && !quieto) viePlay(true);
+      if (n > 1 && !quieto) for (const k in VIE.m) viePlay(k, true);
     });
     setInterval(() => vieCargar().then(vieRender), 5 * 60e3);
   }
