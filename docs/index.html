@@ -2607,10 +2607,9 @@ button.mini{min-width:44px;padding:0 10px;margin-top:0}
     vieRender();
     Promise.all([cargarGeo().then(g => { METEO.geo = METEO.geo || g; }), vieCargar()]).then(() => {
       const n = VIE.datos && VIE.datos.pasos ? VIE.datos.pasos.length : 0;
-      const quieto = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-      for (const k in VIE.m) VIE.m[k].paso = quieto ? Math.max(0, n - 1) : 0;
+      // Ya no arranca sola: se muestra la última lectura y la animación solo corre al pulsar ▶
+      for (const k in VIE.m) VIE.m[k].paso = Math.max(0, n - 1);
       vieRender();
-      if (n > 1 && !quieto) for (const k in VIE.m) viePlay(k, true);
     });
     setInterval(() => vieCargar().then(vieRender), 5 * 60e3);
   }
